@@ -54,7 +54,7 @@ pp. 257 -- 286, 1989.
 }
 
 \author{Rolf Turner
-  \email{rolf@math.unb.ca}
+  \email{r.turner@auckland.ac.nz}
   \url{http://www.math.unb.ca/~rolf}
 }
 

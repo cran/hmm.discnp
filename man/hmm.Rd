@@ -121,7 +121,7 @@ the name of the argument y by deparse(substitute(y)).
 }}
 
 \section{Note}{
-If code{K=1} then \code{tpm}, \code{ispd}, \code{converged}, and
+If \code{K=1} then \code{tpm}, \code{ispd}, \code{converged}, and
 \code{nstep} are all set equal to \code{NA} in the list returned
 by this function.
 }
@@ -158,7 +158,7 @@ values used.
 }
 
 \author{Rolf Turner
-  \email{rolf@math.unb.ca}
+  \email{r.turner@auckland.ac.nz}
   \url{http://www.math.unb.ca/~rolf}
 }
 
@@ -168,6 +168,7 @@ values used.
 # See the help for sim.hmm() for how to generate y.sim.
 \dontrun{
 try <- hmm(y.sim,K=2,verb=TRUE)
+try.mix <- hmm(y.sim,K=2,verb=TRUE,mixture=TRUE)
 }
 }
 \keyword{models}

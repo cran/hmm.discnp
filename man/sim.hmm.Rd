@@ -39,7 +39,7 @@ The values of those observations are integers between 1 and
 }
 
 \author{Rolf Turner
-  \email{rolf@math.unb.ca}
+  \email{r.turner@auckland.ac.nz}
   \url{http://www.math.unb.ca/~rolf}
 }
 
