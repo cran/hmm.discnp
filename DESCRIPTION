@@ -1,5 +1,5 @@
 Package: hmm.discnp
-Version: 0.0-4
+Version: 0.0-5
 Date: 2005-02-02
 Title: Hidden Markov models with discrete non-parametric
 	observation distributions.
@@ -11,4 +11,4 @@ Description: Fits hidden Markov models with discrete non-parametric
 	from such models.
 License: GPL version 2 or newer
 URL: http://www.math.unb.ca/~rolf/
-Packaged: Tue Apr  5 11:48:40 2005; rolf
+Packaged: Tue Nov  1 13:09:29 2005; rolf
