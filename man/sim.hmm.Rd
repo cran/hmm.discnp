@@ -36,7 +36,8 @@ those observations are integers between 1 and \code{nrow(Rho)}.
 \seealso{\code{\link{hmm}()}}
 \examples{
 P     <- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
-R     <- matrix(c(0.33,0.24,0.05,0.24,0.23,0.23,0.33,0.26,0.06,0.04),
+R     <- matrix(c(0.33,0.24,0.05,0.24,0.23,
+                  0.23,0.33,0.25,0.06,0.04),
                   5,2,byrow=TRUE)
 y.sim <- sim.hmm(300,P,R,20)
 }
