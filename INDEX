@@ -1,0 +1,3 @@
+hmm                     Fit a hidden Markov model to discrete data.
+sim.hmm                 Simulate discrete data from a hidden Markov
+                        model.
