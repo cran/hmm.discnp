@@ -1,12 +1,9 @@
-recurse <- function(fy,tpm,nc,epsilon)
+recurse <- function(fy,tpm,ispd,nc)
 {
 #
 # Function recurse to revise the ``recursive probabilities'',
 # given the parameters theta, and the observations y.
 #
-
-# Get the initial state probability distribution.
-ispd <- revise.ispd(tpm)
 
 # Set a bunch of constants:
 K  <- nrow(tpm)
@@ -15,6 +12,7 @@ L  <- ncol(fy)
 M  <- K*L
 N  <- K*M - K2
 n  <- L/nc
+epsilon <- 10*.Machine$double.eps
 
 # Recursive probabilities:
 

@@ -43,11 +43,16 @@ function \code{init.all()}.
 The number of states in the hidden Markov chain; if \code{par0} is
 not specified \code{K} MUST be; if \code{par0} is specified, \code{K}
 is ignored.
+
+Note that \code{K=1} is acceptable; if \code{K} is 1 then all
+observations are treated as being independent and the non-parametric
+estimate of the distribution of the observations is calculated
+in the obvious way.
 }
 \item{rand.start}{
 A list consisting of two logical scalars which must be named
-\code{tmp} and \code{Rho}, if \code{tmp} is TRUE then the function
-init.all() chooses entries for then starting value of \code{tmp} at
+\code{tpm} and \code{Rho}, if \code{tpm} is TRUE then the function
+init.all() chooses entries for then starting value of \code{tpm} at
 random; likewise for \code{Rho}.  This argument defaults to
 \code{list(tpm=FALSE,Rho=FALSE)}.
 }
@@ -114,6 +119,13 @@ The number of EM steps performed by the algorithm.
 An identifying tag, specified as an argument, or determined from
 the name of the argument y by deparse(substitute(y)).
 }}
+
+\section{Note}{
+If code{K=1} then \code{tpm}, \code{ispd}, \code{converged}, and
+\code{nstep} are all set equal to \code{NA} in the list returned
+by this function.
+}
+
 \details{
 The hard work is done by a Fortran subroutine "recurse" (actually
 coded in Ratfor) which is dynamically loaded.
@@ -127,11 +139,26 @@ Liu, Limin, "Hidden Markov Models for Precipitation in a Region
 of Atlantic Canada", Master's Report, University of New Brunswick,
 1997.
 }
-\seealso{\code{\link{sim.hmm}()}}
+
+\section{Warning}{
+The ordering of the (hidden) states can be arbitrary.  What
+the estimation procedure decides to call ``state 1'' may
+not be what \emph{you} think of as being state number 1.
+The ordering of the states will be affected by the starting
+values used.
+}
+
+\author{Rolf Turner
+  \email{rolf@math.unb.ca}
+  \url{http://www.math.unb.ca/~rolf}
+}
+
+\seealso{\code{\link{sim.hmm}()}, \code{\link{mps}()},
+         \code{\link{viterbi}()}}
 \examples{
 # See the help for sim.hmm() for how to generate y.sim.
 \dontrun{
-try <- hmm(y.sim,K=2,verb=T)
+try <- hmm(y.sim,K=2,verb=TRUE)
 }
 }
 \keyword{models}

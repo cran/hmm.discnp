@@ -1,3 +1,5 @@
 hmm                     Fit a hidden Markov model to discrete data.
+mps                     Most probable states.
 sim.hmm                 Simulate discrete data from a hidden Markov
                         model.
+viterbi                 Most probable state sequence.

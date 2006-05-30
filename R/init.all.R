@@ -1,11 +1,11 @@
-init.all <- function(nval,K,rand.start,mixture=F) {
+init.all <- function(nval,K,rand.start,mixture=FALSE) {
 #
 # Function init.all to create (rather arbitrary) initial values for
 # tpm and Rho.
 #
 
 if(rand.start$tpm)
-	tpm <- if(mixture) matrix(runif(K),K,K,byrow=T)
+	tpm <- if(mixture) matrix(runif(K),K,K,byrow=TRUE)
 			else matrix(runif(K*K),K,K)
 else tpm <- matrix(1/K,K,K) + 1.5*diag(K)
 tpm <- tpm/apply(tpm,1,sum)

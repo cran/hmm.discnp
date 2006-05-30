@@ -5,19 +5,28 @@ sim.hmm <- function(nsim,tpm,Rho,nrep=1) {
 # (non-parametric) distributions specified by the matrix Rho.
 #
 
-# Check for validity of tpm and Rho arguments:
+# Check for validity of the Rho argument:
+if(any(Rho<0)) stop("Negative entries in Rho.\n")
+Rho <- as.matrix(Rho)
+xxx <- apply(Rho,2,sum)
+if(!identical(all.equal(xxx,rep(1,ncol(Rho))),TRUE))
+	stop("Columns of Rho do not all sum to 1.\n")
+
+# If Rho has a single column, generate i.i.d. data.
+if(ncol(Rho)==1) {
+	temp <- sample(1:nrow(Rho),size=nsim*nrep,
+                       prob=Rho[,1],replace=TRUE)
+	return(if(nrep==1) temp else matrix(temp,ncol=nrep))
+}
+
 if(ncol(tpm) != nrow(tpm))
 	stop("The matrix tpm must be square.\n")
 if(ncol(tpm) != ncol(Rho))
 	stop("Mismatch in dimensions of tpm and Rho.\n")
 if(any(tpm<0)) stop("Negative entries in tpm.\n")
-if(any(Rho<0)) stop("Negative entries in Rho.\n")
 xxx <- apply(tpm,1,sum)
 if(!identical(all.equal(xxx,rep(1,nrow(tpm))),TRUE))
 	stop("Rows of tpm do not all sum to 1.\n")
-xxx <- apply(Rho,2,sum)
-if(!identical(all.equal(xxx,rep(1,ncol(Rho))),TRUE))
-	stop("Columns of Rho do not all sum to 1.\n")
 
 ispd <- revise.ispd(tpm)
 K    <- ncol(Rho)

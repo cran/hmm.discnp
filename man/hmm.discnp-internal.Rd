@@ -1,6 +1,7 @@
 \name{hmm.discnp-internal}
 \alias{ffun}
 \alias{init.all}
+\alias{tidyup}
 \alias{recurse}
 \alias{revise.ispd}
 \alias{revise.rho}
@@ -11,8 +12,9 @@
 }
 \usage{
 ffun(y,Rho)
-init.all(nval,K,rand.start,mixture=F)
-recurse(fy,tpm,nc,epsilon)
+init.all(nval,K,rand.start,mixture=FALSE)
+tidyup(y,yval=NULL)
+recurse(fy,tpm,ispd,nc)
 revise.ispd(tpm)
 revise.rho(y,gamma,m)
 revise.tpm(xi,mixture)

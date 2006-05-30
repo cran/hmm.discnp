@@ -12,14 +12,6 @@ hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,
 # Note that y is allowed to be a matrix, each column being interpreted
 # as an independent replicate of the observation sequence.
 #
-# Copyright (C) 1997 by T. Rolf Turner and Limin Liu.
-#
-# Permission to use, copy, modify, and distribute this software and
-# its documentation for any purpose and without fee is hereby
-# granted, provided that the above copyright notice appear in all
-# copies and that both that copyright notice and this permission
-# notice appear in supporting documentation.
-#
 
 # Check that one of par0 and K is specified.
 if(is.null(par0) & is.null(K))
@@ -28,23 +20,23 @@ if(is.null(par0) & is.null(K))
 # Put together a data name tag for the output.
 if(is.null(data.name)) data.name <- deparse(substitute(y))
 
+# Transform the possible values of y to 1:nval where nval is
+# the number of unique values of the original y.
+y <- tidyup(y,yval)
+nc <- ncol(y)
+nval <- length(unique(y))
+
+# If K=1 do the triv thing:
+if(K==1) {
+	Rho <- as.matrix(table(y)/length(y))
+	ll  <- sum(log(ffun(y,Rho)))
+	return(list(Rho=Rho,tpm=NA,ispd=NA,log.like=ll,
+               converged=NA,nstep=NA,data.name=data.name))
+}
+
 # Pick out the index of the stopping criterion:
 icrit <- match(crit,c('PCLL','L2','Linf'))
 if(is.na(icrit)) stop('Stopping criterion not recognized.')
-
-# Transform the possible values of y to 1:nval where nval is
-# the number of unique values of the original y.
-if(is.null(yval)) yval <- sort(unique(as.vector(y)))
-nval <- length(yval)
-if(is.matrix(y)) {
-	nr <- nrow(y)
-	nc <- ncol(y)
-}
-else {
-	nr <- length(y)
-	nc <- 1
-}
-y <- matrix(match(y,yval),nr,nc)
 
 # Perform initial setting-up.
 if(is.null(par0)) {
@@ -54,8 +46,9 @@ if(is.null(par0)) {
 else
 	K     <- nrow(par0$tpm)
 
-tpm <- par0$tpm
-Rho <- par0$Rho
+tpm  <- par0$tpm
+ispd <- revise.ispd(tpm)
+Rho  <- par0$Rho
 
 m         <- nrow(Rho)
 old.theta <- c(c(tpm[,-K]),c(Rho[1:(m-1),]))
@@ -66,7 +59,6 @@ if(verbose) cat('\n      Initial set-up completed ...\n\n')
 
 # Set the level below which probabilities are considered to
 # be noise:
-epsilon <- 10*.Machine$double.eps
 
 # Update:
 em.step <- 1
@@ -80,11 +72,12 @@ repeat{
 	fy <- ffun(y,Rho)
 
 # Calculate the recursive probabilities.
-	rp <- recurse(fy,tpm,nc,epsilon)
+	rp <- recurse(fy,tpm,ispd,nc)
 
 # Calculate the parameters.
-	tpm <- revise.tpm(rp$xi,mixture)
-	Rho <- revise.rho(y,rp$gamma,m)
+	tpm  <- revise.tpm(rp$xi,mixture)
+	ispd <- revise.ispd(tpm)
+	Rho  <- revise.rho(y,rp$gamma,m)
 
 # Test for convergence:
 	new.theta <- c(c(tpm[,-K]),c(Rho[1:(m-1),]))
@@ -128,14 +121,10 @@ repeat{
 # Calculate the log-likelihood of the current (final)
 # parameter values.
 fy <- ffun(y,Rho)
-rp <- recurse(fy,tpm,nc,epsilon)
+rp <- recurse(fy,tpm,ispd,nc)
 ll <- sum(log(abs(rp$llc)))
-
-# Calculate the initial state probability distribution.
-ispd   <- revise.ispd(tpm)
 
 # Return:
 list(Rho=Rho,tpm=tpm,ispd=ispd,log.like=ll,converged=converged,
      nstep=nstep,data.name=data.name)
-
 }
