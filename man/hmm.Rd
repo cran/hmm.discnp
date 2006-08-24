@@ -29,12 +29,12 @@ unique values of \code{y}.  If any value of \code{y} does not match
 some value of \code{yval}, it will be treated as a MISSING VALUE.
 }
 \item{par0}{
-An optional list of starting values for the parameters of the model,
-with components \code{tpm} (transition probability matrix) and
-\code{Rho}.  The matrix \code{Rho} specifies the probability that the
-observations take on each value in yval, given the state of the
-hidden Markov chain.  The columns of \code{Rho} correspond to states,
-the rows to the values of \code{yval}.
+An optional (\emph{named}) list of starting values for the parameters
+of the model, with components \code{tpm} (transition probability
+matrix) and \code{Rho}.  The matrix \code{Rho} specifies the
+probability that the observations take on each value in yval, given
+the state of the hidden Markov chain.  The columns of \code{Rho}
+correspond to states, the rows to the values of \code{yval}.
 
 If \code{par0} is not specified, starting values are created by the
 function \code{init.all()}.

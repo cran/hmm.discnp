@@ -13,10 +13,6 @@ hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,
 # as an independent replicate of the observation sequence.
 #
 
-# Check that one of par0 and K is specified.
-if(is.null(par0) & is.null(K))
-	stop('One of par0 and K must be specified.')
-
 # Put together a data name tag for the output.
 if(is.null(data.name)) data.name <- deparse(substitute(y))
 
@@ -24,7 +20,17 @@ if(is.null(data.name)) data.name <- deparse(substitute(y))
 # the number of unique values of the original y.
 y <- tidyup(y,yval)
 nc <- ncol(y)
-nval <- length(unique(y))
+nval <- length(unique(as.vector(y)))
+
+# Check that one of par0 and K is specified and use the specified
+# one to determine the other.
+if(is.null(par0) & is.null(K))
+	stop('One of par0 and K must be specified.')
+if(is.null(par0)) {
+	if(is.null(rand.start)) rand.start <- list(tpm=FALSE,Rho=FALSE)
+	par0  <- init.all(nval,K,rand.start,mixture)
+}
+else K <- nrow(par0$tpm)
 
 # If K=1 do the triv thing:
 if(K==1) {
@@ -39,13 +45,6 @@ icrit <- match(crit,c('PCLL','L2','Linf'))
 if(is.na(icrit)) stop('Stopping criterion not recognized.')
 
 # Perform initial setting-up.
-if(is.null(par0)) {
-	if(is.null(rand.start)) rand.start <- list(tpm=FALSE,Rho=FALSE)
-	par0  <- init.all(nval,K,rand.start,mixture)
-}
-else
-	K     <- nrow(par0$tpm)
-
 tpm  <- par0$tpm
 ispd <- revise.ispd(tpm)
 Rho  <- par0$Rho
