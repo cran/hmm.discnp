@@ -130,10 +130,19 @@ by this function.
 The hard work is done by a Fortran subroutine "recurse" (actually
 coded in Ratfor) which is dynamically loaded.
 }
+
 \references{
 Rabiner, L. R., "A tutorial on hidden Markov models and
 selected applications in speech recognition," Proc. IEEE vol. 77,
 pp. 257 -- 286, 1989.
+
+Zucchini, W. and Guttorp, P., "A hidden Markov model
+for space-time precipitation," Water Resources Research vol.
+27, pp. 1917-1923, 1991.
+
+MacDonald, I. L., and Zucchini, W., "Hidden Markov
+and Other Models for Discrete-valued Time Series, Chapman \& Hall,
+London, 1997.
 
 Liu, Limin, "Hidden Markov Models for Precipitation in a Region
 of Atlantic Canada", Master's Report, University of New Brunswick,
