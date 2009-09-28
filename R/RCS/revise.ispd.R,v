@@ -1,0 +1,91 @@
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.08.01.41;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.25.52;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@Adapted to estimate ispd as the averaged of the
+``first columns'' in the gamma matrix, when stationary
+is false.
+@
+text
+@revise.ispd <- function(tpm=NULL,gamma=NULL,lns=NULL) {
+# Function revise.ispd.  To revise the initial state probability
+# distribution
+
+if(is.null(tpm) + (is.null(gamma) & is.null(lns)) != 1)
+	stop(paste("Either \"tpm\" should be given OR\n",
+                   "\"gamma\" and \"lns\" should be given.\n"))
+
+# If ispd is taken to be the steady state distribution:
+if(!is.null(tpm)) {
+	eee   <- eigen(t(tpm))
+	k <- match(1,round(eee$values,6))
+	if(length(k) != 1) {
+		cat('Problems with eigenvalues:\n')
+		print(eee$values)
+		stop()
+	}
+	v <- Re(eee$vectors[,k])
+	return(v/sum(v))
+}
+
+# Steady state not assumed:
+v <- 0
+j <- 1
+nseq <- length(lns)
+for(i in 1:nseq) {
+		v <- v + gamma[,j]
+		j <- j + lns[i]
+}
+v/nseq 
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 2
+revise.ispd <- function(tpm)
+{
+d3 1
+a3 2
+# distribution in the setting wherein ispd is taken to be the steady
+# state distribution.
+d5 24
+a28 6
+eee   <- eigen(t(tpm))
+k <- match(1,round(eee$values,6))
+if(length(k) != 1) {
+	cat('Problems with eigenvalues:\n')
+	print(eee$values)
+	stop()
+d30 1
+a30 2
+ispd <- Re(eee$vectors[,k])
+ispd/sum(ispd)
+@

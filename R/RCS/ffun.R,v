@@ -1,0 +1,63 @@
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.07.47.15;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.25.03;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@Now expects y as a list rather than a matrix.
+@
+text
+@ffun <- function(y,Rho)
+{
+#
+# Function ffun to calculate f(x) = Pr(Y=x | the model parameters)
+# for each entry of each vector in the list y, for each value of the
+# state k, k = 1, ..., K.  The returned result, fy, is a matrix whose
+# ***rows*** correspond to the states and whose ***columns***
+# correspond to the observations y.
+#
+
+fy <- lapply(y,function(x,Rho){Rho[x,1:ncol(Rho)]},Rho=Rho)
+fy <- do.call(rbind,fy)
+fy[is.na(fy)] <- 1
+t(fy)
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d4 5
+a8 4
+# Function ffun.  To calculate f(y) = f(Y=y | the model parameters)
+# for each value of the state k, k = 1, ..., K.  The returned result,
+# fy, is a matrix whose ***rows*** correspond to the states and whose
+# ***columns*** correspond to the observations y.
+d11 2
+a12 2
+K <- ncol(Rho)
+fy <- Rho[y,1:K]
+@

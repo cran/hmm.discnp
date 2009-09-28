@@ -1,0 +1,52 @@
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.07.48.38;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.24.49;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@Produces warning message that the observations should be
+presented in list rather than matrix form.
+@
+text
+@.First.lib <- function(lib,pkg) {
+	library.dynam("hmm.discnp", pkg, lib)
+	ver <- read.dcf(file.path(lib, pkg, "DESCRIPTION"), "Version")
+	cat(paste(pkg, ver, "\n\n"))
+	cat("WARNING:  The package has changed substantially\n")
+	cat("from the previous version.  New functions have been\n")
+	cat("added and both the argument lists and the returned\n")
+	cat("values from old functions have new forms.  Please\n")
+	cat("read the ChangeLog and the documentation.\n\n")
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d4 6
+a9 1
+	cat(paste(pkg, ver, "\n"))
+@

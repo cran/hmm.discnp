@@ -1,0 +1,58 @@
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.08.02.46;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.25.57;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@Changed to accommodate the list presentation of multiple
+sequences of observations.  Also accomodates observations
+being in any finite set rather than just 1:nrow(Rho).
+@
+text
+@revise.rho <- function(y,gamma,yval) {
+	y <- factor(unlist(y),levels=yval)
+	there <- !is.na(y)
+	t1 <- apply(gamma[,there],1,
+		function(x,index){tapply(x,index,sum)},y[there])
+	t(t(t1)/apply(t1,2,sum))
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 3
+a3 2
+revise.rho <- function(y,gamma,m) {
+	there <- !is.na(c(y))
+d5 2
+a6 5
+		function(x,index){tapply(x,index,sum)},c(y)[there])
+	t2 <- t(t(t1)/apply(t1,2,sum))
+	rslt <- matrix(0,nrow=m,ncol=nrow(gamma))
+	rslt[sort(unique(as.vector(y))),] <- t2
+	rslt
+@

@@ -1,0 +1,101 @@
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.08.10.47;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.26.13;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@Now returns fitted conditional means (if asked) in addition
+to the state probabilities.  If argument y is not specified,
+now tries to extract y from ``object''.  Argument yval is
+eliminated.
+@
+text
+@sp <- function (y, object = NULL, tpm, Rho, ispd=NULL, means=FALSE)
+{
+    if (!is.null(object)) {
+        tpm <- object$tpm
+        Rho <- object$Rho
+        ispd <- object$ispd
+    }
+    if(is.null(ispd)) ispd <- revise.ispd(tpm)
+    if(missing(y)) {
+	y <- if(!is.null(object)) object$y else NULL
+	if(is.null(y)) stop("No observation sequence supplied.\n")
+    }
+    y <- mat2list(y)
+    check.yval(y,Rho)
+    lns  <- sapply(y,length)
+    fy   <- ffun(y, Rho)
+    rp   <- recurse(fy, tpm, ispd, lns)
+    prbs <- rp$gamma
+    if(means) {
+	yval <- ( if(!is.null(row.names(Rho)))
+                      as.numeric(row.names(Rho)) else 1:nrow(Rho) )
+	if(any(is.na(yval)))
+		stop("Non-numeric y-values; means make no sense.\n")
+        cmns <- apply(yval*Rho,2,sum)
+	mns <- apply(cmns*prbs,2,sum)
+    }
+    nseq <- length(lns)
+    if (nseq == 1) {
+	if(means) return(list(probs=prbs,means=mns))
+	return(prbs)
+    }
+    xxx <- list()
+    if(means) yyy <- list()
+    istop <- 0
+    for(i in 1:nseq) {
+        istart <- istop+1
+        istop  <- istop + lns[i]
+        xxx[[i]] <- prbs[,istart:istop]
+        if(means) yyy[[i]] <- mns[istart:istop]
+    }
+    if(means) return(list(probs=xxx,means=yyy))
+    xxx
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+sp <- function (y, object = NULL, tpm, Rho, ispd, yval = NULL) 
+a2 2
+    y <- tidyup(y, yval)
+    nc <- ncol(y)
+d8 4
+a11 8
+    fy <- ffun(y, Rho)
+    rp <- recurse(fy, tpm, ispd, nc)
+    rslt <- rp$gamma
+    if (nc == 1) rslt
+    else {
+        K <- nrow(tpm)
+        nr <- nrow(y)
+        array(rslt, dim=c(K,nr,nc))
+d13 30
+@

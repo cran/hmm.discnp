@@ -1,0 +1,31 @@
+head	1.1;
+access;
+symbols;
+locks
+	rturner:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2009.09.23.03.40.48;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@Executable file to turn the ratfor into fortran.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#! /bin/csh
+foreach file (*.r)
+set stem = `basename $file .r`
+ratfor $file > $stem.f
+/bin/mv -i $stem.f ../../src
+end
+@

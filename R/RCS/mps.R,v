@@ -1,0 +1,85 @@
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.07.55.42;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.25.36;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@Removed the yval argument; if y is missing, attempt to
+extract it from object; if ispd not suppled calculate
+it from tpm; return result as a list, not as a matrix.
+@
+text
+@mps <- function(y,object=NULL,tpm,Rho,ispd=NULL) {
+#
+# Function mps: most probable states.
+#
+
+if(!is.null(object)) {
+	tpm  <- object$tpm
+	Rho  <- object$Rho
+	ispd <- object$ispd
+}
+if(is.null(ispd)) ispd <- revise.ispd(tpm)
+if(missing(y)) {
+	y <- if(!is.null(object)) object$y else NULL
+	if(is.null(y)) stop("No observation sequence supplied.\n")
+}
+y <- mat2list(y)
+check.yval(y,Rho)
+lns  <- sapply(y,length)
+nseq <- length(y)
+fy   <- ffun(y,Rho)
+rp   <- recurse(fy, tpm, ispd, lns)
+xxx  <- apply(rp$gamma, 2, which.max)
+if(nseq==1) return(xxx)
+rslt  <- list()
+jstop <- 0
+for(i in 1:nseq) {
+        jstart <- jstop+1
+        jstop  <- jstop + lns[i]
+	rslt[[i]] <- xxx[jstart:jstop]
+}
+rslt
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+mps <- function(y,object=NULL,tpm,Rho,ispd,yval=NULL) {
+a5 3
+y  <- tidyup(y,yval)
+nc <- ncol(y)
+
+d11 9
+d21 11
+a31 3
+rp   <- recurse(fy, tpm, ispd, nc)
+rslt <- apply(rp$gamma, 2, which.max)
+if(nc==1) rslt else matrix(rslt,ncol=nc)
+@

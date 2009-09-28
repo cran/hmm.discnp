@@ -1,4 +1,35 @@
-viterbi <- function(y,object=NULL,tpm,Rho,ispd=NULL) {
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.08.13.33;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.26.22;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@Adapted to list as opposed to matrix presentation of
+multiple observation sequences.  If argument y is missing
+now attempts to extract it from ``object''.
+@
+text
+@viterbi <- function(y,object=NULL,tpm,Rho,ispd=NULL) {
 #
 # Function viterbi to apply the Viterbi algorithm to a collection
 # of data sequences, given the parameters of the model.
@@ -63,3 +94,51 @@ for(j in 1:nseq) {
 }
 if(nseq==1) rslt[[1]] else rslt
 }
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+viterbi <- function(y,object=NULL,tpm,Rho,ispd,yval=NULL) {
+d3 2
+a4 2
+# Function vitervi to apply the Viterbi algorithm to a collection
+# of equi-length data sequences, given the parameters of the model.
+d7 2
+a8 4
+y  <- tidyup(y,yval)
+n  <- nrow(y)
+nc <- ncol(y)
+
+d15 17
+d34 1
+a34 1
+for(j in 1:nc) {
+d36 1
+a36 1
+	delta <- ispd*Rho[y[1,j],]
+d38 2
+a39 1
+	for(tt in 2:n) {
+d46 1
+a46 1
+		delta <- Rho[y[tt,j],]*apply(delta*tpm,2,max)
+a47 1
+
+d49 2
+a50 2
+	temp[[n]] <- (1:K)[delta==max(delta)]
+	for(tt in (n-1):1) {
+d61 1
+a61 1
+        rrr <- matrix(unlist(temp[[1]]), nrow = n)
+d64 1
+a64 2
+if(nc==1) rslt <- rslt[[1]]
+rslt
+@

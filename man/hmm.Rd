@@ -14,8 +14,9 @@ y_i | S = j)}, \eqn{Y} being the observable random variable and
 \eqn{S} being the hidden state.
 }
 \usage{
-hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, mixture=FALSE,
-    tolerance=1e-4, verbose=FALSE, itmax=200, crit='PCLL', data.name=NULL)
+hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=TRUE,
+    mixture=FALSE, tolerance=1e-4, verbose=FALSE, itmax=200,
+    crit='PCLL',keep.y=TRUE, data.name=NULL)
 }
 \arguments{
 \item{y}{
@@ -56,6 +57,17 @@ init.all() chooses entries for then starting value of \code{tpm} at
 random; likewise for \code{Rho}.  This argument defaults to
 \code{list(tpm=FALSE,Rho=FALSE)}.
 }
+\item{stationary}{
+   Logical scalar.  If \code{TRUE} then the model is fitted under
+   the stationarity assumption, i.e. that the Markov chain was in
+   steady state at the time that observations commenced. In this
+   case  the initial state probability distribution is estimated
+   as the stationary distribution determined by the (estimated)
+   transition probability matrix.  Otherwise the initial state
+   probability distribution is estimated as the mean of the vectors
+   of conditional probabilities of the states, given the observation
+   sequences, at time \code{t=1}.
+}
 \item{mixture}{
 A logical scalar; if TRUE then a mixture model (all rows of the
 transition probability matrix are identical) is fitted rather than a
@@ -83,10 +95,11 @@ i.e.  square root of sum of squares of change in coefficients), or
 "Linf" (L-infinity norm, i.e.  maximum absolute value of change in
 coefficients).
 }
+\item{keep.y}{Logical scalar; should the observations \code{y}
+be returned as a component of the value of this function?}
 \item{data.name}{
 An identifying tag for the fit; if omitted, it defaults to the
-name of data set \code{y} as determined by \code{deparse(substitute(y))}.
-}
+name of data set \code{y} as determined by \code{deparse(substitute(y))}.}
 }
 \value{
 A list with components:
@@ -115,10 +128,13 @@ exceeded.
 \item{nstep}{
 The number of EM steps performed by the algorithm.
 }
-\item{data.name}{
-An identifying tag, specified as an argument, or determined from
-the name of the argument y by deparse(substitute(y)).
-}}
+\item{y}{The observations (argument \code{y}).  Present
+only if \code{keep.y} is \code{TRUE}.}
+\item{data.name}{ An identifying tag, specified as an argument, or
+determined from the name of the argument y by deparse(substitute(y)).
+}
+\item{stationary}{The argument \code{stationary}}
+}
 
 \section{Note}{
 If \code{K=1} then \code{tpm}, \code{ispd}, \code{converged}, and
@@ -158,17 +174,17 @@ values used.
 }
 
 \author{Rolf Turner
-  \email{r.turner@auckland.ac.nz}
+  \email{r.turner@auckland.ac.nz}\cr
   \url{http://www.math.unb.ca/~rolf}
 }
 
 \seealso{\code{\link{sim.hmm}()}, \code{\link{mps}()},
          \code{\link{viterbi}()}}
 \examples{
-# See the help for sim.hmm() for how to generate y.sim.
+# See the help for sim.hmm() for how to generate y.num.
 \dontrun{
-try <- hmm(y.sim,K=2,verb=TRUE)
-try.mix <- hmm(y.sim,K=2,verb=TRUE,mixture=TRUE)
+fit.num <- hmm(y.num,K=2,verb=TRUE)
+fit.num.mix <- hmm(y.num,K=2,verb=TRUE,mixture=TRUE)
 }
 }
 \keyword{models}

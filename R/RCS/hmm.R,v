@@ -1,4 +1,38 @@
-hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,stationary=TRUE,
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.07.49.41;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.25.17;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@No longer insists on fitting stationary model; has an
+argument ``stationary'' defaulting to TRUE.  Returns,
+by default, the observation argument y as a component
+of the function value.  Returns the argument ``stationary''
+as a component of the function value.  No longer transforms
+observations to 1:nrow(Rho).
+@
+text
+@hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,stationary=TRUE,
                 mixture=FALSE,tolerance=1e-4,verbose=FALSE,itmax=200,
                 crit='PCLL',keep.y=TRUE,data.name=NULL)
 {
@@ -64,25 +98,30 @@ icrit <- match(crit,c('PCLL','L2','Linf'))
 if(is.na(icrit)) stop('Stopping criterion not recognized.')
 
 # Perform initial setting-up.
-tpm    <- par0$tpm
-ispd   <- if(stationary) revise.ispd(tpm) else par0$ispd
-Rho    <- par0$Rho
-m      <- nrow(Rho)
-digits <- 2+ceiling(abs(log10(tolerance)))
+tpm  <- par0$tpm
+ispd <- if(stationary) revise.ispd(tpm) else par0$ispd
+Rho  <- par0$Rho
 
+m         <- nrow(Rho)
 old.theta <- c(c(tpm[,-K]),c(Rho[1:(m-1),]))
-fy        <- ffun(y,Rho)
-rp        <- recurse(fy,tpm,ispd,lns)
-old.ll    <- sum(log(rp$llc))
+old.ll    <- -Inf
+digits    <- 2+ceiling(abs(log10(tolerance)))
 
 if(verbose) cat('\n      Initial set-up completed ...\n\n')
 
 # Revise:
 em.step <- 1
 if(verbose) cat('Repeating ...\n\n')
+
 chnge <- numeric(3)
 repeat{
 	if(verbose) cat(paste('EM step ',em.step,':\n',sep=''))
+
+# Get the probabilities of the observations.
+	fy <- ffun(y,Rho)
+
+# Calculate the recursive probabilities.
+	rp <- recurse(fy,tpm,ispd,lns)
 
 # Calculate the parameters.
 	tpm  <- revise.tpm(rp$xi,mixture)
@@ -93,18 +132,13 @@ repeat{
 		}
 	Rho  <- revise.rho(y,rp$gamma,yval)
 
-# Update the log likelihood on the basis of the
-# new parameter estimates.  This entails calculating
-# the new recursive probabilities (which will be used
-# to update the parameter estimates on the *next* EM
-# step, if necessary).
-	fy <- ffun(y,Rho)
-	rp <- recurse(fy,tpm,ispd,lns)
-	ll <-  sum(log(rp$llc))
-
 # Test for convergence:
 	new.theta <- c(c(tpm[,-K]),c(Rho[1:(m-1),]))
-	chnge[1] <- 100*(ll - old.ll)/abs(old.ll)
+	ll <-  sum(log(abs(rp$llc)))
+	chnge[1] <- if(old.ll > -Inf)
+			100*(ll - old.ll)/abs(old.ll)
+		    else
+			Inf
 	chnge[2] <- sqrt(sum((old.theta-new.theta)**2))
 	chnge[3] <- max(abs(old.theta-new.theta))
 	if(verbose){
@@ -119,6 +153,7 @@ repeat{
 	}
 
 	if(chnge[icrit] < tolerance) {
+			theta <- new.theta
 			converged <- TRUE
 			nstep <- em.step
 			break
@@ -126,18 +161,22 @@ repeat{
 
 	if(em.step >= itmax) {
 		cat('Failed to converge in ',itmax,' EM steps.\n',sep='')
+		theta <- new.theta
 		converged <- FALSE
 		nstep <- em.step
 		break
 	}
-
-# Replace the ``old'' parameter and log likelihood values
-# by the new ones.
 	old.theta <- new.theta
 	old.ll    <- ll
-# Increment the step number.
 	em.step   <- em.step + 1
 }
+
+# Calculate the log-likelihood of the current (final)
+# parameter values.
+fy <- ffun(y,Rho)
+rp <- recurse(fy,tpm,ispd,lns)
+#ll <- sum(log(abs(rp$llc)))
+ll <- sum(log(rp$llc))
 
 # Return:
 if(length(y)==1) y <- y[[1]]
@@ -147,3 +186,58 @@ rslt <- list(Rho=Rho,tpm=tpm,ispd=ispd,log.like=ll,converged=converged,
 class(rslt) <- "hmm.discnp"
 rslt
 }
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,
+d3 1
+a3 1
+                crit='PCLL',data.name=NULL)
+d12 3
+a14 2
+# Note that y is allowed to be a matrix, each column being interpreted
+# as an independent replicate of the observation sequence.
+d17 4
+d24 12
+a35 5
+# Transform the possible values of y to 1:nval where nval is
+# the number of unique values of the original y.
+y <- tidyup(y,yval)
+nc <- ncol(y)
+nval <- length(unique(as.vector(y)))
+d45 7
+a51 1
+else K <- nrow(par0$tpm)
+d55 1
+d68 1
+a68 1
+ispd <- revise.ispd(tpm)
+d78 1
+a78 4
+# Set the level below which probabilities are considered to
+# be noise:
+
+# Update:
+d90 1
+a90 1
+	rp <- recurse(fy,tpm,ispd,nc)
+d94 6
+a99 2
+	ispd <- revise.ispd(tpm)
+	Rho  <- revise.rho(y,rp$gamma,m)
+d143 3
+a145 2
+rp <- recurse(fy,tpm,ispd,nc)
+ll <- sum(log(abs(rp$llc)))
+d148 6
+a153 2
+list(Rho=Rho,tpm=tpm,ispd=ispd,log.like=ll,converged=converged,
+     nstep=nstep,data.name=data.name)
+@

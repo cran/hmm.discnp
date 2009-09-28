@@ -1,0 +1,38 @@
+head	1.1;
+access;
+symbols;
+locks
+	rolf:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2009.09.23.02.26.18;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@tidyup <- function(y,yval=NULL) {
+if(is.null(yval)) yval <- sort(unique(as.vector(y)))
+nval <- length(yval)
+if(is.matrix(y)) {
+	nr <- nrow(y)
+	nc <- ncol(y)
+}
+else {
+	nr <- length(y)
+	nc <- 1
+}
+matrix(match(y,yval),nr,nc)
+}
+@

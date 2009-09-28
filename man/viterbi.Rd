@@ -6,27 +6,32 @@
   each of one or more replicate observation sequences.
 }
 \usage{
-viterbi(y, object = NULL, tpm, Rho, ispd, yval = NULL)
+viterbi(y, object = NULL, tpm, Rho, ispd=NULL)
 }
 \arguments{
-  \item{y}{The observations for which the underlying most
-  probable hidden states are required.  May be a sequence
-  of observations, or a matrix each column of which constitutes
-  a (replicate) sequence of observations.}
+  \item{y}{The observations for which the underlying most probable
+  hidden states are required.  May be a sequence of observations,
+  or a list each entry of which constitutes an independent sequence
+  of observations.  If \code{y} is missing (and if \code{object}
+  is not \code{NULL}) then \code{y} is extracted from \code{object},
+  provided that the \code{y} component of \code{object} is present.
+  Otherwise an error is given.}
   \item{object}{ An object describing a hidden Markov model, as
   fitted to the data set \code{y} by \code{\link{hmm}()}.}
   \item{tpm}{ The transition probability matrix for a hidden
-  Markov model; ignored if \code{object} is non-null. Should
-  bear some reasonable relationship to \code{y}.}
+  Markov model; ignored if \code{object} is non-null.}
   \item{Rho}{ A matrix specifying the probability distributions
-  of the observations for a hidden
-  Markov model; ignored if \code{object} is non-null. Should
-  bear some reasonable relationship to \code{y}.}
+  of the observations for a hidden Markov model; ignored if
+  \code{object} is non-null. Should bear some reasonable relationship
+  to \code{y}.  If \code{Rho} has row names then these must
+  include all values of the observations.  If \code{Rho} does
+  not have row names then the values of the observations must
+  be integers between \code{1} and \code{nrow(Rho)}.}
   \item{ispd}{ The initial state probability distribution for a hidden
   Markov model; ignored if \code{object} is non-null. Should
-  bear some reasonable relationship to \code{y}.}
-  \item{yval}{ The set of unique values of the observations;
-  calculated from the observations \code{y} if left \code{NULL}.}
+  bear some reasonable relationship to \code{y}. If \code{object}
+  and \code{ispd} are both \code{NULL} then \code{ispd} is set
+  equal to the stationary distribution calculated from \code{tpm}.}
 }
 \details{
   Applies the Viterbi algorithm to calculate ``the'' most probable
@@ -38,7 +43,7 @@ viterbi(y, object = NULL, tpm, Rho, ispd, yval = NULL)
   or a matrix whose columns consist of such sequences if there
   is more than one (equally) most probable sequence.
 
-  If \code{y} consists of a matrix of observation sequences, the
+  If \code{y} consists of a list of observation sequences, the
   value is a list each entry of which is of the form described
   above.
 }
@@ -49,7 +54,7 @@ selected applications in speech recognition," Proc. IEEE vol. 77,
 pp. 257 -- 286, 1989.
 }
 \author{Rolf Turner
-  \email{r.turner@auckland.ac.nz}
+  \email{r.turner@auckland.ac.nz}\cr
   \url{http://www.math.unb.ca/~rolf}
 }
 
@@ -60,17 +65,20 @@ phenomenon appears to be unlikely to occur in practice.
 }
 
 \seealso{\code{\link{hmm}()}, \code{\link{sim.hmm}()},
-         \code{\link{mps}()}}
+         \code{\link{mps}()}, \code{\link{pr}()}}
 \examples{
-# See the help for sim.hmm() for how to generate y.sim.
+# See the help for sim.hmm() for how to generate y.num and y.let.
 \dontrun{
-try <- hmm(y.sim,K=2,verb=TRUE)
-vvv.1 <- viterbi(y.sim,try)
-vvv.2 <- viterbi(y.sim,tpm=P,ispd=c(0.25,0.75),Rho=R) # P and R as in the
-                                                      # help for sim.hmm().
-# The order of the states has gotten swapped; 3-vvv.1[[1]] is much
-# more similar to vvv.2[[1]] than is vvv.1[[1]].
+fit.num <- hmm(y.num,K=2,verb=TRUE)
+v.1 <- viterbi(object=fit.num)
+v.2 <- viterbi(y.num,tpm=P,Rho=R) # P and R as in the
+                                  # help for sim.hmm().
+# The order of the states has gotten swapped; 3-v.1[[1]] is much
+# more similar to v.2[[1]] than is v.1[[1]].
 
+fit.let <- hmm(y.let,K=2,verb=TRUE)
+v.3 <- viterbi(object=fit.let)    # Works.
+v.4 <- viterbi(y.let,tpm=P,Rho=R) # Throws an error (R has no row names.)
 }
 }
 \keyword{models}

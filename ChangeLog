@@ -1,0 +1,126 @@
+
+Version 0.0-1 --> 0.0-2
+=======================
+
+The changes are lost in the mists of time.
+
+Version 0.0-2 --> 0.0-3
+=======================
+
+The changes are lost in the mists of time.
+
+Version 0.0-3 --> 0.0-4
+=======================
+
+The changes may be recoverable, but haven't yet been recovered.
+
+Version 0.0-4 --> 0.0-5
+=======================
+
+The changes may be recoverable, but haven't yet been recovered.
+
+Version 0.0-5 --> 0.0-6
+=======================
+
+The changes may be recoverable, but haven't yet been recovered.
+
+Version 0.0-6 --> 0.0-7
+=======================
+
+The changes may be recoverable, but haven't yet been recovered.
+
+Version 0.0-7 --> 0.0-8
+=======================
+
+The changes may be recoverable, but haven't yet been recovered.
+
+Version 0.0-8 --> 0.0-9
+=======================
+
+26 February 2009:
+
+Fixed bug in revise.tpm.R; if "mixture" was set to
+TRUE in hmm(), this function returned a one-column (!!!)
+matrix, not a square one.
+
+So the package was not (ever?) working with "mixture"
+set to be TRUE.
+
+Thanks to Mohammad Amin Jamalzadeh for pointing out
+this bug.
+
+Version 0.0-9 --> 0.0-10
+========================
+
+23 September 2009:
+
+Changed the input format of the y values.  Now y should be either a
+single vector (of observations) or a list of such vectors.  If there
+is more than one vector of observations, these should ***not***
+be presented as the columns of a matrix.  (This is still allowed,
+but is deprecated.  Allowing the presentation of y as a matrix will
+be discontinued in some future release of this package.)
+
+Changed all functions that take observation sequences as an
+argument to expect multiple observation sequences to be presented
+as components of a list rather than as columns of a matrix.
+Thus multiple observation sequences are not constrained to be of
+the same length.
+
+Revised hmm() so that it does not insist that the underlying Markov
+chain be stationary at time 0.  An argument ``stationary'' which
+defaults to TRUE (giving the old behaviour) has been introduced.
+The value of ``stationary'' is saved in the list returned by hmm().
+
+Revised hmm() so that the observations y are (optionally; default
+TRUE) saved in the list returned by hmm().
+
+Revised hmm() so that the set of values of the observations can
+be any finite set.
+
+Changed the treatment/usage of the yval argument of hmm() somewhat.
+This argument can be any superset of the unique values of the
+observations y.  Any values in yval which are not matched by any
+actually observed values will correspond to rows of the estimate
+Rho all of whose entries are 0.
+
+Gave the object returned by hmm() a class --- hmm.discnp ---
+assigned, so that the fitted values may be calculated by a
+method for fitted().
+
+Created a method for fitted(), fitted.hmm.discnp.
+
+Changed the treatment of the ``y'' argument of mps(); if
+this argument is missing, mps() attempts to extract it
+from the ``object'' argument.
+
+Removed ``yval'' from the argument lists of mps() and
+viterbi.
+
+Revised sim.hmm() to allow the initial state probability
+distribution, ispd, to be specified, rather than forcing it to be
+equal to the stationary distribution determined by the transition
+probability matrix.
+
+Added a ``yvals'' argument to the argument list of sim.hmm()
+so that the simulated observations can be from any specified set
+of cardinality nrow(Rho).  I.e. these observations are no longer
+restricted to being in the sequence of integers from 1 to nrow(Rho).
+
+Changed the argument nsim to be a *vector*.  Its length specifies
+the number of independent sequences generated; its entries specify
+the length of each sequence.  Deleted the argument ``nrep''.
+
+Added a function pr() which calculates the probability of a state
+sequence s given an observation sequence y.
+
+Added a function sp() which returns the probabilities of each state,
+at each time point, given the model parameters and an observation
+sequence (or sequences).  (Added at the request of Murat Ahmed.)
+
+Fixed a bug in viterbi() in respect of the way the values of the
+observation vector were matched up with the rows of Rho.  Thanks
+to Graham Wood for pointing out this bug.
+
+Change tolerance below which probabilities are deemed to be zero from
+10*.Machine$double.eps to the more orthodox sqrt(.Machine$double.eps).

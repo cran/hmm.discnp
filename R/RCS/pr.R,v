@@ -1,0 +1,99 @@
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.07.59.00;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.25.41;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@Now expects multiple sequences to be presented as list
+components rather than columns of a matrix.
+@
+text
+@pr <- function(s,y,object=NULL,tpm,Rho,ispd=NULL) {
+
+if(!is.null(object)) {
+	tpm <- object$tpm
+	Rho <- object$Rho
+	ispd <- object$ispd
+}
+if(missing(y)) {
+	y <- if(!is.null(object)) object$y else NULL
+	if(is.null(y)) stop("No observation sequence supplied.\n")
+}
+if(is.null(ispd)) ispd <- revise.ispd(tpm)
+y <- mat2list(y)
+check.yval(y,Rho)
+
+if(!is.list(s)) s <- list(s)
+nseq <- length(s)
+if(length(y) != nseq)
+	stop(paste("Mismatch between number of state sequences\n",
+                   "and number of observation sequences.\n"))
+rslt <- numeric(nseq)
+for(i in 1:nseq) {
+	tmp <- log(ispd[s[[i]][1]]) + log(Rho[y[[i]][1],s[[i]][1]])
+	n <- length(y[[i]])
+	for(j in 2:n)
+        	tmp <- tmp + log(tpm[s[[i]][j-1],s[[i]][j]]) +
+                             log(Rho[y[[i]][j],s[[i]][j]])
+	rslt[i] <- tmp
+}
+
+fy  <- ffun(y, Rho)
+lns <- sapply(y,length)
+rp  <- recurse(fy, tpm, ispd, lns)
+ll  <- log(rp$llc)
+
+jstop <- 0
+for(i in 1:nseq) {
+        jstart <- jstop+1
+        jstop  <- jstop + lns[i]
+	rslt[i] <- exp(rslt[i]-sum(ll[jstart:jstop]))
+}
+
+rslt
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 6
+pr <- function(y,s,tpm,Rho,ispd)
+{
+	tmp <- log(ispd[s[1]]) + log(Rho[y[1],s[1]])
+	n <- length(y)
+	for(i in 2:n)
+        	tmp <- tmp + log(tpm[s[i-1],s[i]]) + log(Rho[y[i],s[i]])
+d3 41
+a43 6
+	fy <- ffun(y, Rho)
+	eps <- sqrt(.Machine$double.eps)
+	nc  <- 1
+	rp <- recurse(fy, tpm, ispd, nc)
+	ll <- sum(log(abs(rp$llc)))
+	exp(tmp-ll)
+@

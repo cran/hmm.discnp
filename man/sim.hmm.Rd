@@ -8,11 +8,12 @@ Simulates one or more replicates of discrete data
 from a model such as is fitted by the function \code{hmm()}.
 }
 \usage{
-sim.hmm(nsim, tpm, Rho, nrep=1)
+sim.hmm(nsim,tpm,Rho,ispd=NULL,yval=NULL)
 }
 \arguments{
 \item{nsim}{
-The length of each sequence of observations.
+Vector of the lengths of the sequences of observations
+to be generated.
 }
 \item{tpm}{
 The transition probability matrix for the underlying hidden Markov
@@ -20,26 +21,32 @@ chain(s).  Note that the rows of \code{tpm} must sum to 1.
 Ignored if \code{ncol(Rho)==1}.
 }
 \item{Rho}{
-A matrix specifying the probability of an observation taking on one
-of a set of possible values, given the state of the underlying hidden
-Markov chain.  Note that the columns of \code{Rho} must sum to 1.
-If \code{ncol(Rho)==1} the data are i.i.d. from the distribution
-specified by the single column of \code{Rho}.
+A matrix specifying the probability of an observation taking on
+one of a set of possible values, given the state of the underlying
+hidden Markov chain.  Note that the columns of \code{Rho} must sum
+to 1.  If \code{ncol(Rho)==1} the simulated data are i.i.d. from
+the distribution specified by the single column of \code{Rho}.
 }
-\item{nrep}{
-The number of independent replicate sequences of observations.
-}}
+\item{ispd}{A vector specifying the initial state probability
+distribution of the chain.  If this is not specified it is
+taken to be the stationary distribution of the chain, calculated
+from \code{tpm}.
+}
+\item{yval}{Vector of numbers or character strings constituting
+the possible values of the observations.  If not supplied it
+is taken to equal \code{1:nrow(Rho)}.}
+}
 \value{
-A matrix with \code{nsim} rows and \code{nrep} columns; if
-\code{nrep}==1, then the returned value is a vector of length
-\code{nsim}.  Each column of the matrix forms an independent
-replicate of observations from the specified hidden Markov model.
-The values of those observations are integers between 1 and
-\code{nrow(Rho)}.
+If \code{length(nsim)==1} then the value returned is a vector of
+length \code{nsim}.  If \code{length(nsim)>1} then the value returned
+is a list of the same length as \code{nsim}, each component of which
+is an independent vector of simulated observations.  The length
+of component \code{i} of this list is equal to \code{nsim[i]}.
+The values of the observations are entries of \code{yval}.
 }
 
 \author{Rolf Turner
-  \email{r.turner@auckland.ac.nz}
+  \email{r.turner@auckland.ac.nz}\cr
   \url{http://www.math.unb.ca/~rolf}
 }
 
@@ -49,6 +56,7 @@ P <- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
 R <- matrix(c(0.5,0,0.1,0.1,0.3,
               0.1,0.1,0,0.3,0.5),5,2)
 set.seed(42)
-y.sim <- sim.hmm(300,P,R,20)
+y.num <- sim.hmm(rep(300,20),P,R)
+y.let <- sim.hmm(rep(300,20),P,R,yval=letters[1:5])
 }
 \keyword{models}

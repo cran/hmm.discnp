@@ -1,0 +1,38 @@
+head	1.1;
+access;
+symbols;
+locks
+	rolf:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2009.09.27.07.38.20;	author rolf;	state Exp;
+branches;
+next	;
+
+
+desc
+@Check that the y values are compatible with the
+matrix Rho that determines the probability functions
+of the model.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@check.yval <- function(y,Rho) {
+yval <- unique(unlist(y))
+if(is.null(row.names(Rho))) {
+	if(!all(yval%in%(1:nrow(Rho))))
+		stop("Values of \"y\" must be in \"1:nrow(Rho)\".\n")
+} else {
+	if(!all(yval%in%(row.names(Rho))))
+		stop("Values of \"y\" must be in \"row.names(Rho)\".\n")
+}
+return(invisible())
+}
+@

@@ -1,4 +1,37 @@
-sim.hmm <- function(nsim,tpm,Rho,ispd=NULL,yval=NULL) {
+head	1.2;
+access;
+symbols;
+locks
+	rolf:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2009.09.27.08.04.30;	author rolf;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.09.23.02.26.08;	author rturner;	state Exp;
+branches;
+next	;
+
+
+desc
+@See documentation.
+@
+
+
+1.2
+log
+@Now takes an argument yval specifying the set of possible
+observations.  Arguments are changed so that nsim is now
+a *vector*.  Its length specifies the number of independent
+sequences generated; its entries specify the length of each
+sequence.
+@
+text
+@sim.hmm <- function(nsim,tpm,Rho,ispd=NULL,yval=NULL) {
 #
 # Function sim.hmm to simulate data from a hidden Markov
 # model with transition probability matrix tpm, and discrete
@@ -56,3 +89,40 @@ for(j in 1:nseq) {
 }
 if(nseq==1) rslt[[1]] else rslt 
 }
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+sim.hmm <- function(nsim,tpm,Rho,nrep=1) {
+d15 11
+d28 4
+a31 3
+	temp <- sample(1:nrow(Rho),size=nsim*nrep,
+                       prob=Rho[,1],replace=TRUE)
+	return(if(nrep==1) temp else matrix(temp,ncol=nrep))
+d37 1
+a37 1
+	stop("Mismatch in dimensions of tpm and Rho.\n")
+d43 1
+a43 1
+ispd <- revise.ispd(tpm)
+d47 1
+a47 1
+for(j in 1:nrep) {
+d50 2
+a51 2
+	y[[1]] <- sample(1:M,1,prob=Rho[,s1])
+	for(i in 2:nsim) {
+d53 1
+a53 1
+		y[[i]] <- sample(1:M,1,prob=Rho[,s1])
+d57 1
+a57 1
+if(nrep>1) matrix(unlist(rslt),ncol=nrep) else unlist(rslt)
+@
