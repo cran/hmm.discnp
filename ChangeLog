@@ -49,7 +49,7 @@ set to be TRUE.
 Thanks to Mohammad Amin Jamalzadeh for pointing out
 this bug.
 
-Version 0.0-9 --> 0.0-10
+Version 0.0-9 --> 0.1-0
 ========================
 
 23 September 2009:
@@ -124,3 +124,28 @@ to Graham Wood for pointing out this bug.
 
 Change tolerance below which probabilities are deemed to be zero from
 10*.Machine$double.eps to the more orthodox sqrt(.Machine$double.eps).
+
+Version 0.1-0 --> 0.1-1
+=======================
+
+30 November 2009:
+
+Bug fix: The function hmm() threw an error when the observations were
+numeric and contained 0 or did not conform to 1:max(observations) (and
+argument ``yvals'' was not specified).
+
+Fixed.
+
+(Thanks to Alon Ben Ari for pointing out this bug.)
+
+Bug fix:  In revise.rho(), if there were observations missing from the
+sequence 1:max(observations), the estimate of Rho would turn into all
+NAs and the algorithm would converge instantly.  (The consequence was
+that all of the f(y) values became NA and were consequently turned
+into 1 --- which is *supposed* to happen when y is NA, but not
+otherwise.  Psigh!)
+
+Fixed.
+
+Changed the .First.lib() function to say ``PLEASE NOTE'' rather
+than ``WARNING''.

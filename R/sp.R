@@ -12,6 +12,7 @@ sp <- function (y, object = NULL, tpm, Rho, ispd=NULL, means=FALSE)
     }
     y <- mat2list(y)
     check.yval(y,Rho)
+    if(is.null(row.names(Rho))) row.names(Rho) <- 1:nrow(Rho)
     lns  <- sapply(y,length)
     fy   <- ffun(y, Rho)
     rp   <- recurse(fy, tpm, ispd, lns)

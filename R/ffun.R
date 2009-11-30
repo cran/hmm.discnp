@@ -8,6 +8,7 @@ ffun <- function(y,Rho)
 # correspond to the observations y.
 #
 
+y  <- lapply(y,as.character)
 fy <- lapply(y,function(x,Rho){Rho[x,1:ncol(Rho)]},Rho=Rho)
 fy <- do.call(rbind,fy)
 fy[is.na(fy)] <- 1
