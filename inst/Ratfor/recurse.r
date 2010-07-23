@@ -13,11 +13,8 @@ zero = 0.d0
 # Run through the replicates.
 kstop = 0
 do k = 1,nreps {
-	if(k==1) {
-		kstart = 1
-	} else {
-		kstart = 1+lns(k)
-	}
+	n = lns(k)
+	kstart = 1 + kstop
 
 # Update the alpha's.
 	call afun(fy(1,kstart),xispd,tpm,epsilon,n,nstate,wrk,
@@ -39,7 +36,7 @@ do k = 1,nreps {
 kstop = kstop + lns(k)
 }
 
-kstop = kstop - k
+kstop = kstop - nreps
 # Sum up the xi's.
 do i = 1,nstate {
 	do j = 1,nstate {

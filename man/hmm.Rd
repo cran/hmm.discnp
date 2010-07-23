@@ -20,9 +20,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=TRUE,
 }
 \arguments{
 \item{y}{
-A vector or matrix of discrete data; missing values are allowed.  If
-\code{y} is a matrix, each column is interpreted as an independent
-replicate of the observation sequence.
+A vector of discrete data or a list of such vectors; missing values are allowed.
 }
 \item{yval}{
 A vector of possible values for the data; it defaults to the sorted
@@ -112,9 +110,13 @@ distributions of the observations.
 The fitted value of the transition probabilty matrix \code{tpm}.
 }
 \item{ispd}{
-The fitted initial state probability distribution, assumed to
-be the (unique) stationary distribution for the chain, and thereby
-determined by the transition probability matrix \code{tpm}.
+The fitted initial state probability distribution.  If
+\code{stationary} is \code{TRUE} then this is assumed to be the
+(unique) stationary distribution for the chain, and thereby determined
+by the transition probability matrix \code{tpm}.  If \code{stationary}
+is \code{FALSE} then \code{ispd} is estimated as the mean of the
+vectors of conditional probabilities of the states, given the
+observation sequences, at time \code{t=1}.
 }
 \item{log.like}{
 The final value of the log likelihood, as calculated through
@@ -128,23 +130,57 @@ exceeded.
 \item{nstep}{
 The number of EM steps performed by the algorithm.
 }
-\item{y}{The observations (argument \code{y}).  Present
-only if \code{keep.y} is \code{TRUE}.}
-\item{data.name}{ An identifying tag, specified as an argument, or
-determined from the name of the argument y by deparse(substitute(y)).
+\item{y}{The observations (argument \code{y}).  Present only if
+\code{keep.y} is \code{TRUE}.} \item{data.name}{An identifying tag,
+specified as an argument, or determined from the name of the argument
+y by deparse(substitute(y)).
 }
 \item{stationary}{The argument \code{stationary}}
 }
 
-\section{Note}{
+\section{Notes}{
+The package \emph{used} to require the argument \code{y} to be
+a \emph{matrix} in the case of multiple observed series.  If
+the series were of unequal length the user was expected to pad
+them out with NAs to equalize the lengths.  In the revision
+from version 0.0-9 to 0.1-0 this was changed, requiring the
+argument \code{y} to be (more sensibly) a list when there are
+multiple series.  Unfortunately this help page was \emph{not}
+correspondingly revised and the old ``matrix'' format was left
+as being the specified input format.
+
+The old matrix format is still permitted (and the matrix is
+internally changed into a list) but this is deprecated.  In
+some future version of \code{hmm.discnp} this possibility
+will be removed.
+
 If \code{K=1} then \code{tpm}, \code{ispd}, \code{converged}, and
 \code{nstep} are all set equal to \code{NA} in the list returned
 by this function.
+
+The estimate of \code{ispd} in the non-stationary setting
+is inevitably very poor, unless the number of sequences of
+observations (the length of the list \code{y}) is very large.
+We have in effect ``less than one'' relevant observation for
+each such sequence.
 }
 
 \details{
 The hard work is done by a Fortran subroutine "recurse" (actually
 coded in Ratfor) which is dynamically loaded.
+}
+
+\section{Warnings}{
+The ordering of the (hidden) states can be arbitrary.  What
+the estimation procedure decides to call ``state 1'' may
+not be what \emph{you} think of as being state number 1.
+The ordering of the states will be affected by the starting
+values used.
+
+At some time in the future the (deprecated) option of being
+able to specify argument \code{y} as a matrix (in the setting
+in which there are multiple data series to which a single
+model is being fitted) will no longer be permitted.
 }
 
 \references{
@@ -165,14 +201,6 @@ of Atlantic Canada", Master's Report, University of New Brunswick,
 1997.
 }
 
-\section{Warning}{
-The ordering of the (hidden) states can be arbitrary.  What
-the estimation procedure decides to call ``state 1'' may
-not be what \emph{you} think of as being state number 1.
-The ordering of the states will be affected by the starting
-values used.
-}
-
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr
   \url{http://www.math.unb.ca/~rolf}
@@ -183,7 +211,7 @@ values used.
 \examples{
 # See the help for sim.hmm() for how to generate y.num.
 \dontrun{
-fit.num <- hmm(y.num,K=2,verb=TRUE)
+fit.num     <- hmm(y.num,K=2,verb=TRUE)
 fit.num.mix <- hmm(y.num,K=2,verb=TRUE,mixture=TRUE)
 }
 }

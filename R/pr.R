@@ -15,16 +15,17 @@ check.yval(y,Rho)
 
 if(!is.list(s)) s <- list(s)
 nseq <- length(s)
-if(length(y) != nseq)
+if(!length(y)%in%c(1,nseq))
 	stop(paste("Mismatch between number of state sequences\n",
                    "and number of observation sequences.\n"))
 rslt <- numeric(nseq)
 for(i in 1:nseq) {
-	tmp <- log(ispd[s[[i]][1]]) + log(Rho[y[[i]][1],s[[i]][1]])
-	n <- length(y[[i]])
+	ii <- if(length(y)==1) 1 else i
+	tmp <- log(ispd[s[[i]][1]]) + log(Rho[y[[ii]][1],s[[i]][1]])
+	n <- length(y[[ii]])
 	for(j in 2:n)
         	tmp <- tmp + log(tpm[s[[i]][j-1],s[[i]][j]]) +
-                             log(Rho[y[[i]][j],s[[i]][j]])
+                             log(Rho[y[[ii]][j],s[[i]][j]])
 	rslt[i] <- tmp
 }
 

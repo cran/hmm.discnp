@@ -20,10 +20,14 @@ pr(s,y,object=NULL,tpm,Rho,ispd=NULL)
   \item{y}{
   A sequence of observations from a hidden Markov model, corresponding
   to the state sequence \code{s}, or a list of such sequences
-  corresponding to the state sequences in the list \code{s}.
-  If \code{y} is missing, it is extracted from
-  \code{object} provided that \code{object} and its \code{y} component
-  are not \code{NULL}.  Otherwise an error is given.
+  corresponding to the state sequences in the list \code{s}.  If
+  \code{y} is or consists of a single sequence, it is assumed to
+  correspond to each of the state sequences in \code{s} in turn.
+  Otherwise the length of the list \code{y} must be the same as the
+  length of the list \code{s} (otherwise an error is given).  If
+  \code{y} is missing, it is extracted from \code{object} provided
+  that \code{object} and its \code{y} component are not \code{NULL}.
+  Otherwise an error is given.
 }
   \item{object}{
   An object of class \code{hmm.discnp} as returned by

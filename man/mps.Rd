@@ -46,8 +46,8 @@ mps(y, object = NULL, tpm, Rho, ispd=NULL)
   If \code{y} is a single observation sequence, then the
   value is a vector of corresponding most probable states.
 
-  If \code{y} is a matrix of replicate sequences, then the value is
-  a matrix, the \eqn{j}-th column of which constitutes the vector of
+  If \code{y} is a list of replicate sequences, then the value is
+  a list, the \eqn{j}-th entry of which constitutes the vector of
   most probable states underlying the \eqn{j}-th replicate sequence.
 }
 

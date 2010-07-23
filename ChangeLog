@@ -149,3 +149,31 @@ Fixed.
 
 Changed the .First.lib() function to say ``PLEASE NOTE'' rather
 than ``WARNING''.
+
+Version 0.1-1 --> 0.1-2
+=======================
+
+21 July 2010:
+
+Thanks to Thomas Lotze for the pointing out the problems requiring
+the following fixes:
+
+Bug fix:  The length of the k-th replicate sequence (equal to
+lns(k)) was not passed to the afun fortran subroutine.  Fixed.
+
+Bug fix:  If "stationary" was TRUE and then ispd remained NULL,
+causing a fortran error.  Now ispd is initially set to revise.ispd(tpm)
+irrespective of the value of "stationary".
+
+The help page for hmm() was not revised in respect of the way that
+the argument "y" should be supplied.  It retained the old specification
+requiring y to be a matrix, with unequal length replicates adjusted
+for by padding with NAs.  This has now been remedied.
+
+Version 0.1-2 --> 0.1-3
+=======================
+
+23 July 2010
+
+Fixed a glitch in the help page for hmm() in respect of the
+description of the ispd component of the returned value.

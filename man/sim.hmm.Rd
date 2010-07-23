@@ -56,7 +56,8 @@ P <- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
 R <- matrix(c(0.5,0,0.1,0.1,0.3,
               0.1,0.1,0,0.3,0.5),5,2)
 set.seed(42)
-y.num <- sim.hmm(rep(300,20),P,R)
-y.let <- sim.hmm(rep(300,20),P,R,yval=letters[1:5])
+lll   <- sample(250:350,20,TRUE)
+y.num <- sim.hmm(lll,P,R)
+y.let <- sim.hmm(lll,P,R,yval=letters[1:5])
 }
 \keyword{models}

@@ -65,7 +65,7 @@ if(is.na(icrit)) stop('Stopping criterion not recognized.')
 
 # Perform initial setting-up.
 tpm    <- par0$tpm
-ispd   <- if(stationary) revise.ispd(tpm) else par0$ispd
+ispd   <- revise.ispd(tpm)
 Rho    <- par0$Rho
 m      <- nrow(Rho)
 digits <- 2+ceiling(abs(log10(tolerance)))
