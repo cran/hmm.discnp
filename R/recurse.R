@@ -1,7 +1,7 @@
 recurse <- function(fy,tpm,ispd,lns)
 {
 #
-# Function recurse to revise the ``recursive probabilities'',
+# Function recurse to calculate the ``recursive probabilities'',
 # given the parameters theta, and the observations y.
 #
 

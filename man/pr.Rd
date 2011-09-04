@@ -70,7 +70,7 @@ pr(s,y,object=NULL,tpm,Rho,ispd=NULL)
 }
 
 \seealso{\code{\link{hmm}()}, \code{\link{mps}()},
-         \code{\link{viterbi}()}, \code{\link{pr}()},
+         \code{\link{viterbi}()}, \code{\link{sp}()},
          \code{\link{fitted.hmm.discnp}()}}
 
 \examples{

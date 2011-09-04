@@ -193,7 +193,7 @@ for space-time precipitation," Water Resources Research vol.
 27, pp. 1917-1923, 1991.
 
 MacDonald, I. L., and Zucchini, W., "Hidden Markov
-and Other Models for Discrete-valued Time Series, Chapman \& Hall,
+and Other Models for Discrete-valued Time Series", Chapman \& Hall,
 London, 1997.
 
 Liu, Limin, "Hidden Markov Models for Precipitation in a Region

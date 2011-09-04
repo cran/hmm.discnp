@@ -1,9 +1,0 @@
-fitted.hmm.discnp       Fitted values of a discrete non-parametric
-                        hidden Markov model.
-hmm                     Fit a hidden Markov model to discrete data.
-mps                     Most probable states.
-pr                      Probability of state sequences.
-sim.hmm                 Simulate discrete data from a hidden Markov
-                        model.
-sp                      Calculate the conditional state probabilities.
-viterbi                 Most probable state sequence.
