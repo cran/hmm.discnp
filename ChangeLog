@@ -200,3 +200,10 @@ the hidden Markov model.  Thanks to Subhajit Dutta for the
 suggestion.
 
 Fixed a few minor typos in the documentation.
+
+Version 0.1-4 --> 0.1-5
+=======================
+
+4 November 2011
+
+Added a namespace.
