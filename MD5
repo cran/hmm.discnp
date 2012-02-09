@@ -1,5 +1,5 @@
-030c8bdc4395a138d58767d12af7dfa7 *ChangeLog
-6e8d9e27a0951ec7d14b1a1d32c9bb34 *DESCRIPTION
+ad978b0b76631f7188fe63b88cf07f23 *ChangeLog
+782eaf838cfe083deab0724ccdd4e2e7 *DESCRIPTION
 e97c7b6e0d7f0eb3b8e1303451431001 *NAMESPACE
 b2d13c9ca9fcdabeeb09db8998ecdd81 *R/First.R
 184809b9344434a680bbc30dc96d3bb9 *R/RCS/First.R,v
@@ -19,8 +19,8 @@ f247069c6761dc5b4c228d1e33cafda8 *R/RCS/sim.hmm.R,v
 18a62a0226e18e192a87d8a6fa2b6fff *R/RCS/sp.R,v
 7138d81efb770e4b4d3c27538f2476e6 *R/RCS/tidyup.R,v
 3d195832ac7ef95cdeed4dd849f61db6 *R/RCS/viterbi.R,v
-cceb332890c55f4c62745d9bc2636d05 *R/check.yval.R
-64913f5c6ccffe484e7a6b9371fb35de *R/ffun.R
+90355144d471e120fc01fd1685cf445f *R/check.yval.R
+ab1a44feb53f6bb9d961ef3b2d731638 *R/ffun.R
 d9b85d50148cd101bed871410ac73a0d *R/fitted.hmm.discnp.R
 8eb8cb180c8844a46a5d51e63cccd93c *R/hmm.R
 eb22d9be687321b5243b12879f272cee *R/init.all.R
