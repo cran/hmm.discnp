@@ -8,7 +8,7 @@ Simulates one or more replicates of discrete data
 from a model such as is fitted by the function \code{hmm()}.
 }
 \usage{
-sim.hmm(nsim,tpm,Rho,ispd=NULL,yval=NULL)
+sim.hmm(nsim,tpm,Rho,ispd=NULL,yval=NULL,verb=FALSE)
 }
 \arguments{
 \item{nsim}{
@@ -35,6 +35,10 @@ from \code{tpm}.
 \item{yval}{Vector of numbers or character strings constituting
 the possible values of the observations.  If not supplied it
 is taken to equal \code{1:nrow(Rho)}.}
+\item{verb}{Logical scalar.  If \code{TRUE} then the overall index
+of the simulated value that has been reached is printed out every
+1000 iterations.  Useful for reassurance when very \dQuote{large}
+simulations are undertaken.}
 }
 \value{
 If \code{length(nsim)==1} then the value returned is a vector of

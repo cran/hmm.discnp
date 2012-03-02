@@ -230,3 +230,19 @@ Version 0.1-6 --> 0.1-7
 
 Fixed up some infelicities in this ChangeLog.
 (Note that version 0.1-6 was never installed on CRAN.)
+
+Version 0.1-7 --> 0.1-8
+=======================
+
+2 March 2012
+
+Changed the function sim.hmm() so that storage to hold
+the simulated values is completely pre-allocated ***as a
+vector***.  For simulation of a long (e.g. length = 600000) 
+single data sequence, this speeds up the simulation process
+dramatically.  (E.g. from c. 5250 seconds of ellapsed time
+to c. 30 seconds of ellapsed time!)
+
+Thanks to Martin Ellis for drawing the problem of slowness
+of the simulation procedure to my attention, and indicating
+the solution of the problem.

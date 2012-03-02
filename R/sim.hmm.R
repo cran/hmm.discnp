@@ -1,4 +1,4 @@
-sim.hmm <- function(nsim,tpm,Rho,ispd=NULL,yval=NULL) {
+sim.hmm <- function(nsim,tpm,Rho,ispd=NULL,yval=NULL,verb=FALSE) {
 #
 # Function sim.hmm to simulate data from a hidden Markov
 # model with transition probability matrix tpm, and discrete
@@ -43,16 +43,27 @@ if(!identical(all.equal(xxx,rep(1,nrow(tpm))),TRUE))
 if(is.null(ispd)) ispd <- revise.ispd(tpm)
 K    <- ncol(Rho)
 M    <- nrow(Rho)
-rslt <- list()
+ntot <- sum(nsim)
+rslt <- if(is.numeric(yval)) numeric(ntot) else character(ntot)
+jr   <- 0
 for(j in 1:nseq) {
+	jr <- jr+1
 	s1     <- sample(1:K,1,prob=ispd)
-	y      <- list()
-	y[[1]] <- sample(yval,1,prob=Rho[,s1])
+        rslt[jr] <- sample(yval,1,prob=Rho[,s1])
 	for(i in 2:nsim[j]) {
+		jr <- jr+1
 		s1 <- sample(1:K,1,prob=tpm[s1,])
-		y[[i]] <- sample(yval,1,prob=Rho[,s1])
+		rslt[jr] <- sample(yval,1,prob=Rho[,s1])
+		if(verb) {
+			if(jr%%1000 == 0) cat(jr,"")
+			if(jr%%10000 == 0) cat("\n")
+		}
 	}
-	rslt[[j]] <- unlist(y)
 }
-if(nseq==1) rslt[[1]] else rslt 
+if(verb) cat("\n")
+if(nseq==1) rslt else {
+	rslt <- unname(tapply(rslt,rep(1:nseq,nsim),function(x){x}))
+	attr(rslt,"dim") <- NULL
+	rslt
+}
 }
