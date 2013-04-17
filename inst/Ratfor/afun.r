@@ -1,7 +1,7 @@
 subroutine afun(fy,xispd,tpm,epsilon,n,nstate,wrk,xlc,alpha)
 implicit double precision(a-h,o-z)
-dimension wrk(1), xispd(1), xlc(1)
-dimension fy(nstate,1), tpm(nstate,1), alpha(nstate,1)
+dimension wrk(nstate), xispd(nstate), xlc(n)
+dimension fy(nstate,n), tpm(nstate,nstate), alpha(nstate,n)
 
 # Set some constants
 one  = 1.d0
@@ -10,7 +10,7 @@ zero = 0.d0
 # Set the value to give to ``log-likelihood constant'', xlc(...)
 # if this is indeterminate --- i.e. less than epsilon.
 # Possible choices: -1, 1, or epsilon.
-dummy = -one
+dummy = epsilon
 
 # Update the initial alpha.
 tsum = zero

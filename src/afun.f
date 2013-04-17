@@ -1,11 +1,11 @@
 C Output from Public domain Ratfor, version 1.0
       subroutine afun(fy,xispd,tpm,epsilon,n,nstate,wrk,xlc,alpha)
       implicit double precision(a-h,o-z)
-      dimension wrk(1), xispd(1), xlc(1)
-      dimension fy(nstate,1), tpm(nstate,1), alpha(nstate,1)
+      dimension wrk(nstate), xispd(nstate), xlc(n)
+      dimension fy(nstate,n), tpm(nstate,nstate), alpha(nstate,n)
       one = 1.d0
       zero = 0.d0
-      dummy = -one
+      dummy = epsilon
       tsum = zero
       do23000 j = 1,nstate 
       wrk(j) = fy(j,1)*xispd(j)

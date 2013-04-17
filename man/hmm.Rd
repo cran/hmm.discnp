@@ -213,6 +213,8 @@ of Atlantic Canada", Master's Report, University of New Brunswick,
 \dontrun{
 fit.num     <- hmm(y.num,K=2,verb=TRUE)
 fit.num.mix <- hmm(y.num,K=2,verb=TRUE,mixture=TRUE)
+print(fit.num[c("tpm","Rho")])
+# Note that states 1 and 2 get swapped.
 }
 }
 \keyword{models}

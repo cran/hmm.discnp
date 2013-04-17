@@ -246,3 +246,11 @@ to c. 30 seconds of ellapsed time!)
 Thanks to Martin Ellis for drawing the problem of slowness
 of the simulation procedure to my attention, and indicating
 the solution of the problem.
+
+Version 0.1-8 --> 0.1-9
+=======================
+
+4 April 2013
+
+Fixed up the dimensioning of Fortran arrays so that they
+no longer use dummy 1's as the final dimension.

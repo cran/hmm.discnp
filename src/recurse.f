@@ -1,16 +1,17 @@
 C Output from Public domain Ratfor, version 1.0
       subroutine recurse(fy,xispd,tpm,nreps,epsilon,lns,nstate,wrk,xlc, 
-     *alpha,beta,gamma,xi,xisum)
+     *ntot,nxi,alpha,beta,gamma,xi,xisum)
       implicit double precision(a-h,o-z)
-      dimension xispd(1), xlc(1), lns(1)
-      dimension tpm(nstate,1), wrk(nstate,1)
-      dimension fy(nstate,1), alpha(nstate,1), beta(nstate,1), gamma(nst
-     *ate,1)
-      dimension xi(nstate,nstate,1), xisum(nstate,1)
+      dimension xispd(nstate), xlc(ntot), lns(nreps)
+      dimension tpm(nstate,nstate), wrk(nstate,nstate)
+      dimension fy(nstate,ntot), alpha(nstate,ntot), beta(nstate,ntot)
+      dimension gamma(nstate,ntot), xi(nstate,nstate,nxi), xisum(nstate,
+     *nstate)
       zero = 0.d0
       kstop = 0
       do23000 k = 1,nreps 
       n = lns(k)
+      nm1 = n - 1
       kstart = 1 + kstop
       call afun(fy(1,kstart),xispd,tpm,epsilon,n,nstate,wrk, xlc(kstart)
      *,alpha(1,kstart))
@@ -19,7 +20,7 @@ C Output from Public domain Ratfor, version 1.0
       call gfun(alpha(1,kstart),beta(1,kstart),epsilon,n, nstate,wrk,gam
      *ma(1,kstart))
       call xfun(alpha(1,kstart),beta(1,kstart),fy(1,kstart), tpm,epsilon
-     *,n,nstate,wrk,xi(1,1,kstart-k+1))
+     *,n,nstate,nm1,wrk,xi(1,1,kstart-k+1))
       kstop = kstop + lns(k)
 23000 continue
 23001 continue

@@ -1,7 +1,7 @@
-subroutine xfun(alpha,beta,fy,tpm,epsilon,n,nstate,wrk,xi)
+subroutine xfun(alpha,beta,fy,tpm,epsilon,n,nstate,nm1,wrk,xi)
 implicit double precision(a-h,o-z)
-dimension alpha(nstate,1), beta(nstate,1), fy(nstate,1)
-dimension tpm(nstate,1), wrk(nstate,1), xi(nstate,nstate,1)
+dimension alpha(nstate,n), beta(nstate,n), fy(nstate,n)
+dimension tpm(nstate,nstate), wrk(nstate,nstate), xi(nstate,nstate,nm1)
 
 one  = 1.d0
 zero = 0.d0

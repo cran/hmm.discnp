@@ -1,7 +1,7 @@
 subroutine gfun(alpha,beta,epsilon,n,nstate,wrk,gamma)
 implicit double precision(a-h,o-z)
-dimension alpha(nstate,1), beta(nstate,1), gamma(nstate,1)
-dimension wrk(1)
+dimension alpha(nstate,n), beta(nstate,n), gamma(nstate,n)
+dimension wrk(nstate)
 
 zero = 0.d0
 ook  = 1.d0/dble(nstate)

@@ -1,10 +1,15 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks
-	rturner:1.1; strict;
+	rolf:1.2; strict;
 comment	@# @;
 
+
+1.2
+date	2013.04.17.02.33.39;	author rolf;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2009.09.23.03.41.11;	author rturner;	state Exp;
@@ -18,26 +23,31 @@ the alpha, beta, gamma, and xi probabilities.
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Adjusted the dimensioning --- no more 1's.  Fixed up
+the final dimension of xi to be nxi = L - nreps where L
+is the toadal length of y.
 @
 text
-@subroutine recurse(fy,xispd,tpm,nreps,epsilon,n,nstate,wrk,xlc,
-                   alpha,beta,gamma,xi,xisum)
+@subroutine recurse(fy,xispd,tpm,nreps,epsilon,lns,nstate,wrk,xlc,
+                   ntot,nxi,alpha,beta,gamma,xi,xisum)
 
 implicit double precision(a-h,o-z)
-dimension xispd(1), xlc(1)
-dimension tpm(nstate,1), wrk(nstate,1)
-dimension fy(nstate,1), alpha(nstate,1), beta(nstate,1), gamma(nstate,1)
-dimension xi(nstate,nstate,1), xisum(nstate,1)
+dimension xispd(nstate), xlc(ntot), lns(nreps)
+dimension tpm(nstate,nstate), wrk(nstate,nstate)
+dimension fy(nstate,ntot), alpha(nstate,ntot), beta(nstate,ntot)
+dimension gamma(nstate,ntot), xi(nstate,nstate,nxi), xisum(nstate,nstate)
 
 # Set zero:
 zero = 0.d0
 
 # Run through the replicates.
+kstop = 0
 do k = 1,nreps {
-	kstart = (k-1)*n + 1
+	n = lns(k)
+        nm1 = n - 1
+	kstart = 1 + kstop
 
 # Update the alpha's.
 	call afun(fy(1,kstart),xispd,tpm,epsilon,n,nstate,wrk,
@@ -53,11 +63,14 @@ do k = 1,nreps {
 
 # Update the xi's.
 	call xfun(alpha(1,kstart),beta(1,kstart),fy(1,kstart),
-                  tpm,epsilon,n,nstate,wrk,xi(1,1,kstart-k+1))
+                  tpm,epsilon,n,nstate,nm1,wrk,xi(1,1,kstart-k+1))
+
+# Increment kstop.
+kstop = kstop + lns(k)
 }
 
+kstop = kstop - nreps
 # Sum up the xi's.
-kstop = nreps*(n-1)
 do i = 1,nstate {
 	do j = 1,nstate {
 		xisum(i,j) = zero
@@ -69,4 +82,32 @@ do i = 1,nstate {
 
 return
 end
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 2
+a2 2
+subroutine recurse(fy,xispd,tpm,nreps,epsilon,n,nstate,wrk,xlc,
+                   alpha,beta,gamma,xi,xisum)
+d5 4
+a8 4
+dimension xispd(1), xlc(1)
+dimension tpm(nstate,1), wrk(nstate,1)
+dimension fy(nstate,1), alpha(nstate,1), beta(nstate,1), gamma(nstate,1)
+dimension xi(nstate,nstate,1), xisum(nstate,1)
+d14 1
+d16 3
+a18 1
+	kstart = (k-1)*n + 1
+d34 4
+a37 1
+                  tpm,epsilon,n,nstate,wrk,xi(1,1,kstart-k+1))
+d40 1
+a41 1
+kstop = nreps*(n-1)
 @

@@ -1,8 +1,8 @@
 C Output from Public domain Ratfor, version 1.0
       subroutine bfun(fy,xispd,tpm,epsilon,n,nstate,wrk,beta)
       implicit double precision(a-h,o-z)
-      dimension wrk(1), xispd(1)
-      dimension fy(nstate,1), tpm(nstate,1), beta(nstate,1)
+      dimension wrk(nstate), xispd(nstate)
+      dimension fy(nstate,n), tpm(nstate,nstate), beta(nstate,n)
       one = 1.d0
       zero = 0.d0
       do23000 j = 1,nstate 

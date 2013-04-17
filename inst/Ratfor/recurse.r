@@ -1,11 +1,11 @@
 subroutine recurse(fy,xispd,tpm,nreps,epsilon,lns,nstate,wrk,xlc,
-                   alpha,beta,gamma,xi,xisum)
+                   ntot,nxi,alpha,beta,gamma,xi,xisum)
 
 implicit double precision(a-h,o-z)
-dimension xispd(1), xlc(1), lns(1)
-dimension tpm(nstate,1), wrk(nstate,1)
-dimension fy(nstate,1), alpha(nstate,1), beta(nstate,1), gamma(nstate,1)
-dimension xi(nstate,nstate,1), xisum(nstate,1)
+dimension xispd(nstate), xlc(ntot), lns(nreps)
+dimension tpm(nstate,nstate), wrk(nstate,nstate)
+dimension fy(nstate,ntot), alpha(nstate,ntot), beta(nstate,ntot)
+dimension gamma(nstate,ntot), xi(nstate,nstate,nxi), xisum(nstate,nstate)
 
 # Set zero:
 zero = 0.d0
@@ -14,6 +14,7 @@ zero = 0.d0
 kstop = 0
 do k = 1,nreps {
 	n = lns(k)
+        nm1 = n - 1
 	kstart = 1 + kstop
 
 # Update the alpha's.
@@ -30,7 +31,7 @@ do k = 1,nreps {
 
 # Update the xi's.
 	call xfun(alpha(1,kstart),beta(1,kstart),fy(1,kstart),
-                  tpm,epsilon,n,nstate,wrk,xi(1,1,kstart-k+1))
+                  tpm,epsilon,n,nstate,nm1,wrk,xi(1,1,kstart-k+1))
 
 # Increment kstop.
 kstop = kstop + lns(k)

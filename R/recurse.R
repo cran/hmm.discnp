@@ -10,8 +10,10 @@ K  <- nrow(tpm)
 K2 <- K*K
 L  <- ncol(fy)
 M  <- K*L
-N  <- K*M - K2
 nreps <- length(lns)
+nxi   <- L - nreps
+#N  <- K*M - K2
+N <- K*K*nxi
 epsilon <- sqrt(.Machine$double.eps)
 
 # Recursive probabilities:
@@ -27,6 +29,8 @@ epsilon <- sqrt(.Machine$double.eps)
                 nstate=as.integer(K),
                 wrk=double(K2),
 		xlc=double(L),
+                ntot=as.integer(L),
+                nxi=as.integer(nxi),
                 alpha=double(M),
                 beta=double(M),
                 gamma=double(M),
