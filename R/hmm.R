@@ -1,7 +1,7 @@
-hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,stationary=TRUE,
-                mixture=FALSE,tolerance=1e-4,verbose=FALSE,itmax=200,
-                crit='PCLL',keep.y=TRUE,data.name=NULL)
-{
+hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,stationary=cis,
+                mixture=FALSE,cis=TRUE,tolerance=1e-4,verbose=FALSE,itmax=200,
+                crit='PCLL',keep.y=TRUE,data.name=NULL) {
+#
 # Function hmm.  To fit a Hidden Markov model to a data set where the
 # observations come from one of a number of finite discrete
 # distributions, depending on the (hidden) state of the Markov chain.
@@ -17,6 +17,12 @@ hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,stationary=TRUE,
 # Check on consistency of ``mixture'' and ``stationary''.
 if(mixture & !stationary)
 	stop("Makes no sense for mixture to be non-stationary.\n")
+
+# Check on consistancy of ``stationary'' and ``cis''.
+if(stationary & !cis)
+	stop(paste("If the model is stationary the initial state\n",
+                   "probability distribution must be constant\n",
+                   "across data sequences.\n"))
 
 # Put together a data name tag for the output.
 if(is.null(data.name)) data.name <- deparse(substitute(y))
@@ -65,14 +71,19 @@ if(is.na(icrit)) stop('Stopping criterion not recognized.')
 
 # Perform initial setting-up.
 tpm    <- par0$tpm
-ispd   <- revise.ispd(tpm)
+if(cis) {
+    ispd   <- revise.ispd(tpm)
+} else { # Start all chains in state 1 with probability 1.
+    ispd <- matrix(0,K,length(y))
+    ispd[1,] <- 1
+}
 Rho    <- par0$Rho
 m      <- nrow(Rho)
 digits <- 2+ceiling(abs(log10(tolerance)))
 
 old.theta <- c(c(tpm[,-K]),c(Rho[1:(m-1),]))
 fy        <- ffun(y,Rho)
-rp        <- recurse(fy,tpm,ispd,lns)
+rp        <- recurse(fy,tpm,ispd,lns,cis)
 old.ll    <- sum(log(rp$llc))
 
 if(verbose) cat('\n      Initial set-up completed ...\n\n')
@@ -89,7 +100,7 @@ repeat{
 	ispd <- if(stationary) {
 			revise.ispd(tpm)
 		} else {
-			revise.ispd(gamma=rp$gamma,lns=lns)
+			revise.ispd(gamma=rp$gamma,lns=lns,cis=cis)
 		}
 	Rho  <- revise.rho(y,rp$gamma,yval)
 
@@ -99,7 +110,7 @@ repeat{
 # to update the parameter estimates on the *next* EM
 # step, if necessary).
 	fy <- ffun(y,Rho)
-	rp <- recurse(fy,tpm,ispd,lns)
+	rp <- recurse(fy,tpm,ispd,lns,cis)
 	ll <-  sum(log(rp$llc))
 
 # Test for convergence:
@@ -143,7 +154,7 @@ repeat{
 if(length(y)==1) y <- y[[1]]
 rslt <- list(Rho=Rho,tpm=tpm,ispd=ispd,log.like=ll,converged=converged,
              nstep=nstep,y=if(keep.y) y else NULL, data.name=data.name,
-             stationary=stationary)
+             stationary=stationary, cis=cis)
 class(rslt) <- "hmm.discnp"
 rslt
 }

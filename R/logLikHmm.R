@@ -15,8 +15,11 @@ y <- mat2list(y)
 Rho  <- par$Rho
 tpm  <- par$tpm
 ispd <- par$ispd
-if(is.null(ispd)) ispd <- revise.ispd(tpm=tpm)
-K    <- length(ispd)
+if(is.null(ispd)) {
+   ispd <- revise.ispd(tpm=tpm)
+}
+K   <- length(ispd)
+cis <- !(is.matrix(ispd) && ncol(ispd) > 1)
 
 # Make sure that the entries of the vectors in y correspond
 # to the row names of Rho.
@@ -27,6 +30,6 @@ if(K==1) return(sum(log(ffun(y,Rho))))
 
 lns <- sapply(y,length)
 fy  <- ffun(y,Rho)
-rp  <- recurse(fy,tpm,ispd,lns)
+rp  <- recurse(fy,tpm,ispd,lns,cis)
 sum(log(rp$llc))
 }

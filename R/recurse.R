@@ -1,4 +1,4 @@
-recurse <- function(fy,tpm,ispd,lns)
+recurse <- function(fy,tpm,ispd,lns,cis)
 {
 #
 # Function recurse to calculate the ``recursive probabilities'',
@@ -15,6 +15,7 @@ nxi   <- L - nreps
 #N  <- K*M - K2
 N <- K*K*nxi
 epsilon <- sqrt(.Machine$double.eps)
+nis <- if(cis) 1 else nreps
 
 # Recursive probabilities:
 
@@ -27,6 +28,8 @@ epsilon <- sqrt(.Machine$double.eps)
                 epsilon=as.double(epsilon),
 		lns=as.integer(lns),
                 nstate=as.integer(K),
+                nis=as.integer(nis),
+                cis=as.logical(cis),
                 wrk=double(K2),
 		xlc=double(L),
                 ntot=as.integer(L),

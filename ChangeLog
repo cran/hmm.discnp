@@ -254,3 +254,17 @@ Version 0.1-8 --> 0.1-9
 
 Fixed up the dimensioning of Fortran arrays so that they
 no longer use dummy 1's as the final dimension.
+
+17 April 2013
+
+Uploaded to CRAN
+
+Version 0.1-9 --> 0.2-0
+=======================
+
+30 September 2013
+
+Added the capability to use a different ispd for each
+(independent) sequence in the data set.
+
+Uploaded to CRAN
