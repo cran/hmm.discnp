@@ -1,10 +1,15 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks
-	rolf:1.2; strict;
+	rolf:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2014.01.31.02.41.38;	author rolf;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2009.09.27.08.01.41;	author rolf;	state Exp;
@@ -22,6 +27,62 @@ desc
 @
 
 
+1.3
+log
+@Function to revise/update the ispd vector (or matrix if
+"non-constant").
+@
+text
+@revise.ispd <- function(tpm=NULL,gamma=NULL,lns=NULL,cis=TRUE) {
+# Function revise.ispd.  To revise the initial state probability
+# distribution
+
+if(cis) {
+    if(is.null(tpm) + (is.null(gamma) & is.null(lns)) != 1)
+    	stop(paste("When \"cis\" is TRUE either \"tpm\" should be given\n",
+                   "OR \"gamma\" and \"lns\" should be given.\n"))
+    
+# If ispd is taken to be the steady state distribution:
+    if(!is.null(tpm)) {
+    	eee   <- eigen(t(tpm))
+    	k <- match(1,round(eee$values,6))
+    	if(length(k) != 1) {
+    		cat('Problems with eigenvalues:\n')
+    		print(eee$values)
+    		stop()
+    	}
+    	v <- Re(eee$vectors[,k])
+        ispd <- v/sum(v)
+    } else {
+    
+# Steady state not assumed:
+        v <- 0
+        j <- 1
+        nseq <- length(lns)
+        for(i in 1:nseq) {
+            v <- v + gamma[,j]
+            j <- j + lns[i]
+        }
+        ispd <- v/nseq
+    }
+} else {
+    if(is.null(gamma) | is.null(lns))
+    	stop(paste("When \"cis\" is FALSE \"gamma\" and \"lns\"\n",
+                   "must be given.\n"))
+    jg   <- 1
+    nseq <- length(lns)
+    K    <- nrow(gamma)
+    ispd <- matrix(0,K,nseq)
+    for(j in 1:nseq) {
+        ispd[which.max(gamma[,jg]),j] <- 1
+        jg <- jg + lns[j]
+    }
+}
+return(ispd)
+}
+@
+
+
 1.2
 log
 @Adapted to estimate ispd as the averaged of the
@@ -29,15 +90,17 @@ log
 is false.
 @
 text
-@revise.ispd <- function(tpm=NULL,gamma=NULL,lns=NULL) {
-# Function revise.ispd.  To revise the initial state probability
-# distribution
-
+@d1 1
+a1 1
+revise.ispd <- function(tpm=NULL,gamma=NULL,lns=NULL) {
+d5 5
+a9 4
 if(is.null(tpm) + (is.null(gamma) & is.null(lns)) != 1)
 	stop(paste("Either \"tpm\" should be given OR\n",
                    "\"gamma\" and \"lns\" should be given.\n"))
 
-# If ispd is taken to be the steady state distribution:
+d11 12
+a22 12
 if(!is.null(tpm)) {
 	eee   <- eigen(t(tpm))
 	k <- match(1,round(eee$values,6))
@@ -50,16 +113,17 @@ if(!is.null(tpm)) {
 	return(v/sum(v))
 }
 
-# Steady state not assumed:
+d24 21
+a44 6
 v <- 0
 j <- 1
 nseq <- length(lns)
 for(i in 1:nseq) {
 		v <- v + gamma[,j]
 		j <- j + lns[i]
-}
+d46 1
+a46 1
 v/nseq 
-}
 @
 
 

@@ -89,7 +89,7 @@ sp(y, object = NULL, tpm, Rho, ispd=NULL, means = FALSE)
 }
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr
-  \url{http://www.math.unb.ca/~rolf}
+  \url{http://www.stat.auckland.ac.nz/~rolf}
 }
 
 \seealso{\code{\link{hmm}()}, \code{\link{mps}()},

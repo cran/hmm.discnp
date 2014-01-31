@@ -1,4 +1,4 @@
-viterbi <- function(y,object=NULL,tpm,Rho,ispd=NULL) {
+viterbi <- function(y,object=NULL,tpm,Rho,ispd=NULL,log=FALSE) {
 #
 # Function viterbi to apply the Viterbi algorithm to a collection
 # of data sequences, given the parameters of the model.
@@ -33,17 +33,33 @@ lns  <- sapply(y,length)
 rslt <- list()
 for(j in 1:nseq) {
 	psi <- list()
-	delta <- ispd*Rho[y[[j]][1],]
-	delta <- delta/sum(delta)
+        if(log) {
+            delta <- log(ispd) + log(Rho[y[[j]][1],])
+        } else {
+	    delta <- ispd*Rho[y[[j]][1],]
+	    delta <- delta/sum(delta)
+        }
 	nj <- lns[j]
 	for(tt in 2:nj) {
-		tmp <- apply(delta*tpm,2,
+		if(log) {
+                    tmp <- apply(delta + log(tpm),2,
                              function(x){((1:length(x))[x==max(x)])}
                              )
-		psi[[tt]] <- tmp # Note that tmp will be a list of
+                } else {
+		    tmp <- apply(delta*tpm,2,
+                             function(x){((1:length(x))[x==max(x)])}
+                             )
+                }
+	        psi[[tt]] <- tmp # Note that tmp will be a list of
 		                 # vectors, each of length between
                                  # 1 and K = the number of states.
-		delta <- Rho[y[[j]][tt],]*apply(delta*tpm,2,max)
+		if(log) {
+                    delta <- log(Rho[y[[j]][tt],]) +
+                                 apply(delta + log(tpm),2,max)
+                } else {
+		    delta <- Rho[y[[j]][tt],]*apply(delta*tpm,2,max)
+                    delta <- delta/sum(delta)
+                }
 	}
 	temp <- list()
 	temp[[nj]] <- (1:K)[delta==max(delta)]

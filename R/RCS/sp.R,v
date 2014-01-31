@@ -1,10 +1,15 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks
-	rolf:1.2; strict;
+	rolf:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2014.01.31.02.48.23;	author rolf;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2009.09.27.08.10.47;	author rolf;	state Exp;
@@ -22,12 +27,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Now returns fitted conditional means (if asked) in addition
-to the state probabilities.  If argument y is not specified,
-now tries to extract y from ``object''.  Argument yval is
-eliminated.
+@Fixed to give Rho row names if necessary.
 @
 text
 @sp <- function (y, object = NULL, tpm, Rho, ispd=NULL, means=FALSE)
@@ -44,6 +46,7 @@ text
     }
     y <- mat2list(y)
     check.yval(y,Rho)
+    if(is.null(row.names(Rho))) row.names(Rho) <- 1:nrow(Rho)
     lns  <- sapply(y,length)
     fy   <- ffun(y, Rho)
     rp   <- recurse(fy, tpm, ispd, lns)
@@ -73,6 +76,18 @@ text
     if(means) return(list(probs=xxx,means=yyy))
     xxx
 }
+@
+
+
+1.2
+log
+@Now returns fitted conditional means (if asked) in addition
+to the state probabilities.  If argument y is not specified,
+now tries to extract y from ``object''.  Argument yval is
+eliminated.
+@
+text
+@d15 1
 @
 
 

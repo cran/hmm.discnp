@@ -6,7 +6,6 @@ sp <- function (y, object = NULL, tpm, Rho, ispd=NULL, means=FALSE)
         ispd <- object$ispd
     }
     if(is.null(ispd)) ispd <- revise.ispd(tpm)
-    cis <- !(is.matrix(ispd) && ncol(ispd) > 1)
     if(missing(y)) {
 	y <- if(!is.null(object)) object$y else NULL
 	if(is.null(y)) stop("No observation sequence supplied.\n")
@@ -16,7 +15,7 @@ sp <- function (y, object = NULL, tpm, Rho, ispd=NULL, means=FALSE)
     if(is.null(row.names(Rho))) row.names(Rho) <- 1:nrow(Rho)
     lns  <- sapply(y,length)
     fy   <- ffun(y, Rho)
-    rp   <- recurse(fy, tpm, ispd, lns,cis)
+    rp   <- recurse(fy, tpm, ispd, lns)
     prbs <- rp$gamma
     if(means) {
 	yval <- ( if(!is.null(row.names(Rho)))

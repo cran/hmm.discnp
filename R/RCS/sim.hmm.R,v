@@ -1,10 +1,15 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks
-	rolf:1.2; strict;
+	rolf:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2014.01.31.02.46.27;	author rolf;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2009.09.27.08.04.30;	author rolf;	state Exp;
@@ -22,16 +27,13 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Now takes an argument yval specifying the set of possible
-observations.  Arguments are changed so that nsim is now
-a *vector*.  Its length specifies the number of independent
-sequences generated; its entries specify the length of each
-sequence.
+@Can now simulated multiple sequences (possibly of different
+lengths).
 @
 text
-@sim.hmm <- function(nsim,tpm,Rho,ispd=NULL,yval=NULL) {
+@sim.hmm <- function(nsim,tpm,Rho,ispd=NULL,yval=NULL,verb=FALSE) {
 #
 # Function sim.hmm to simulate data from a hidden Markov
 # model with transition probability matrix tpm, and discrete
@@ -76,19 +78,62 @@ if(!identical(all.equal(xxx,rep(1,nrow(tpm))),TRUE))
 if(is.null(ispd)) ispd <- revise.ispd(tpm)
 K    <- ncol(Rho)
 M    <- nrow(Rho)
-rslt <- list()
+ntot <- sum(nsim)
+rslt <- if(is.numeric(yval)) numeric(ntot) else character(ntot)
+jr   <- 0
 for(j in 1:nseq) {
+	jr <- jr+1
 	s1     <- sample(1:K,1,prob=ispd)
+        rslt[jr] <- sample(yval,1,prob=Rho[,s1])
+	for(i in 2:nsim[j]) {
+		jr <- jr+1
+		s1 <- sample(1:K,1,prob=tpm[s1,])
+		rslt[jr] <- sample(yval,1,prob=Rho[,s1])
+		if(verb) {
+			if(jr%%1000 == 0) cat(jr,"")
+			if(jr%%10000 == 0) cat("\n")
+		}
+	}
+}
+if(verb) cat("\n")
+if(nseq==1) rslt else {
+	rslt <- unname(tapply(rslt,rep(1:nseq,nsim),function(x){x}))
+	attr(rslt,"dim") <- NULL
+	rslt
+}
+}
+@
+
+
+1.2
+log
+@Now takes an argument yval specifying the set of possible
+observations.  Arguments are changed so that nsim is now
+a *vector*.  Its length specifies the number of independent
+sequences generated; its entries specify the length of each
+sequence.
+@
+text
+@d1 1
+a1 1
+sim.hmm <- function(nsim,tpm,Rho,ispd=NULL,yval=NULL) {
+d46 3
+a48 1
+rslt <- list()
+d50 1
+d52 1
+a52 2
 	y      <- list()
 	y[[1]] <- sample(yval,1,prob=Rho[,s1])
-	for(i in 2:nsim[j]) {
-		s1 <- sample(1:K,1,prob=tpm[s1,])
+d54 1
+d56 5
+a60 1
 		y[[i]] <- sample(yval,1,prob=Rho[,s1])
-	}
+a61 1
 	rslt[[j]] <- unlist(y)
-}
+d63 6
+a68 1
 if(nseq==1) rslt[[1]] else rslt 
-}
 @
 
 

@@ -1,10 +1,15 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks
-	rolf:1.2; strict;
+	rolf:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2014.01.31.02.36.24;	author rolf;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2009.09.27.07.59.00;	author rolf;	state Exp;
@@ -22,10 +27,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Now expects multiple sequences to be presented as list
-components rather than columns of a matrix.
+@Fixed to handle lists of observation sequences properly.
 @
 text
 @pr <- function(s,y,object=NULL,tpm,Rho,ispd=NULL) {
@@ -45,16 +49,17 @@ check.yval(y,Rho)
 
 if(!is.list(s)) s <- list(s)
 nseq <- length(s)
-if(length(y) != nseq)
+if(!length(y)%in%c(1,nseq))
 	stop(paste("Mismatch between number of state sequences\n",
                    "and number of observation sequences.\n"))
 rslt <- numeric(nseq)
 for(i in 1:nseq) {
-	tmp <- log(ispd[s[[i]][1]]) + log(Rho[y[[i]][1],s[[i]][1]])
-	n <- length(y[[i]])
+	ii <- if(length(y)==1) 1 else i
+	tmp <- log(ispd[s[[i]][1]]) + log(Rho[y[[ii]][1],s[[i]][1]])
+	n <- length(y[[ii]])
 	for(j in 2:n)
         	tmp <- tmp + log(tpm[s[[i]][j-1],s[[i]][j]]) +
-                             log(Rho[y[[i]][j],s[[i]][j]])
+                             log(Rho[y[[ii]][j],s[[i]][j]])
 	rslt[i] <- tmp
 }
 
@@ -72,6 +77,25 @@ for(i in 1:nseq) {
 
 rslt
 }
+@
+
+
+1.2
+log
+@Now expects multiple sequences to be presented as list
+components rather than columns of a matrix.
+@
+text
+@d18 1
+a18 1
+if(length(y) != nseq)
+d23 3
+a25 2
+	tmp <- log(ispd[s[[i]][1]]) + log(Rho[y[[i]][1],s[[i]][1]])
+	n <- length(y[[i]])
+d28 1
+a28 1
+                             log(Rho[y[[i]][j],s[[i]][j]])
 @
 
 

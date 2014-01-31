@@ -6,7 +6,7 @@
   each of one or more replicate observation sequences.
 }
 \usage{
-viterbi(y, object = NULL, tpm, Rho, ispd=NULL)
+viterbi(y, object = NULL, tpm, Rho, ispd=NULL,log=FALSE)
 }
 \arguments{
   \item{y}{The observations for which the underlying most probable
@@ -32,6 +32,17 @@ viterbi(y, object = NULL, tpm, Rho, ispd=NULL)
   bear some reasonable relationship to \code{y}. If \code{object}
   and \code{ispd} are both \code{NULL} then \code{ispd} is set
   equal to the stationary distribution calculated from \code{tpm}.}
+  \item{log}{Logical scalar.  Should logarithms be used in the
+  recursive calculations of the probabilities involved in the
+  Viterbi algorithm, so as to avoid underflow?  If \code{log} is
+  \code{FALSE} then underflow is avoided instead by a normalization
+  procedure.  The quantity \code{delta} (see Rabiner 1989, page 264)
+  is replaced by \code{delta/sum(delta)} at each step.  It should
+  actually make no difference whether \code{log} is set to \code{TRUE}.
+  I just included the option because I could.  Also the \code{HMM}
+  package uses the logarithm approach so setting \code{log=TRUE}
+  might be of interest if comparisons are to be made between the
+  results of the two packages.}
 }
 \details{
   Applies the Viterbi algorithm to calculate ``the'' most probable
@@ -55,7 +66,7 @@ pp. 257 -- 286, 1989.
 }
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr
-  \url{http://www.math.unb.ca/~rolf}
+  \url{http://www.stat.auckland.ac.nz/~rolf}
 }
 
 \section{Warning}{
@@ -64,8 +75,15 @@ state sequence underlying a given observation sequence.  This
 phenomenon appears to be unlikely to occur in practice.
 }
 
+\section{Thanks}{
+The correction made to the code so as to avoid underflow
+problems was made due to an inquiry and suggestion from
+Owen Marshall.
+}
+
 \seealso{\code{\link{hmm}()}, \code{\link{sim.hmm}()},
-         \code{\link{mps}()}, \code{\link{pr}()}}
+         \code{\link{mps}()}, \code{\link{pr}()},
+         \code{\link[HMM]{viterbi}()}}
 \examples{
 # See the help for sim.hmm() for how to generate y.num and y.let.
 \dontrun{

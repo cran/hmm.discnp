@@ -1,4 +1,4 @@
-recurse <- function(fy,tpm,ispd,lns,cis)
+recurse <- function(fy,tpm,ispd,lns)
 {
 #
 # Function recurse to calculate the ``recursive probabilities'',
@@ -12,10 +12,17 @@ L  <- ncol(fy)
 M  <- K*L
 nreps <- length(lns)
 nxi   <- L - nreps
-#N  <- K*M - K2
 N <- K*K*nxi
 epsilon <- sqrt(.Machine$double.eps)
-nis <- if(cis) 1 else nreps
+if(is.matrix(ispd)) {
+    if(ncol(ispd) != nreps)
+        stop("Number of columns of \"ispd\" must equal \"nreps\".\n")
+    cis <- FALSE
+    nis <- nreps
+} else {
+    cis <- TRUE
+    nis <- 1
+}
 
 # Recursive probabilities:
 

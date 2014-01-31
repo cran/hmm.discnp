@@ -239,7 +239,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
 
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr
-  \url{http://www.math.unb.ca/~rolf}
+  \url{http://www.stat.auckland.ac.nz/~rolf}
 }
 
 \seealso{\code{\link{sim.hmm}()}, \code{\link{mps}()},

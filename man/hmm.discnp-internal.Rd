@@ -15,7 +15,7 @@
 ffun(y,Rho)
 init.all(nval,K,rand.start,mixture=FALSE)
 check.yval(y,Rho)
-recurse(fy,tpm,ispd,lns,cis)
+recurse(fy,tpm,ispd,lns)
 revise.ispd(tpm=NULL,gamma=NULL,lns=NULL,cis=TRUE)
 revise.rho(y,gamma,yval)
 revise.tpm(xi,mixture)

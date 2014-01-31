@@ -1,10 +1,15 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks
-	rolf:1.2; strict;
+	rolf:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2014.01.31.02.43.17;	author rolf;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2009.09.27.08.02.46;	author rolf;	state Exp;
@@ -22,11 +27,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Changed to accommodate the list presentation of multiple
-sequences of observations.  Also accomodates observations
-being in any finite set rather than just 1:nrow(Rho).
+@Change to handle NAs correctly.
 @
 text
 @revise.rho <- function(y,gamma,yval) {
@@ -34,8 +37,20 @@ text
 	there <- !is.na(y)
 	t1 <- apply(gamma[,there],1,
 		function(x,index){tapply(x,index,sum)},y[there])
+	t1[is.na(t1)] <- 0
 	t(t(t1)/apply(t1,2,sum))
 }
+@
+
+
+1.2
+log
+@Changed to accommodate the list presentation of multiple
+sequences of observations.  Also accomodates observations
+being in any finite set rather than just 1:nrow(Rho).
+@
+text
+@d6 1
 @
 
 

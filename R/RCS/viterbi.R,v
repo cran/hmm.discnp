@@ -1,10 +1,15 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks
-	rolf:1.2; strict;
+	rolf:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2014.01.31.02.49.07;	author rolf;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2009.09.27.08.13.33;	author rolf;	state Exp;
@@ -22,14 +27,14 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Adapted to list as opposed to matrix presentation of
-multiple observation sequences.  If argument y is missing
-now attempts to extract it from ``object''.
+@Underflow problems diminished by normalizing "delta" or
+alternatively by using logarithms.  New argument "log"
+defaulting to FALSE) introduced.
 @
 text
-@viterbi <- function(y,object=NULL,tpm,Rho,ispd=NULL) {
+@viterbi <- function(y,object=NULL,tpm,Rho,ispd=NULL,log=FALSE) {
 #
 # Function viterbi to apply the Viterbi algorithm to a collection
 # of data sequences, given the parameters of the model.
@@ -64,17 +69,33 @@ lns  <- sapply(y,length)
 rslt <- list()
 for(j in 1:nseq) {
 	psi <- list()
-	delta <- ispd*Rho[y[[j]][1],]
-	delta <- delta/sum(delta)
+        if(log) {
+            delta <- log(ispd) + log(Rho[y[[j]][1],])
+        } else {
+	    delta <- ispd*Rho[y[[j]][1],]
+	    delta <- delta/sum(delta)
+        }
 	nj <- lns[j]
 	for(tt in 2:nj) {
-		tmp <- apply(delta*tpm,2,
+		if(log) {
+                    tmp <- apply(delta + log(tpm),2,
                              function(x){((1:length(x))[x==max(x)])}
                              )
-		psi[[tt]] <- tmp # Note that tmp will be a list of
+                } else {
+		    tmp <- apply(delta*tpm,2,
+                             function(x){((1:length(x))[x==max(x)])}
+                             )
+                }
+	        psi[[tt]] <- tmp # Note that tmp will be a list of
 		                 # vectors, each of length between
                                  # 1 and K = the number of states.
-		delta <- Rho[y[[j]][tt],]*apply(delta*tpm,2,max)
+		if(log) {
+                    delta <- log(Rho[y[[j]][tt],]) +
+                                 apply(delta + log(tpm),2,max)
+                } else {
+		    delta <- Rho[y[[j]][tt],]*apply(delta*tpm,2,max)
+                    delta <- delta/sum(delta)
+                }
 	}
 	temp <- list()
 	temp[[nj]] <- (1:K)[delta==max(delta)]
@@ -94,6 +115,32 @@ for(j in 1:nseq) {
 }
 if(nseq==1) rslt[[1]] else rslt
 }
+@
+
+
+1.2
+log
+@Adapted to list as opposed to matrix presentation of
+multiple observation sequences.  If argument y is missing
+now attempts to extract it from ``object''.
+@
+text
+@d1 1
+a1 1
+viterbi <- function(y,object=NULL,tpm,Rho,ispd=NULL) {
+d36 6
+a41 2
+	delta <- ispd*Rho[y[[j]][1],]
+	delta <- delta/sum(delta)
+d44 2
+a45 1
+		tmp <- apply(delta*tpm,2,
+d48 6
+a53 1
+		psi[[tt]] <- tmp # Note that tmp will be a list of
+d56 7
+a62 1
+		delta <- Rho[y[[j]][tt],]*apply(delta*tpm,2,max)
 @
 
 

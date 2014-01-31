@@ -1,10 +1,15 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks
-	rolf:1.2; strict;
+	rolf:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2014.01.31.02.30.00;	author rolf;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2009.09.27.07.48.38;	author rolf;	state Exp;
@@ -22,22 +27,47 @@ desc
 @
 
 
+1.3
+log
+@Changed .onLoad() to .onAttach(); changed messaging to use
+packageStartupMessage() rather than cat().
+@
+text
+@.onLoad <- function(lib, pkg) {
+	library.dynam("hmm.discnp", pkg, lib)
+}
+
+.onAttach <- function(lib, pkg) {
+	ver <- read.dcf(file.path(lib, pkg, "DESCRIPTION"), "Version")
+        packageStartupMessage(paste(pkg, ver))
+	msg <- paste("\n     PLEASE NOTE:  The package has changed substantially",
+                     "\n     from the 0.0-x versions.  New functions have been",
+                     "\n     added and both the argument lists and the returned",
+                     "\n     values from old functions have new forms.  Please",
+                     "\n     read the ChangeLog and the documentation.\n")
+	packageStartupMessage(msg)
+}
+@
+
+
 1.2
 log
 @Produces warning message that the observations should be
 presented in list rather than matrix form.
 @
 text
-@.First.lib <- function(lib,pkg) {
-	library.dynam("hmm.discnp", pkg, lib)
-	ver <- read.dcf(file.path(lib, pkg, "DESCRIPTION"), "Version")
+@d1 1
+a1 1
+.First.lib <- function(lib,pkg) {
+d3 3
+d7 7
+a13 6
 	cat(paste(pkg, ver, "\n\n"))
 	cat("WARNING:  The package has changed substantially\n")
 	cat("from the previous version.  New functions have been\n")
 	cat("added and both the argument lists and the returned\n")
 	cat("values from old functions have new forms.  Please\n")
 	cat("read the ChangeLog and the documentation.\n\n")
-}
 @
 
 

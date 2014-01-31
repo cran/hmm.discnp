@@ -268,3 +268,20 @@ Added the capability to use a different ispd for each
 (independent) sequence in the data set.
 
 Uploaded to CRAN
+
+Version 0.2-0 --> 0.2-1
+
+Changed the way non-constant initial state probability
+distribution is handled by recurse(); now non-constancy
+is detected from the shape of ispd.  The logical argument
+"cis" is not needed.
+
+Fixed the viterbi() function to avoid ridiculously small
+probability values and consequent underflow.  Thanks to an
+inquiry from Owen Marshall.  Either uses logarithms or
+normalizes "delta" to sum to 1 (the latter being the default
+procedure).
+
+Various other small infelicities fixed.
+
+Uploaded to CRAN 31 January 2014.

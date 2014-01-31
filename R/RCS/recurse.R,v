@@ -1,10 +1,15 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks
-	rolf:1.2; strict;
+	rolf:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2014.01.31.02.39.27;	author rolf;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2009.09.27.08.00.54;	author rolf;	state Exp;
@@ -22,16 +27,16 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Adapted to allow observation sequences to be of
-different lengths.
+@Can now handle non-constant ispd; determines non-constancy
+according to whether ispd is a matrix with ncol==nreps.
 @
 text
 @recurse <- function(fy,tpm,ispd,lns)
 {
 #
-# Function recurse to revise the ``recursive probabilities'',
+# Function recurse to calculate the ``recursive probabilities'',
 # given the parameters theta, and the observations y.
 #
 
@@ -40,9 +45,19 @@ K  <- nrow(tpm)
 K2 <- K*K
 L  <- ncol(fy)
 M  <- K*L
-N  <- K*M - K2
 nreps <- length(lns)
+nxi   <- L - nreps
+N <- K*K*nxi
 epsilon <- sqrt(.Machine$double.eps)
+if(is.matrix(ispd)) {
+    if(ncol(ispd) != nreps)
+        stop("Number of columns of \"ispd\" must equal \"nreps\".\n")
+    cis <- FALSE
+    nis <- nreps
+} else {
+    cis <- TRUE
+    nis <- 1
+}
 
 # Recursive probabilities:
 
@@ -55,8 +70,12 @@ epsilon <- sqrt(.Machine$double.eps)
                 epsilon=as.double(epsilon),
 		lns=as.integer(lns),
                 nstate=as.integer(K),
+                nis=as.integer(nis),
+                cis=as.logical(cis),
                 wrk=double(K2),
 		xlc=double(L),
+                ntot=as.integer(L),
+                nxi=as.integer(nxi),
                 alpha=double(M),
                 beta=double(M),
                 gamma=double(M),
@@ -67,6 +86,24 @@ epsilon <- sqrt(.Machine$double.eps)
 
 list(gamma=matrix(rp$gamma,nrow=K),xi=matrix(rp$xisum,nrow=K),llc=rp$xlc)
 }
+@
+
+
+1.2
+log
+@Adapted to allow observation sequences to be of
+different lengths.
+@
+text
+@d4 1
+a4 1
+# Function recurse to revise the ``recursive probabilities'',
+a12 1
+N  <- K*M - K2
+d14 2
+d17 9
+d38 2
+d42 2
 @
 
 

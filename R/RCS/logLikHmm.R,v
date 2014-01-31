@@ -1,4 +1,29 @@
-logLikHmm <- function(y,par) {
+head	1.1;
+access;
+symbols;
+locks
+	rolf:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2014.01.31.02.33.20;	author rolf;	state Exp;
+branches;
+next	;
+
+
+desc
+@Function to calculate the log likelihood of a hidden Markov
+model.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@logLikHmm <- function(y,par) {
 #
 # Function logLikHmm.  To calculate the log likelihood of a sequence,
 # or collection (list) of sequences, of observations which come
@@ -32,3 +57,4 @@ fy  <- ffun(y,Rho)
 rp  <- recurse(fy,tpm,ispd,lns)
 sum(log(rp$llc))
 }
+@

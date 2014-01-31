@@ -83,7 +83,7 @@ digits <- 2+ceiling(abs(log10(tolerance)))
 
 old.theta <- c(c(tpm[,-K]),c(Rho[1:(m-1),]))
 fy        <- ffun(y,Rho)
-rp        <- recurse(fy,tpm,ispd,lns,cis)
+rp        <- recurse(fy,tpm,ispd,lns)
 old.ll    <- sum(log(rp$llc))
 
 if(verbose) cat('\n      Initial set-up completed ...\n\n')
@@ -110,7 +110,7 @@ repeat{
 # to update the parameter estimates on the *next* EM
 # step, if necessary).
 	fy <- ffun(y,Rho)
-	rp <- recurse(fy,tpm,ispd,lns,cis)
+	rp <- recurse(fy,tpm,ispd,lns)
 	ll <-  sum(log(rp$llc))
 
 # Test for convergence:
@@ -154,7 +154,7 @@ repeat{
 if(length(y)==1) y <- y[[1]]
 rslt <- list(Rho=Rho,tpm=tpm,ispd=ispd,log.like=ll,converged=converged,
              nstep=nstep,y=if(keep.y) y else NULL, data.name=data.name,
-             stationary=stationary, cis=cis)
+             stationary=stationary)
 class(rslt) <- "hmm.discnp"
 rslt
 }

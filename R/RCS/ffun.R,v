@@ -1,10 +1,15 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks
-	rolf:1.2; strict;
+	rolf:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2014.01.31.02.29.13;	author rolf;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2009.09.27.07.47.15;	author rolf;	state Exp;
@@ -22,9 +27,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Now expects y as a list rather than a matrix.
+@Adjusted how non-numeric observations are handled.
 @
 text
 @ffun <- function(y,Rho)
@@ -37,11 +42,25 @@ text
 # correspond to the observations y.
 #
 
+if(is.null(rownames(Rho))) {
+	y <- lapply(y,as.numeric)
+} else {
+	y <- lapply(y,as.character)
+}
 fy <- lapply(y,function(x,Rho){Rho[x,1:ncol(Rho)]},Rho=Rho)
 fy <- do.call(rbind,fy)
 fy[is.na(fy)] <- 1
 t(fy)
 }
+@
+
+
+1.2
+log
+@Now expects y as a list rather than a matrix.
+@
+text
+@d11 5
 @
 
 
