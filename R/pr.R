@@ -10,8 +10,8 @@ if(missing(y)) {
 	if(is.null(y)) stop("No observation sequence supplied.\n")
 }
 if(is.null(ispd)) ispd <- revise.ispd(tpm)
-y <- mat2list(y)
-check.yval(y,Rho)
+y <- charList(y)
+Rho <- check.yval(y,Rho)
 
 if(!is.list(s)) s <- list(s)
 nseq <- length(s)

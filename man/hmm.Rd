@@ -64,12 +64,13 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
    steady state at the time that observations commenced. In this
    case  the initial state probability distribution is estimated
    as the stationary distribution determined by the (estimated)
-   transition probability matrix.  Otherwise if \code{cis}(see below)
-   is \code{TRUE} the initial state probability distribution
+   transition probability matrix.  Otherwise if \code{cis} (see
+   below) is \code{TRUE} the initial state probability distribution
    is estimated as the mean of the vectors of conditional
    probabilities of the states, given the observation sequences,
    at time \code{t=1}.  If \code{stationary} is \code{TRUE} and
    \code{cis} is \code{FALSE} an error is given.
+
 }
 \item{mixture}{
    A logical scalar; if TRUE then a mixture model (all rows of the
@@ -182,9 +183,11 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
    pad them out with NAs to equalize the lengths.  In the revision
    from version 0.0-9 to 0.1-0 this was changed, requiring the
    argument \code{y} to be (more sensibly) a list when there are
-   multiple series.  Unfortunately this help page was \emph{not}
-   correspondingly revised and the old ``matrix'' format was left
-   as being the specified input format.
+   multiple series.  (Unfortunately this help page was \emph{not}
+   correspondingly revised at the time of that transition nor of
+   the next one, and the old ``matrix'' format was left as being
+   the specified input format until the package was updated to
+   version 0.1-2.)
 
    The old matrix format is still permitted (and the matrix
    is internally changed into a list) but this is deprecated.
@@ -229,7 +232,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
    pp. 1917-1923, 1991.
 
    MacDonald, I. L., and Zucchini, W., "Hidden Markov and Other
-   Models for Discrete-valued Time Series", Chapman \& Hall,
+   Models for Discrete-valued Time Series", Chapman & Hall,
    London, 1997.
 
    Liu, Limin, "Hidden Markov Models for Precipitation in a Region
@@ -252,5 +255,8 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
    print(fit.num[c("tpm","Rho")])
 # Note that states 1 and 2 get swapped.
 }
+xxx <- with(colifCount,split(y,f=locn))
+fitColCount <- hmm(xxx,K=2) # Two states: above and below the thermocline.
+fitLesCount <- hmm(lesionCount,K=2) # Two states: relapse and remission.
 }
 \keyword{models}

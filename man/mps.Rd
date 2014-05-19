@@ -28,11 +28,16 @@ mps(y, object = NULL, tpm, Rho, ispd=NULL)
   \code{object} is non-null. Should bear some reasonable relationship
   to \code{y}.}
   \item{ispd}{A vector specifying the initial state probability
-  distribution for a hidden Markov model; ignored if \code{object}
-  is non-null. Should bear some reasonable relationship to \code{y}.
-  If both \code{ispd} and \code{object} are \code{NULL} then
-  \code{ispd} is taken to be the stationary distribution of the
-  chain, calculated from \code{tpm}.}
+  distribution for a hidden Markov model, or a matrix each of whose
+  columns are trivial (\dQuote{delta function}) vectors specifying
+  the \dQuote{most probable} initial state for each observation
+  sequence.
+
+  This argument is ignored if \code{object} is non-null. It should
+  bear some reasonable relationship to \code{y}.  If both \code{ispd}
+  and \code{object} are \code{NULL} then \code{ispd} is taken to
+  be the stationary distribution of the chain, calculated from
+  \code{tpm}.}
 }
 \details{
   For each \eqn{t} the maximum value of \eqn{\gamma_t(i)}{gamma_t(i)},

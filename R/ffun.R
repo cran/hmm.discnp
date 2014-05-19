@@ -1,4 +1,16 @@
-ffun <- function(y,Rho)
+ffun <- local({
+
+fixNA <- function(x,Rho) {
+  if(any(is.na(x))) {
+    rn <- c(rownames(Rho),"missing")
+    Rho  <- rbind(Rho,rep(1,ncol(Rho)))
+    rownames(Rho) <- rn
+    x[is.na(x)] <- "missing"
+  }
+  Rho[x,1:ncol(Rho)]
+}
+
+function(y,Rho)
 {
 #
 # Function ffun to calculate f(x) = Pr(Y=x | the model parameters)
@@ -8,13 +20,8 @@ ffun <- function(y,Rho)
 # correspond to the observations y.
 #
 
-if(is.null(rownames(Rho))) {
-	y <- lapply(y,as.numeric)
-} else {
-	y <- lapply(y,as.character)
-}
-fy <- lapply(y,function(x,Rho){Rho[x,1:ncol(Rho)]},Rho=Rho)
+fy <- lapply(y,fixNA,Rho=Rho)
 fy <- do.call(rbind,fy)
-fy[is.na(fy)] <- 1
 t(fy)
 }
+})

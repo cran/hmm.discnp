@@ -27,13 +27,13 @@ if(stationary & !cis)
 # Put together a data name tag for the output.
 if(is.null(data.name)) data.name <- deparse(substitute(y))
 
-# If y is a matrix, change it to a list, and put out a
-# snarky message to the user.
-y <- mat2list(y)
+# Change y into *character* data.  If y is a matrix, change it
+# to a list, and put out a snarky message to the user.
+y <- charList(y)
 
 # Check that the observation values are compatible
 # with yval if it is specified.
-uval <- sort(unique(unlist(y)))
+uval <- attr(y,"uval")
 if(is.null(yval)) yval <- uval
 if(!all(uval%in%yval))
         stop("Specified y values do not include all observed y values.\n")
@@ -54,7 +54,15 @@ else {
 		stop(paste("Row dimension of \"Rho\" not equal to\n",
                            "the number of distinct y-values.\n"))
 }
-row.names(par0$Rho) <- yval
+if(is.null(row.names(par0$Rho))) {
+    row.names(par0$Rho) <- yval
+} else {
+    if(!all.equal(yval,row.names(par0$Rho))) {
+        whinge <- paste("The row names of the initial value of \"Rho\" are not\n",
+                        "equal to the list of possible y-values, \"yval\".\n")
+        stop(whinge)
+    }
+}
 
 # If K=1 do the triv thing:
 if(K==1) {

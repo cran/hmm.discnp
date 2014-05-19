@@ -16,13 +16,13 @@ if(missing(y)) {
 	y <- if(!is.null(object)) object$y else NULL
 	if(is.null(y)) stop("No observation sequence supplied.\n")
 }
-y <- mat2list(y)
+y <- charList(y)
 
 # Build ispd if it was given as NULL
 if(is.null(ispd)) ispd <- revise.ispd(tpm)
 
 # Make sure that the y-values are compatible with Rho.
-check.yval(y,Rho)
+Rho <- check.yval(y,Rho)
 
 # Make sure y is a list, and get the number of sequences and
 # lengths of these sequences.

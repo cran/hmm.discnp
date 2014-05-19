@@ -21,10 +21,14 @@ logLikHmm(y, par)
   \item \code{Rho}: The matrix whose columns consist of the
   probabilities specifying the distributions of the observations.
   \item \code{tpm}: The transition probability matrix of the Markov chain.
-  \item (Optionally) \code{ispd}: The vector of probabilities specifying
-  the initial state probability distribution.  If this component of \code{par}
-  is not present then \code{ispd} is calculated as the stationary distribution
-  determined by \code{tpm}.
+  \item (Optionally) \code{ispd}: The vector of probabilities
+  specifying the initial state probability distribution, or a matrix
+  each of whose columns are trivial (\dQuote{delta function})
+  vectors specifying the \dQuote{most probable} initial state
+  for each observation sequence.  If the component \code{ispd}
+  of \code{par} is not present then \code{ispd} is calculated as
+  the stationary distribution determined by \code{tpm}.
+
   }
   This list may be an object returned by \code{\link{hmm}()}.
 }

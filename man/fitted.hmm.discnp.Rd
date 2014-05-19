@@ -9,7 +9,7 @@
   Calculates the fitted values of a discrete non-parametric hidden
   Markov model as the conditional expectations of the observations,
   given the entire observation sequence (and the estimated parameters
-  of the model.
+  of the model).
 }
 \usage{
 \method{fitted}{hmm.discnp}(object, ...)
@@ -25,6 +25,14 @@
 }
 \details{
   This function is essentially a wrapper for \code{\link{sp}()}.
+  This latter function gets called with \code{mean=TRUE}.
+  The fitted values are the conditional expected values of the
+  observations, given the entire observation sequence.  Note that the
+  \dQuote{conditional expected value} concept makes sense \emph{only}
+  if the observations are \emph{numeric}. If this is not the case,
+  an error is thrown.  The observation sequence must be present in
+  \code{object} (which will be the case if \code{object} was returned
+  by \code{hmm()}).  If it is not present an error is thrown.
 }
 \value{
   If the observations (stored in \code{object}) consist of a

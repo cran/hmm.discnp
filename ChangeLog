@@ -285,3 +285,37 @@ procedure).
 Various other small infelicities fixed.
 
 Uploaded to CRAN 31 January 2014.
+
+Version 0.2-1 --> 0.2-2
+
+Fixed typo (an omitted parenthesis) in fitted.hmm.discnp.Rd.
+(02/02/2014)
+
+Augmented the details in fitted.hmm.discnp.Rd to explain the fitted
+value concept.  (02/02/2014)
+
+Revised code of fitted.hmm.discnp() to (a) make sure that "y" is
+a list and to check that all components of the list are numeric.
+(02/02/2014)
+
+Fixed up the description of "ispd" in logLikeHmm.Rd and in mps.Rd
+to cover the case where ispd is a matrix.  (02/02/2014)
+
+Fixed bug which occurred when the observations contained missing
+values causing Rho[x,1:ncol(Rho)] to throw a "subscript out of
+bounds error. (18/05/2014)
+
+Revised code to make sure that Rho *always* has row names and that
+the observations *always* get treated as *character*. (18/05/2014)
+
+Added some example data sets:  The Sydney coliform count data and
+the Albert et al. multiple sclerosis lesion count data. (18/05/2014)
+
+Changed mat2list() to charList() which does the conversion from
+matrix to list (and the whinge-producing) and coerces the y-values
+to character. (19/05/2014)
+
+Changed check.yval() to return an emission probability matrix Rho
+if the given Rho doesn't have row names.  The returned Rho is
+equipped with appropriate row names if possible.  Otherwise an
+error is thrown. (19/05/2014)

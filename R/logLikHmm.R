@@ -9,7 +9,7 @@ logLikHmm <- function(y,par) {
 
 # If y is a matrix, change it to a list, and put out a
 # snarky message to the user.
-y <- mat2list(y)
+y <- charList(y)
 
 # Get the parameters.
 Rho  <- par$Rho
@@ -21,7 +21,7 @@ if(is.null(ispd)) {
 
 # Make sure that the entries of the vectors in y correspond
 # to the row names of Rho.
-check.yval(y,Rho)
+Rho <- check.yval(y,Rho)
 
 # If K=1 do the triv thing:
 K <- length(ispd)

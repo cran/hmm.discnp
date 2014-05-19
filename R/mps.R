@@ -13,8 +13,8 @@ if(missing(y)) {
 	y <- if(!is.null(object)) object$y else NULL
 	if(is.null(y)) stop("No observation sequence supplied.\n")
 }
-y <- mat2list(y)
-check.yval(y,Rho)
+y    <- charList(y)
+Rho  <- check.yval(y,Rho)
 lns  <- sapply(y,length)
 nseq <- length(y)
 fy   <- ffun(y,Rho)

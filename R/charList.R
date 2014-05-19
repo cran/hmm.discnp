@@ -1,4 +1,4 @@
-mat2list <- function(y) {
+charList <- function(y) {
 if(is.matrix(y)) {
 	warning(paste("Presenting \"y\" as a matrix is deprecated.\n",
                       "Change to presenting \"y\" either as a vector\n",
@@ -12,5 +12,8 @@ if(is.matrix(y)) {
 		      })
 }
 if(!is.list(y)) y <- list(y)
+uval <- as.character(sort(unique(unlist(y))))
+y    <- lapply(y,as.character)
+attr(y,"uval") <- uval
 y
 }

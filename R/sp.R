@@ -10,20 +10,18 @@ sp <- function (y, object = NULL, tpm, Rho, ispd=NULL, means=FALSE)
 	y <- if(!is.null(object)) object$y else NULL
 	if(is.null(y)) stop("No observation sequence supplied.\n")
     }
-    y <- mat2list(y)
-    check.yval(y,Rho)
-    if(is.null(row.names(Rho))) row.names(Rho) <- 1:nrow(Rho)
+    y    <- charList(y)
+    Rho  <- check.yval(y,Rho)
     lns  <- sapply(y,length)
     fy   <- ffun(y, Rho)
     rp   <- recurse(fy, tpm, ispd, lns)
     prbs <- rp$gamma
     if(means) {
-	yval <- ( if(!is.null(row.names(Rho)))
-                      as.numeric(row.names(Rho)) else 1:nrow(Rho) )
+	yval <- as.numeric(row.names(Rho))
 	if(any(is.na(yval)))
 		stop("Non-numeric y-values; means make no sense.\n")
         cmns <- apply(yval*Rho,2,sum)
-	mns <- apply(cmns*prbs,2,sum)
+	mns  <- apply(cmns*prbs,2,sum)
     }
     nseq <- length(lns)
     if (nseq == 1) {
