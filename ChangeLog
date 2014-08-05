@@ -319,3 +319,23 @@ Changed check.yval() to return an emission probability matrix Rho
 if the given Rho doesn't have row names.  The returned Rho is
 equipped with appropriate row names if possible.  Otherwise an
 error is thrown. (19/05/2014)
+
+Uploaded to CRAN 19/05/2014.
+
+Version 0.2-2 |--> 0.2-3
+
+Made the word "missing" a reserved word (in the function charList()).
+(20/05/2014)
+
+Changed the way starting values for ispd are set when "stationary"
+is FALSE.  Now set ispd[i] = 1/K for all i (irrespective of value
+of "cis") whereas previous set ispd[1] = 1 and the rest 0 when cis
+was FALSE and set ispd = stationary distribution when cis was TRUE.
+(4/08/2014)
+
+Adjusted the return mechanism so that when the number of observation
+sequences is 1, the value of "ispd" is a *vector* irrespective of
+the value of argument "cis".
+(4/08/2014)
+
+Uploaded to CRAN 05/08/2014.

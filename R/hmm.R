@@ -79,11 +79,10 @@ if(is.na(icrit)) stop('Stopping criterion not recognized.')
 
 # Perform initial setting-up.
 tpm    <- par0$tpm
-if(cis) {
+if(stationary) {
     ispd   <- revise.ispd(tpm)
-} else { # Start all chains in state 1 with probability 1.
-    ispd <- matrix(0,K,length(y))
-    ispd[1,] <- 1
+} else { # Make the chains equally likely to start in any state.
+    ispd <- matrix(1/K,K,length(y))
 }
 Rho    <- par0$Rho
 m      <- nrow(Rho)
@@ -159,7 +158,10 @@ repeat{
 }
 
 # Return:
-if(length(y)==1) y <- y[[1]]
+if(length(y)==1) {
+   if(keep.y) y <- y[[1]]
+   ispd <- as.vector(ispd)
+}
 rslt <- list(Rho=Rho,tpm=tpm,ispd=ispd,log.like=ll,converged=converged,
              nstep=nstep,y=if(keep.y) y else NULL, data.name=data.name,
              stationary=stationary)

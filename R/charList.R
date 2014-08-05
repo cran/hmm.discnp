@@ -14,6 +14,14 @@ if(is.matrix(y)) {
 if(!is.list(y)) y <- list(y)
 uval <- as.character(sort(unique(unlist(y))))
 y    <- lapply(y,as.character)
+if("missing" %in% uval) {
+    whinge <- paste("At least one observation consists of the character\n",
+                    "string \"missing\". This is a *reserved* word in the\n",
+                    "hmm.discnp package and may not be used as an\n",
+                    "observation value.\n")
+    stop(whinge)
+}
+
 attr(y,"uval") <- uval
 y
 }

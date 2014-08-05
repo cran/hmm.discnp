@@ -39,7 +39,8 @@ if(cis) {
     K    <- nrow(gamma)
     ispd <- matrix(0,K,nseq)
     for(j in 1:nseq) {
-        ispd[which.max(gamma[,jg]),j] <- 1
+        ispd[,j] <- gamma[,jg]
+        #ispd[which.max(gamma[,jg]),j] <- 1
         jg <- jg + lns[j]
     }
 }
