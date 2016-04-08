@@ -17,7 +17,7 @@ init.all(nval,K,rand.start,mixture=FALSE)
 check.yval(y,Rho,warn=TRUE)
 recurse(fy,tpm,ispd,lns)
 revise.ispd(tpm=NULL,gamma=NULL,lns=NULL,cis=TRUE)
-revise.rho(y,gamma,yval)
+revise.rho(y,gamma,rnms)
 revise.tpm(xi,mixture)
 charList(y)
 }

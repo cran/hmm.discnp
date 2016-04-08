@@ -50,16 +50,24 @@ if(is.null(par0)) {
 }
 else {
 	K <- nrow(par0$tpm)
-	if(nval != nrow(par0$Rho))
-		stop(paste("Row dimension of \"Rho\" not equal to\n",
+        if(K != ncol(par0$tpm))
+            stop("The specified tpm is not square.\n")
+	if(nrow(par0$Rho) < nval)
+		stop(paste("The row dimension of Rho is less than\n",
                            "the number of distinct y-values.\n"))
 }
-if(is.null(row.names(par0$Rho))) {
-    row.names(par0$Rho) <- yval
+if(is.null(rownames(par0$Rho))) {
+    if(length(yval) != nrow(par0$Rho)) {
+        whinge <- paste("No rownames for Rho and nrow(Rho) is not equal\n",
+                        "to the number of unique y values.\n",sep="")
+        stop(whinge)
+    }
+        rnms <- rownames(par0$Rho) <- yval
 } else {
-    if(!all.equal(yval,row.names(par0$Rho))) {
-        whinge <- paste("The row names of the initial value of \"Rho\" are not\n",
-                        "equal to the list of possible y-values, \"yval\".\n")
+    rnms <- rownames(par0$Rho)
+    if(!all(yval%in%rnms)) {
+        whinge <- paste("The row names of the initial value of \"Rho\" do not\n",
+                        "include all possible y-values.\n")
         stop(whinge)
     }
 }
@@ -68,6 +76,7 @@ if(is.null(row.names(par0$Rho))) {
 if(K==1) {
 	y <- factor(unlist(y),levels=yval)
 	Rho <- as.matrix(table(y)/length(y))
+        rownames(Rho) <- rnms
 	ll  <- sum(log(ffun(y,Rho)))
 	return(list(Rho=Rho,tpm=NA,ispd=NA,log.like=ll,
                converged=NA,nstep=NA,data.name=data.name))
@@ -109,7 +118,7 @@ repeat{
 		} else {
 			revise.ispd(gamma=rp$gamma,lns=lns,cis=cis)
 		}
-	Rho  <- revise.rho(y,rp$gamma,yval)
+	Rho  <- revise.rho(y,rp$gamma,rnms)
 
 # Update the log likelihood on the basis of the
 # new parameter estimates.  This entails calculating
@@ -157,10 +166,17 @@ repeat{
 	em.step   <- em.step + 1
 }
 
-# Return:
+# Tidy up a bit:
 if(length(y)==1) {
    if(keep.y) y <- y[[1]]
    ispd <- as.vector(ispd)
+}
+stnms <- rownames(par0$tpm)
+if(!is.null(stnms)) {
+    rownames(tpm) <- stnms
+    colnames(tpm) <- stnms
+    names(ispd)   <- stnms
+    colnames(Rho) <- stnms
 }
 rslt <- list(Rho=Rho,tpm=tpm,ispd=ispd,log.like=ll,converged=converged,
              nstep=nstep,y=if(keep.y) y else NULL, data.name=data.name,

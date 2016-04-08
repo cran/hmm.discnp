@@ -66,7 +66,6 @@ pp. 257 -- 286, 1989.
 }
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr
-  \url{http://www.stat.auckland.ac.nz/~rolf}
 }
 
 \section{Warning}{

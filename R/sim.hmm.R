@@ -8,8 +8,8 @@ sim.hmm <- function(nsim,tpm,Rho,ispd=NULL,yval=NULL,verb=FALSE) {
 # Check for validity of the Rho argument:
 if(any(Rho<0)) stop("Negative entries in Rho.\n")
 Rho <- as.matrix(Rho)
-xxx <- apply(Rho,2,sum)
-if(!identical(all.equal(xxx,rep(1,ncol(Rho))),TRUE))
+xxx <- unname(apply(Rho,2,sum))
+if(!isTRUE(all.equal(xxx,rep(1,ncol(Rho)))))
 	stop("Columns of Rho do not all sum to 1.\n")
 
 # Check for validity of yval argument:
@@ -36,8 +36,8 @@ if(ncol(tpm) != nrow(tpm))
 if(ncol(tpm) != ncol(Rho))
 	stop("Mismatch between dimensions of tpm and Rho.\n")
 if(any(tpm<0)) stop("Negative entries in tpm.\n")
-xxx <- apply(tpm,1,sum)
-if(!identical(all.equal(xxx,rep(1,nrow(tpm))),TRUE))
+xxx <- unname(apply(tpm,1,sum))
+if(!isTRUE(all.equal(xxx,rep(1,nrow(tpm)))))
 	stop("Rows of tpm do not all sum to 1.\n")
 
 if(is.null(ispd)) ispd <- revise.ispd(tpm)

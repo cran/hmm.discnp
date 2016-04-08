@@ -38,6 +38,11 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
    The columns of \code{Rho} correspond to states, the rows to the
    values of \code{yval}.
 
+   If \code{par0$tpm} has row and column names these must be the
+   same (otherwise an error is thrown).  If \code{par0$Rho} has
+   column names these must be the same as the row and column names
+   of \code{par0$tpm}.
+
    If \code{par0} is not specified, starting values are created by
    the function \code{init.all()}.
 }
@@ -203,6 +208,15 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
    observations (the length of the list \code{y}) is very large.
    We have in effect ``less than one'' relevant observation for
    each such sequence.
+
+   The returned values of \code{tpm} and \code{Rho} have row
+   and column names.  These are the same as the row and column
+   names of the starting values of these matrices (as provided
+   in \code{par0} is these exist.  Otherwise they are taken to
+   be the appropriate sequences of integers.  Likewise the
+   returned value of \code{ispd} is a named vector, the names
+   being the same as the row (and column) names of \code{tpm}
+   and the column names of \code{Rho}.
 }
 
 \details{
@@ -242,21 +256,35 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
 
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr
-  \url{http://www.stat.auckland.ac.nz/~rolf}
 }
 
 \seealso{\code{\link{sim.hmm}()}, \code{\link{mps}()},
          \code{\link{viterbi}()}}
 \examples{
+# 1.
+Yval <- LETTERS[1:10]
+Tpm  <- matrix(c(0.75,0.25,0.25,0.75),ncol=2,byrow=TRUE)
+Rho  <- cbind(c(rep(1,5),rep(0,5)),c(rep(0,5),rep(1,5)))/5
+rownames(Rho) <- Yval
+set.seed(42)
+xxx  <- sim.hmm(rep(1000,5),tpm=Tpm,Rho=Rho,yval=Yval)
+fit  <- hmm(xxx,par0=list(tpm=Tpm,Rho=Rho))
+print(fit$Rho)
+
+# 2.
 # See the help for sim.hmm() for how to generate y.num.
 \dontrun{
    fit.num     <- hmm(y.num,K=2,verb=TRUE)
    fit.num.mix <- hmm(y.num,K=2,verb=TRUE,mixture=TRUE)
    print(fit.num[c("tpm","Rho")])
-# Note that states 1 and 2 get swapped.
 }
+# Note that states 1 and 2 get swapped.
+
+# 3.
 xxx <- with(colifCount,split(y,f=locn))
 fitColCount <- hmm(xxx,K=2) # Two states: above and below the thermocline.
+
+# 4.
 fitLesCount <- hmm(lesionCount,K=2) # Two states: relapse and remission.
 }
 \keyword{models}

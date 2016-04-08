@@ -339,3 +339,24 @@ the value of argument "cis".
 (4/08/2014)
 
 Uploaded to CRAN 05/08/2014.
+
+Version 0.2-3 |--> 0.2-4
+
+Fixed bug in respect of the naming of the rows of "Rho"
+(the "emissions" probability matrix).  Thanks to Harshita
+Patak, an enquiry from whom revealed the bug.
+(7/04/2016)
+
+Fixed up some other deficiencies in respect of the row and column
+names of tpm and Rho; made sure the values of Rho and tpm that are
+returned have appropriate row and column names and that the returned
+value of ispd is a named vector.
+(7/04/2016)
+
+Fixed several problems that occurred if the sorted row names of
+Rho were not the same as the original row names.
+(8/04/2016)
+
+Changed error trapping to allow the set of unique y values to
+be a proper subset of the row names of Rho.
+(8/04/2016)

@@ -51,7 +51,6 @@ The values of the observations are entries of \code{yval}.
 
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr
-  \url{http://www.stat.auckland.ac.nz/~rolf}
 }
 
 \seealso{\code{\link{hmm}()}}
