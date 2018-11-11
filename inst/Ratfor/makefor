@@ -2,5 +2,5 @@
 foreach file (*.r)
 set stem = `basename $file .r`
 ratfor $file > $stem.f
-/bin/mv -i $stem.f ../../src
+/bin/mv $stem.f ../../src
 end

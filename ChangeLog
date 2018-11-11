@@ -360,3 +360,707 @@ Rho were not the same as the original row names.
 Changed error trapping to allow the set of unique y values to
 be a proper subset of the row names of Rho.
 (8/04/2016)
+
+Uploaded to CRAN 08/04/2016
+
+Version 0.2-4 |--> 0.3-0
+
+Major renovation; introduced *bivariate* emissions.
+Distributed the actual work amongst three functions:
+hmmUV() (univariate), hmmBI() (bivariate independent),
+and hmmBD() (bivariate dependent).  Initial stage of
+renovation completed 03/07/2016.
+
+Renovations continued; adjusted logLikHmm(), check.yval(),
+sp(), pr(), mps(), sim.hmm(), and viterbi().  Revised
+the help files.  Finished this pass 13/07/2016.
+
+Changed revise.Rho() to make a correct estimate of Rho in
+the bivariate dependent variables setting.  Uses optim().
+Not yet tested. 20/07/2016
+
+Checks out OK 22/07/2016
+
+Removed the function sim.hmm() and replaced it by generic
+and methods --- rhmm(), rhmm.default() and rhmm.hmm.discnp()
+Wrote the appropriate help file.
+13/10/2016.
+
+Adjusted the argument list of logLikHmm() (got rid of "par", and
+effectively replaced it by "model".  Changed the name of argument
+"object" to "model" in mps() pr(), sp() and viterbi().  Adjusted help
+files accordingly.
+13/10/2016.
+
+Built, checked and locally installed 13/10/2016.
+
+Adjusted logLikHmm so that it works if "y" is not supplied,
+but "model" is.  (Simply by extracting "log.like" from
+"model".) 17/10/2016
+
+Fixed a glitch in check.yval.R (used lapply(as.character,yval)
+in the type==1 setting).
+
+Made adjustment to logLikHmm.R --- changed "charList" to "tidyList",
+and applied mat2charmat.
+
+Same for pr.R, mps.R, sp.R, viterbi.R.
+
+Created function mat2charmat(); changed charList() to tidyList()
+(to keep numeric values as numeric).
+
+Adjusted the hmm*.R files; made "keep.y" the responsibility of
+hmm(); improved the consistency (between functions) of checking
+the validity of arguments; eliminated repetitive code by introduing
+for loops.
+(25/10/2016)
+
+Made various adjustements to the rhmm simulation functions; fixed
+error in rhmm.default() --- incorrect treatment of the dimensions
+of Rho; allowed for yval to be passed from rhmm.hmm.discnp to
+rhmm.default.  Fixed up problem with using length() in settings
+where nrow() should have been used.
+
+Created functions() misstify() to insert missing values into
+simulated data and nafracCalc() to determine the fraction(s)
+of missing values in existing data sets.
+
+Added a "drop=" argument to the extraction of subarrays of Rho
+in ffun() to handle the K=1 case properly.
+(26/10/2016)
+
+Re-wrote the function revise.rho() to catch various numerical
+screw-ups in respect of getting infinite values in log(Rho)
+and "G".
+
+Fixed some glitches in hmmUV().
+
+Version 0.3-0 never installed on CRAN
+
+Version 0.3-0 |--> 0.3.1
+
+Added "npar" (the number of fitted parameters) to the object
+returned by hmm(), to facilitate doing an automated likelihood
+ratio test.
+
+Wrote an anova() method to effect the aforesaid likelihood ratio
+test.
+(01/11/2016)
+
+Messed about debugging; fixed a major screw up in revise.rho()
+that was causing anomalous *decreases* in the achieved log
+likelihood with increasing K.
+
+Still doesn't work right; getting crashes, with wll() returning
+-Inf.
+(05/11/2016)
+
+Version 0.3-1 never installed on CRAN
+
+Version 0.3-1 |--> 0.3-2
+
+Major reworking of revise.rho() to overcome the -Inf problems.
+Finally started doing the calculations *right* thanks to a tip
+from Chuck Berry on R-help.
+
+Much messing around and debugging, getting revision to check
+with a known correct answer.
+
+Fixed another silly mistake in revise.rho().
+
+Got everything to run with K=4.
+(08/11/2016)
+
+Added AIC to the list returned by hmm().
+Adjusted the help file for hmm() accordingly.
+Added "cis" to the list returned by hmm() so
+as to accord with the help file.
+(08/11/2016)
+
+Adjusted names of a couple of utility functions
+in the environment of revise.rho().
+
+Corrected slight bug in the returned value when K=1;
+especially in hmmUV().
+
+Adjusted tolerance in the utility function r2zVfun()
+(in the environment of revise.rho()).  Now using
+x > sqrt(.Machine$double.eps) rather than the simplistic
+x > 0.  Done to prevent singularity of matrix in the
+set of equations to be solved for the zetas; seems to
+work, so far. (???)
+(09/11/2016)
+
+Version 0.3-2 never installed on CRAN
+
+Added BIC value to the list returned by hmm().
+
+Changed the K=1 type=3 estimator to do the correct maximum
+likelihood estimator of Rho, rather than just mindlessly using
+the crosstabs estimator (i.e. allowing for (x_t,NA) and (NA,y_t)
+entries in the data.
+(10/11/2016)
+
+Fixed several glitches in the handling of the K=1 case in
+hmmBD().
+
+Fixed a screw up involving summing over the wrong index
+in ffun().
+
+Similar screw up fixed in ell().
+
+Fixed problem with K=1 case in hmmBD(), hmmBI(), hmmUV();
+needed a call to mat2charmat().
+(11/11/2016)
+
+Added the argument "warn" to logLikHmm(), mps(), pr(), sp() and
+viterbi().  This argument is passed on the utility function
+check.yval() which actually issues the warning if warn=TRUE.
+(13/11/2016)
+
+Fixed a bug in hmmBI(), in the K=1 case.  (Wrong in divisor
+used in forming the Rho[[i]] from the tabulation of the respective
+columns of the y-matrices.)
+
+Added a componet par0 (the starting values used by the EM algorithm)
+to the list returned by hmm().
+(14/11/2016)
+
+Version 0.3-3 never installed on CRAN
+
+Version 0.3-3 |--> Version 1.0-0
+
+Started working on allowing dependence of emission probabilities
+on auxiliary predictors.
+(10/03/2017)
+
+Added the foregoing capacity --- but only in the univariate
+setting.  In the bivariate settings it is less obvious how to deal
+with modelling the dependence of the emission probabilities
+on the predictors.  Using a multinomial model becomes much less
+intuitively appealing. Dealing with missing values of the emissions
+appears to be highly problematic.
+
+As indicated above, in the univariate case a multinomial model (using
+multinom() from the nnet package) is used to handle the dependence
+on the predictors.  A different representation/parameterisation of
+Rho (as a data frame) is required to accommodate this dependence.
+If no predictors are supplied the previous matrix representation
+of Rho is still permitted.
+
+Did a lot of adjusting of hmm() code, eliminating redundancies and
+adding helper functions to do repeated tasks.  Added the capacity
+to deal with predictors to functions that are called a posteriori:
+sp(), predict(), fitted(), logLikHmm().
+
+Changed the default for keep.y from TRUE to FALSE.
+(21/04/2017)
+
+Added a "direct method", using nlm() (so far applicable only
+in the univariate setting).
+(04/05/2017, ..., 08/05/2017)
+
+Struggled with an anomalous phenomenon: Fitting the K=4 model
+to the monocytes data only (univariate) using the direct method
+ran (slowly! But it got there.) on my laptop.  Tried it on the
+Nesi cluster; it crashed on step 73.  Used the printed out parameters
+from step 72 to restart.  It ran through to completion.  Put in
+try() calls in an attempt to catch the parameters actually causing
+the problem.  It ran to completion.  Put in a different try() and
+a stop() call.  It again crashed on step 73.  Figured out what
+was causing the crash, and how to guard against it.  Re-jigged
+the code with this guard, and set the function running again.
+We shall see ....
+(08/05/2017)
+
+It ran, but returned a "code" value of *3*.
+(09/05/2017)
+
+Made some adjustements to the help files, amongst other things
+making them consistent with the (new) possibility of using the
+"direct" maximisation method.
+(09/05/2017)
+
+More tweaking of help files.  Fixed a glitch in revise.ispd().
+(10--14/05/2017).
+
+Corrected the value of "npar" to allow for the non-stationary
+and non-cis settings.
+(15/05/2017).
+
+Modified hmmDirect() to return the covariance matrix of the
+parameter estimates if hessian=TRUE was set in the call.
+
+Added example data sets obtained from the "HYDAT" data
+base (and discretised to deciles).
+04/01/2018
+
+Modified hmmDirect() to use optim() as well as nlm().
+
+Modified rhmm.default() to allow for Rho being a data
+frame.
+
+Added example data sets obtained from Prof. Christian Weiß (from
+his new book "An Introduction to Discrete-Valued Time Series").
+05/01/2018
+
+Set version number to 1.0-0.
+06/01/2018
+
+Version 1.0-0 |--> 1.0-1
+
+Added function scovmat() to estimate covariance matrix of parameter
+estimates via simulation.  Made modifications to the simulation
+functions rhmm.default() and rhmm.hmm.discnp(), including adding
+the "inMiss" argument to the latter and the "nafrac", "p2" and
+"drop" arguments to the former.  Changed the meaning of the "nsim"
+argument, introduced the "ylengths" argument to serve its old role;
+made appropriate modifications throughout.  Changed name of "verb"
+argument to "verbose".  Modified misstify() appropriately.
+
+Added "parity" for the data structure "y" returned by tidyList()
+and adjusted hmm() to make use of it.
+
+Changed stop message in respect of "newstyle" in hmm().
+
+Modified the returned value of hmm() and of the hmm*() functions that
+it calls.  This included adding "parity", "hessian" and "optimiser"
+to the list, where appropriate.
+
+Added function (method) update.hmm.discnp(); modified hmm()
+to return values needed by update() and by rhmm(), and to
+return values in a better organised way.
+
+Modified message produced in the functions called in "First.R".
+
+Wrote documentation for new functions and adjusted old
+documentation appropriately.
+07/01/2018
+
+Added function squantCI().
+
+Incremented the version number.
+08/01/2018
+
+Version 1.0-1 |--> 2.0-0
+
+Started on adding cappacity for using Levinberg-Marquardt
+algorithm, 08/02/2018.
+
+Finished (???) add LM capacity to the package 27/03/2018.
+(*SUBSTANTIAL* modifications effected.)
+
+Tidied up and checked, 28/06/2018.
+
+Incremented the version number.
+28/06/2018
+
+Version 2.0-0 |--> 2.0-1
+
+Fixed up the Sydney coliform count data; now including *only* the
+discretised version, and *not* the pseudo-Poisson count version.
+Put in the *correct* discretised version (having fixed a fuck-up in
+the hglmm "data preparation". Made some adjustments to nafracCalc.Rd.
+
+Incremented the version number.
+29/06/2018
+
+Version 2.0-1 |--> 2.0-2
+
+In ffun(), in the type=4 setting, changed the way that calculations
+are done when the y value(s) is/are missing.
+
+Changed tidyList() to coerce the y-values into *character* mode.
+This fixed a serious bug whereby the dimnames of Rho were not
+properly matching (or not matching at all) the y-values when these
+were numeric.
+
+Made adjustment so the stopping criterion defaults to "PCLL" for
+the EM algorithm and to "ABSGRD" for the LM algorithm.
+
+Made adjustment so that tolerance defaults to 1e-4 for the EM algorithm
+and to sqrt(.Machine$double.eps) for the LM algorithm.
+
+Fixed things up so that "digits" gets set (properly) in the subsidiary
+hmm* functions (rather than in hmm()).
+
+Changed the "converged" component of the returned value to be *always*
+TRUE or FALSE (even when the "bf" method is used).  Added an
+attribute to "converged", equal to the value of the convergence
+criterion returned by the optimiser, when the "bf" method is used.
+
+Adjusted the documentation of hmm() to refer appropriately to optim()
+as well as to nlm().
+
+Made other adjustments to the documentation.
+
+Added a component "numeric" to the returned list, TRUE if the original
+data were numeric.  (Basically for the use of the "fitted.hmm.discnp()"
+method.
+
+In the documentation of hmm() fixed up the description of the value
+returned.
+
+Added comments in tidyList() clarifying what is going on with
+the "numeric" and "character" modes.
+
+Incremented version number.
+01/07/2018
+
+Version 2.0-2 |--> 2.0-3
+
+Fixed bug in hmmUV(); had not set "crit" for hmmLM() (when
+crit is NULL). 02/07/2018.
+
+Revised way crit is set (obviating the foregoing change) --- went
+back to the old way; also "PCLL" is the default used in all non-"bf"
+settings, including "LM".
+
+Revised the way tolerance is set --- went back to the old way;
+now 1e-4 is the default used in all circumstances.
+
+Fixed up the names of "theta" and the dimnames of the hessian which
+weren't getting set properly in hmmLM().  Also fixed up the names
+of grad and added grad to the returned value (for hmmLM() and for
+hmmNumOpt(); the latter being possible only when the optimiser
+is *not* optim(), which does not return the gradient --- only
+the hessian.  Go figure.)
+
+Made the calculations of the stopping criteria in hmmBD(), hmmBI(),
+and hmmUV() (when EM is used) the same as those in hmmLM() --- i.e.
+making them all "relative", with tolerance added to the denominators.
+
+Added the final values of the stopping criteria ("stopCrit")
+to the returned value (except of course for the "bf" method,
+wherein these criteria are internal to nlm() or optim() and
+are obscure).
+
+Re-ordered the components of the returned lists a bit.
+
+Incremented the version number.
+04/07/2018.
+
+Version 2.0-3 |--> 2.0-4
+
+Revised the way an error in revise.ispd() (multiple eigenvalues
+of t(tpm) equal to 1) is treated.
+
+Added a new method "steepest descent" ("SD"), allowing this
+method to stand on its own rather than just being used as an
+escape hatch when "LM" screws up.
+
+Fixed up a number of anomalies in the documentation of hmm()
+(inappropriate references to "EM").  Added an "lmc" argument
+to hmm() --- to be passed on to hmmUV() and thence to hmmLM().
+
+Got rid of the unnecessary/erroneously used function newstep().
+
+Incremented the version number.
+07/07/2018
+
+Version 2.0-4 |--> 2.0-5
+
+Fixed bug in revise.ispd() --- had "eee$vectors" in error
+message; should be "eee$values".
+
+Change conditional browsers() in ffun(), logLikHmm() and
+msRho() (in type4stuff.R) to depend on interactive().
+
+Incremented the version number.
+10/07/2018
+
+Version 2.0-5 |--> 2.0-6
+
+Adjusted hmmNumOpt() to do a restart from the penultimate parameter
+values when it hits a problem with ispd.  Stores the penultimate
+value in a specially created environment.  Not at all clear why
+this should "work" but it seems to have an impact.
+
+Added some comments to the functions in directMaxStuff.R, to clarify
+their roles.
+
+Incremented the version number.
+11/07/2018
+
+Version 2.0-6 |--> 2.0-7
+
+Did some more commenting.  Re-indexed the sub-functions if ffun()
+to be f1, f2, f3 and f4 (rather than the confusing f0, ..., f3).
+
+Changed the argument "Dat" of f1, f2, f3 and f4 to "Y" to avoid
+confusion with list "Dat".  (Note that "Y" is one of the *entries*
+of "Dat".)
+
+Incremented the version number.
+18/07/2018
+
+Version 2.0-7 |--> 2.0-8
+
+Added the capability for hmmNumOpt() to tell nlm() or optim() to
+avail themselves of an analytically calculated gradient vector
+produced by get.gl().  Whether to do so is specified by an
+argument useAnalGrad, which is passed to hmmNumOpt() via the ...
+argument.  Adjusted the documentation in hmm.discnp-internal.Rd
+and hmm.Rd accordingly.
+
+Incremented the version number.
+20/07/2018
+
+Version 2.0-8 |--> 2.0-9
+
+Corrected a typo in hydroDat.Rd.
+04/08/2018
+
+Fixed a major fuck-up in the calculation of the hessian.  An
+important term had been omitted.
+09/08/2018.
+
+Incremented the version number. (To 2.0-9.)
+09/08/2018
+
+Fixed init.c w.r.t. the call to gethgl.
+11/08/2018
+
+Fixed a bug that had been lurking in get.hgl.R and getghl.r
+(and in get.gl.R and gethl.r) for God knows how long.  An
+undefined value "nphi" was being passed as an argument to
+the Fortran code.  This fix eliminated a seg fault that had
+been occuring.
+13/08/2018.
+
+Later got email from Peter Dalgaard saying that this should
+have triggered an "object nphi not found" error --- which it
+didn't!  I put the code back (???) to the way it was before,
+and then of course got that error!
+
+Re-righted the code.  Seg fault still "eliminated", so I'll
+just carry on.
+
+Incremented the version number. (To 2.0-10.)
+16/08/2018
+
+Fixed a bug in tidylist() (the string "colnms" had been
+written as "colnames" whence the *function* was found, yielding
+a bewildering error.
+03/10/2018
+
+Fixed a bug in logLikHmm() --- didn't handle the K=1 case
+properly.
+03/10/2018
+
+Revised update.hmm.discnp() --- now has a new argment
+Kplus1=TRUE which allows fitting a model with K+1 states
+starting from a fit to a model with K states.  (Thus an
+improvement of the log likelihood is guaranteed when K
+is increased by 1.)
+03/10/2018
+
+Changed the EM algorithm procedure so that if an increase of
+the log likelihood occurs, the function switches to the "LM"
+method rather than to the "bf" method.
+03/10/2018
+
+Incremented the version number. (To 2.0-11.)
+03/10/2018
+
+Adjusted update.hmm.discnp() to have arguments "tpm2" and "verbose".
+04/10/2018.  (No change to version number.)
+
+Changed "decrease in log likelihood" to "increase in log likelihood"
+in hmmLM() and hmmSD().  (Duhhh!)
+
+Adjusted hmmLM() and hmmSD() to calculate initial log likelhood
+(rather than using -Inf) and to print out the initial value when
+verbose=TRUE.
+
+Adjusted hmmUV() to output a blank line after printing the initial
+log likelihood value.
+22/10/2018.  (No change to version number.)
+
+Fixed bug in fitted.hmm.discnp(); object$y produced the object
+"ylengths" rather than "y" (and always produced a result, even
+if "keep.y" had been set to FALSE) because of partial matching.
+Changed this to object[["y"]].
+
+Fixed bug in update.hmm.discnp(); it was effectively applying
+tidyList() to the data twice, resulting in the loss of any "numeric"
+characteristic (since tidyList() coerces its arguments to "character"
+after discerning whether they have "numeric" mode.
+
+Adjusted "tidyList()" so that its returned value is of class
+"tidyList".
+
+Adjusted hmm() so that if its "y" argument is (already) of class
+"tidyList", then the tidyList() function is *not* applied to it.
+
+Incremented version number. (To 2.0-12.)
+23/10/2018.
+
+Adjusted sp() to make use of addIntercept argument in the appropriate
+manner.
+
+Adjusted logLikHmm() to make use of addIntercept argument in the
+appropriate manner.
+
+Adjusted makeDat() to make use of of prednames  and addIntercept
+arguments in the appropriate manner.  Got rid of the old shaganappi
+system for dealing with adding an intercept column to the predictor
+matrices.  Added "list" to the classes from which the value
+of makeDat() inherits.
+
+Added a function checkConstColumns() to deal with problems arising
+when adding an intercept and checking for certain anomalies in
+the predictor matrices.
+
+Did a major revision of tidyList(); now tidyList() handles adding
+an intercept column to the predictor matrices.  It is now better
+organised in respect of determining whether "addIntercept=TRUE"
+actually makes sense.  The "prednames" attribute now has "Intercept" as
+its first entry whenever the predictors indeed have an intercept.
+The "ncol" attribute now counts the intercept column.  Added "list"
+to the classes from which the value of tidyList() inherits.
+
+Changed hmmUV() so that if there is a predictor matrix (which LM
+can't handle --- yet???) it switches to the "bf" method when the
+EM algorith produces a decrease in the log likelihood.  Put in
+error-throws if hmmUV() is called with method = LM  or SD, when
+there is a predictor "X".
+
+Major revision to updata.hmm.discnp() so that it deals properly
+with auxilliary predictor variables "X".  It now handles the
+K=1 case properly, even when there are predictor variables.
+
+Adjusted init.all() to conform properly to the new structure
+of the output of tidyList().  It now uses "prednames" to
+construct the column names of the Rho dataframe.  The "ncX"
+argument (number of columns of X) is no longer used, and
+neither is "addIntercept".
+
+Incremented the version number.   (To 2.0-13.)
+29/10/2018
+
+Adjusted revise.rho() to use the "prednames" attribute of "Dat"
+to form the column names of Rho.
+
+Fixed bug (w.r.t. augmenting "prednames" with "Intercept") in
+checkConstColumns().
+
+Did major revision/bug-fix of tidyList() to handle the "prednames"
+structure properly.  In particular corrected the way "prednames"
+is formed if entries of "X" have no column names.
+
+Adjusted makeDat() to provide a "prednames" attribute when "X"
+is NULL.
+
+Amended the hmm() help to specify the restrictions/conditions
+that the "X" argument (if present) must satisfy.
+
+Incremented the version number.   (To 2.0-14.)
+31/10/2018
+
+Fixed bugs in misstify().  (Wrong order of application of
+fix1() and fix2().)
+
+Fixed bugs in rhmm.default() (was using x[j] rather that x[[j]],
+where "x" is a list, in some instances).
+
+Revised the argument structure of misstify() (and hence of rhmm.*()).
+Replace the shaganappi "p2" by "fep" (first entry present).  Provided
+sensible default values of the entries of fep.
+
+Revised the help for rhmm() and misstify().
+
+Added the data set "ccprSim" which consists of data simulated from
+a model fitted to a real data set which has to be kept confidential
+due to ethical constraints.
+
+Incremented the version number.  (To 2.0-15.)
+01/11/2018
+
+Fixed bug in makeDat (assigned attribute "rhovals" to the returned
+structure when type is 2).
+
+Re-did hmmNumOpt so that if nlm() falls over, the function switches
+to using optim() rather the previous shaganappi procedure of retrying
+nlm() from a previous iterate of the parameter vecot.  (This latter
+procedure should never work anyway!)
+
+Introduced the argument "hessian" indicating whether a hessian matrix
+should be returned by nlm() or optim().  Defaults to FALSE which saves
+a huge amount of frustrating time at the end (between completion of
+iterations and actually returning a value).  It appears that this
+final calculation of the hessian is *very* time consuming.
+
+Incremented the version number.  (To 2.0-16.)
+04/11/2018
+
+Improved the logical flow, instigated by an error thrown when
+the get.{hgl,gl,l}() functions could not find the "rhovals"
+(the unique values of the emissions) due the object returned
+by makeDat() being incorrectly structered.  If it was right
+for some circumstances it was wrong for others, under the old
+(shaganappi) logial flow.
+
+    * Reorganised tidyList().
+    * Reorganised makeDat().
+    * Reorganised get.l().
+    * Reorganised get.gl().
+    * Reorganised get.hgl().
+    * Reorganised ffun().
+    * Adjusted hmmUV().
+    * Adjusted hmmBI().
+    * Adjusted logLikHmm().
+    * Adjusted sp().
+
+In particular, the object returned by tidyList() now always has a
+"lvls" (formerly "uval") attribute so that makeDat() can get the
+levels of the factor in the "y" column from that attribute and they
+no longer have to be passed as an argument.
+
+The makeDat() function now just returns data frames whose
+nature depends only the parity (which is an attribute of the "y"
+argument) and not on "type" so type no longer has to be passed
+as an argument.
+
+Incremented the version number.  (To 2.1-1.)
+06/11/2018
+
+Fixed some bugs in get.*.R involving a missnaming of the "rhovals"
+attribute of a "madeDat" object.
+
+Changed name of the "rhovals" attribute in the makeDat() function
+to "lvls" to make it consistent with tidyList().
+
+Added an acknowledgement of Prof. Kurt Brännäs in the documentation
+of the data from Prof. Weiß's book.
+
+Incremented the version number.  (To 2.1-2.)
+07/11/2018
+
+Fixed a bug in ffun(), type 3.  The columns of Y must be passed
+to f2() as Y[,1,drop=FALSE] and Y[,2,drop=FALSE], since f2() is
+expected data frames, not factors.
+
+Fixed a bug in init.all() --- need to have the ncol argument of
+matrix() equal to nval[i], *not* nval.  (If the vector nval
+is passed, the *first* entry of nval is used, equivalent to always
+using nval[1].)
+
+Fixed hmmBI() to resolve conflict/inconsistency between the
+"yval" argument and rownames(Rho[[i]]) if Rho is given in
+par0.  The row names of the components of Rho now take precedence.
+
+Put in a check on the adequacy of the data (must have at least
+*one* completely non-missing combination of the values of variable
+1 and variable 2) in hmmBD().
+
+Found a really bad error in hmmBD() --- the non-redundant parameters
+from Rho were being extracted completely incorrectly!  Fixed.
+
+Fixed hmmBD(), in a manner similar to that with which hmmBI()
+was treated above, to resolve conflict/inconsistency between the
+"yval" argument and dimnames(Rho) if Rho is given in
+par0.  The dimnames attribute of Rho now takes precedence.
+
+Incremented the version number.  (To 2.1-3.)
+10/11/2018

@@ -1,8 +1,8 @@
-C Output from Public domain Ratfor, version 1.0
+C Output from Public domain Ratfor, version 1.03
       subroutine recurse(fy,xispd,tpm,nreps,epsilon,lns,nstate,nis,cis, 
      *wrk,xlc,ntot,nxi,alpha,beta,gamma,xi,xisum)
       implicit double precision(a-h,o-z)
-      logical cis
+      integer cis
       dimension xispd(nstate,nis), xlc(ntot), lns(nreps)
       dimension tpm(nstate,nstate), wrk(nstate,nstate)
       dimension fy(nstate,ntot), alpha(nstate,ntot), beta(nstate,ntot)
@@ -15,7 +15,7 @@ C Output from Public domain Ratfor, version 1.0
       n = lns(k)
       nm1 = n - 1
       kstart = 1 + kstop
-      if(cis)then
+      if(cis .gt. 0)then
       kis = 1
       else
       kis = k

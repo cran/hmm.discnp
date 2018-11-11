@@ -33,24 +33,44 @@
   an error is thrown.  The observation sequence must be present in
   \code{object} (which will be the case if \code{object} was returned
   by \code{hmm()}).  If it is not present an error is thrown.
+
+  However, if such an error is thrown, do not despair!  You
+  \emph{do not} have to start from scratch when fitting your
+  model with \code{keep.y==TRUE}.  If \code{fit} is your fitted
+  model that you obtained \emph{without} setting \code{keep.y==TRUE},
+  then you can just re-fit the model using \code{fit} as the
+  starting values: \preformatted{
+      fit2 <- hmm(<whatever>,par0=fit,keep.y=TRUE)
+  }
+  This will of course converge instantaneously.  You could also do:
+  \preformatted{
+      fit2 <- update(fit,data=<whatever>,keep.y=TRUE)
+  }
 }
 \value{
-  If the observations (stored in \code{object}) consist of a
-  single sequence, then the object returned is the corresponding
-  sequence of fitted values.  If the observations consist of a
-  list of observation sequences, then the object returned is a
-  list of corresponding sequences of fitted values.
+  If the observations (stored in \code{object}) consist of a single
+  sequence, then the object returned is a matrix.  If the model
+  is univariate (see \code{\link{hmm}()}) then matrix has a single
+  column constituting the corresponding sequence of fitted values.
+  If the model is bivariate (either independent or dependent) then
+  the martrix has two columns corresponding respectively to the two
+  variables in the bivariate model.  If the observations consist
+  of a list of observation sequences, then the object returned is a
+  list of corresponding matrices whose columns are the fitted values.
 }
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr
 }
-\seealso{ \code{\link{sp}()} }
+\seealso{ \code{\link{sp}()} \code{link{predict.hmm.discnp}()} }
 \examples{
-# See the help for sim.hmm() for how to generate y.num.
-\dontrun{
-fit.num <- hmm(y.num,K=2,verb=TRUE)
-fv      <- fitted(fit.num)
-}
+P <- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
+R <- matrix(c(0.5,0,0.1,0.1,0.3,
+              0.1,0.1,0,0.3,0.5),5,2)
+set.seed(42)
+lll <- sample(250:350,20,TRUE)
+y   <- rhmm(ylengths=lll,nsim=1,drop=TRUE,tpm=P,Rho=R)
+fit <- hmm(y,K=2,verb=TRUE,keep.y=TRUE,itmax=10)
+fv  <- fitted(fit)
 }
 
 \keyword{models}

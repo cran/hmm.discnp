@@ -6,30 +6,36 @@
   each of one or more replicate observation sequences.
 }
 \usage{
-viterbi(y, object = NULL, tpm, Rho, ispd=NULL,log=FALSE)
+viterbi(y, model = NULL, tpm, Rho, ispd=NULL,log=FALSE, warn=TRUE)
 }
 \arguments{
   \item{y}{The observations for which the underlying most probable
   hidden states are required.  May be a sequence of observations,
   or a list each entry of which constitutes an independent sequence
-  of observations.  If \code{y} is missing (and if \code{object}
-  is not \code{NULL}) then \code{y} is extracted from \code{object},
-  provided that the \code{y} component of \code{object} is present.
+  of observations.  If \code{y} is missing (and if \code{model}
+  is not \code{NULL}) then \code{y} is extracted from \code{model},
+  provided that the \code{y} component of \code{model} is present.
   Otherwise an error is given.}
-  \item{object}{ An object describing a hidden Markov model, as
+  \item{model}{ An object describing a hidden Markov model, as
   fitted to the data set \code{y} by \code{\link{hmm}()}.}
   \item{tpm}{ The transition probability matrix for a hidden
-  Markov model; ignored if \code{object} is non-null.}
-  \item{Rho}{ A matrix specifying the probability distributions
-  of the observations for a hidden Markov model; ignored if
-  \code{object} is non-null. Should bear some reasonable relationship
-  to \code{y}.  If \code{Rho} has row names then these must
-  include all values of the observations.  If \code{Rho} does
-  not have row names then the values of the observations must
-  be integers between \code{1} and \code{nrow(Rho)}.}
+  Markov model; ignored if \code{model} is non-null.}
+  \item{Rho}{An object specifying the probability distributions
+  of the observations for a hidden Markov model.  See
+  \code{\link{hmm}()}. Ignored if \code{model} is non-null. Should
+  bear some reasonable relationship to \code{y}.
+
+  If \code{Rho} has dimension names (or if its entries have
+  dimension names in the case where \code{Rho} is a list) then the
+  appropriate dimension names must include all corresponding values
+  of the observations.  If a relevant vector of dimension names is
+  \code{NULL} then it is formed as the sort unique values of the
+  approprate columns of the observation matrices.   In this case the
+  corresponding dimensions must match the number of unique values.}
+
   \item{ispd}{ The initial state probability distribution for a hidden
-  Markov model; ignored if \code{object} is non-null. Should
-  bear some reasonable relationship to \code{y}. If \code{object}
+  Markov model; ignored if \code{model} is non-null. Should
+  bear some reasonable relationship to \code{y}. If \code{model}
   and \code{ispd} are both \code{NULL} then \code{ispd} is set
   equal to the stationary distribution calculated from \code{tpm}.}
   \item{log}{Logical scalar.  Should logarithms be used in the
@@ -42,7 +48,18 @@ viterbi(y, object = NULL, tpm, Rho, ispd=NULL,log=FALSE)
   I just included the option because I could.  Also the \code{HMM}
   package uses the logarithm approach so setting \code{log=TRUE}
   might be of interest if comparisons are to be made between the
-  results of the two packages.}
+  results of the two packages.
+  }
+  \item{warn}{Logical scalar; should a warning be issued if \code{Rho}
+  hasn't got relevant dimension names?  (Note that if this is so,
+  then the corresponding dimension names are formed from the sorted
+  unique values of \code{y} or of the appropriate column(s) of \code{y}.
+  And if \emph{this} is so, then the user should be sure that the
+  ordering of the entries of \code{Rho} corresponds properly to the
+  the sorted unique values of \code{y}.)  This argument is passed
+  to the utility function \code{check.yval()} which actually issues
+  the warning if \code{warn=TRUE}.
+  }
 }
 \details{
   Applies the Viterbi algorithm to calculate ``the'' most probable
@@ -69,9 +86,9 @@ pp. 257 -- 286, 1989.
 }
 
 \section{Warning}{
-There \emph{may} be more than one equally most probable
-state sequence underlying a given observation sequence.  This
-phenomenon appears to be unlikely to occur in practice.
+There \emph{may} be more than one equally most probable state
+sequence underlying a given observation sequence.  This phenomenon
+can occur but appears to be unlikely to do so in practice.
 }
 
 \section{Thanks}{
@@ -80,21 +97,21 @@ problems was made due to an inquiry and suggestion from
 Owen Marshall.
 }
 
-\seealso{\code{\link{hmm}()}, \code{\link{sim.hmm}()},
+\seealso{\code{\link{hmm}()}, \code{\link{rhmm}()},
          \code{\link{mps}()}, \code{\link{pr}()},
          \code{\link[HMM]{viterbi}()}}
 \examples{
-# See the help for sim.hmm() for how to generate y.num and y.let.
+# See the help for rhmm() for how to generate y.num and y.let.
 \dontrun{
 fit.num <- hmm(y.num,K=2,verb=TRUE)
-v.1 <- viterbi(object=fit.num)
+v.1 <- viterbi(model=fit.num)
 v.2 <- viterbi(y.num,tpm=P,Rho=R) # P and R as in the
-                                  # help for sim.hmm().
+                                  # help for rhmm().
 # The order of the states has gotten swapped; 3-v.1[[1]] is much
 # more similar to v.2[[1]] than is v.1[[1]].
 
 fit.let <- hmm(y.let,K=2,verb=TRUE)
-v.3 <- viterbi(object=fit.let)    # Works.
+v.3 <- viterbi(model=fit.let)    # Works.
 v.4 <- viterbi(y.let,tpm=P,Rho=R) # Throws an error (R has no row names.)
 }
 }

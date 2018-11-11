@@ -17,15 +17,14 @@ epsilon <- sqrt(.Machine$double.eps)
 if(is.matrix(ispd)) {
     if(ncol(ispd) != nreps)
         stop("Number of columns of \"ispd\" must equal \"nreps\".\n")
-    cis <- FALSE
+    cis <- 0
     nis <- nreps
 } else {
-    cis <- TRUE
+    cis <- 1
     nis <- 1
 }
 
 # Recursive probabilities:
-
         rp <- .Fortran(
                 'recurse',
 		fy=as.double(fy),
@@ -36,7 +35,7 @@ if(is.matrix(ispd)) {
 		lns=as.integer(lns),
                 nstate=as.integer(K),
                 nis=as.integer(nis),
-                cis=as.logical(cis),
+                cis=as.integer(cis),
                 wrk=double(K2),
 		xlc=double(L),
                 ntot=as.integer(L),

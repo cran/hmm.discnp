@@ -1,22 +1,68 @@
-hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,stationary=cis,
-                mixture=FALSE,cis=TRUE,tolerance=1e-4,verbose=FALSE,itmax=200,
-                crit='PCLL',keep.y=TRUE,data.name=NULL) {
+hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,
+                method=c("EM","bf","LM","SD"),hglmethod=c("fortran","oraw","raw"),
+                optimiser=c("nlm","optim"),optimMethod=NULL,stationary=cis,
+                mixture=FALSE,cis=TRUE,indep=NULL,tolerance=1e-4,digits=NULL,
+                verbose=FALSE,itmax=200,crit=c("PCLL","L2","Linf","ABSGRD"),
+                keep.y=FALSE,keep.X=keep.y,newstyle=TRUE,X=NULL,
+                addIntercept=TRUE,lmc=10,hessian=FALSE,...) {
+
 #
 # Function hmm.  To fit a Hidden Markov model to a data set where the
 # observations come from one of a number of finite discrete
 # distributions, depending on the (hidden) state of the Markov chain.
 # These distributions are specified by a matrix Rho = [rho_ij] where
-# rho_ij = P(X = x_i | S = j), X being the observable random variable
+# rho_ij = P(Y = y_i | S = j), Y being the observable random variable
 # and S being the hidden state.
 # 
-# Note that y used to be allowed to be a matrix, each column being interpreted
-# as an independent replicate of the observation sequence.  Now y should be
-# either a vector or a *list* of vectors.
+# Note that y used to be allowed to be a matrix, each column
+# being interpreted as an independent replicate of the observation
+# sequence.  Now y should be either a vector or a one or two column
+# matrix or a *list* of vectors or a *list* of one or two column
+# matrices.
 #
 
+method <- match.arg(method)
+# EM <--> Expectation/maximisation algorithm.
+# bf <--> brute force (maximise using either nlm() or optim()).
+# LM <--> Levenberg-Marquardt algorithm.
+# SD <--> steepest descent
+
+# Check the "crit" argument.
+crit <- match.arg(crit)
+if(method=="EM" & crit=="ABSGRD")
+    stop("Stopping criterion \"ABSGRD\" is not useable with the EM algorithm.\n")
+
+if(!newstyle) {
+    if(method %in% c("bf","LM","SD")) {
+        whinge <- paste0("When the \"",method,"\" method is used ",
+                         "\"newstyle\" must be TRUE.\n")
+        stop(whinge)
+    }
+}
+
+if(method %in% c("LM","SD")) {
+    if(!is.null(X)){
+        whinge <- paste0("Cannot currently use auxiliary predictors with the ",
+                         method," method.\n")
+        stop(whinge)
+    }
+    if(!stationary) {
+        whinge <- paste0("Currently the ",method," method only handles",
+                         " stationary models.\n")
+        stop(whinge)
+    }
+}
+
 # Check on consistency of ``mixture'' and ``stationary''.
-if(mixture & !stationary)
-	stop("Makes no sense for mixture to be non-stationary.\n")
+# Also check on "mixture" and "method".
+if(mixture) {
+    if(!stationary)
+	stop("Makes no sense for a mixture model to be non-stationary.\n")
+    if(method=="bf")
+        stop("Currently the \"bf\" method does not do mixtures.\n")
+    if(method=="LM")
+        stop("Currently the \"LM\" method does not do mixtures.\n")
+}
 
 # Check on consistancy of ``stationary'' and ``cis''.
 if(stationary & !cis)
@@ -24,163 +70,121 @@ if(stationary & !cis)
                    "probability distribution must be constant\n",
                    "across data sequences.\n"))
 
-# Put together a data name tag for the output.
-if(is.null(data.name)) data.name <- deparse(substitute(y))
+# Check that y is sensibly consistent; if it is a single
+# vector or matrix, put it into a single-entry list.
+# In some circumstances "y" may have already been processed
+# into a "tidyList" object; the tidyList() function has now
+# (27/18/2018) been adjusted so that if this is the case then "y"
+# is returned unchanged.  This avoids (amongst other things?)  the
+# problem that if tidyList() has been applied then the entries of
+# "y" will have been coerced to character mode.  Consequently the
+# "numeric" attribute of the result could be wrong if tidyList()
+# were re-applied.
+y <- tidyList(y)
+bivar <- attr(y,"parity")=="bivar"
+if(bivar) {
+    if(method %in% c("bf","LM")) {
+        whinge <- paste0("Currently the \"",method,"\" method can only ",
+                         "be used for univariate data.\n")
+        stop(whinge)
+    }
+}
 
-# Change y into *character* data.  If y is a matrix, change it
-# to a list, and put out a snarky message to the user.
-y <- charList(y)
-
-# Check that the observation values are compatible
-# with yval if it is specified.
-uval <- attr(y,"uval")
-if(is.null(yval)) yval <- uval
-if(!all(uval%in%yval))
-        stop("Specified y values do not include all observed y values.\n")
-lns  <- sapply(y,length)
-nval <- length(yval)
-
-# Check that one of par0 and K is specified and use the specified
-# one to determine the other.
-if(is.null(par0) & is.null(K))
+# Check that at least one of par0 and K is specified and, if
+# both are specified, there is no inconsistency.
+if(is.null(K)) {
+    if(is.null(par0))
 	stop('One of par0 and K must be specified.')
-if(is.null(par0)) {
-	if(is.null(rand.start)) rand.start <- list(tpm=FALSE,Rho=FALSE)
-	par0  <- init.all(nval,K,rand.start,mixture)
-}
-else {
-	K <- nrow(par0$tpm)
-        if(K != ncol(par0$tpm))
+    K <- nrow(par0$tpm)
+    if(K != ncol(par0$tpm))
             stop("The specified tpm is not square.\n")
-	if(nrow(par0$Rho) < nval)
-		stop(paste("The row dimension of Rho is less than\n",
-                           "the number of distinct y-values.\n"))
+} else if(K==1 & !is.null(par0)) {
+    warning("When K equals 1, par0 is ignored.\n")
+} else if(!is.null(par0) && K != nrow(par0$tpm)) {
+    stop("The values of \"K\" and \"par0\" are inconsistent.\n")
 }
-if(is.null(rownames(par0$Rho))) {
-    if(length(yval) != nrow(par0$Rho)) {
-        whinge <- paste("No rownames for Rho and nrow(Rho) is not equal\n",
-                        "to the number of unique y values.\n",sep="")
-        stop(whinge)
+
+# Check on (conditional) independence requirement.
+if(bivar) {
+    if(is.null(par0$Rho)) {
+        if(is.null(indep)) {
+            stop("Neither \"indep\" nor \"par0$Rho\" have been supplied.\n")
+        }
+    } else if(is.list(par0$Rho)) {
+        if(is.null(indep)) {
+            indep <- TRUE
+        } else if(!indep) {
+             stop(paste("The value of \"indep\" and that of \"par0$Rho\"\n",
+                        "are inconsistent.\n",sep=""))
+        }
+    } else {
+        if(is.null(indep)) {
+            indep <- FALSE
+        } else if(indep) {
+             stop(paste("The value of \"indep\" and that of \"par0$Rho\"\n",
+                        "are inconsistent.\n",sep=""))
+        }
     }
-        rnms <- rownames(par0$Rho) <- yval
+}
+
+# Set up the multiplier for BIC.
+nobs <- sum(!is.na(unlist(y)))
+if(bivar) nobs <- nobs/2
+bicm <- log(nobs)
+
+# BI <--> "bivariate independent".
+# BD <--> "bivariate dependent".
+# UV <--> "univariate".
+if(bivar) {
+    if(indep) {
+        rslt <- hmmBI(y,yval=yval,par0=par0,K=K,rand.start=rand.start,
+                      stationary=stationary,mixture=mixture,cis=cis,
+                      tolerance=tolerance,verbose=verbose,itmax=itmax,
+                      crit=crit,bicm=bicm)
+    } else {
+        rslt <- hmmBD(y,yval=yval,par0=par0,K=K,rand.start=rand.start,
+                      stationary=stationary,mixture=mixture,cis=cis,
+                      tolerance=tolerance,verbose=verbose,itmax=itmax,
+                      crit=crit,bicm=bicm)
+    }
 } else {
-    rnms <- rownames(par0$Rho)
-    if(!all(yval%in%rnms)) {
-        whinge <- paste("The row names of the initial value of \"Rho\" do not\n",
-                        "include all possible y-values.\n")
-        stop(whinge)
-    }
+    optimiser <- match.arg(optimiser)
+    rslt <- hmmUV(y,yval=yval,par0=par0,K=K,rand.start=rand.start,
+                  method=method,hglmethod=hglmethod,optimiser=optimiser,
+                  optimMethod=optimMethod,stationary=stationary,
+                  mixture=mixture,cis=cis,tolerance=tolerance,
+                  digits=digits,verbose=verbose,itmax=itmax,crit=crit,
+                  bicm=bicm,newstyle=newstyle,X=X,
+                  addIntercept=addIntercept,lmc=lmc,hessian=hessian,...)
 }
-
-# If K=1 do the triv thing:
-if(K==1) {
-	y <- factor(unlist(y),levels=yval)
-	Rho <- as.matrix(table(y)/length(y))
-        rownames(Rho) <- rnms
-	ll  <- sum(log(ffun(y,Rho)))
-	return(list(Rho=Rho,tpm=NA,ispd=NA,log.like=ll,
-               converged=NA,nstep=NA,data.name=data.name))
+ylnths <- sapply(y,nrow)
+if("prior.emsteps" %in% names(rslt)) {
+    naft <- which(names(rslt)=="prior.emsteps")
+} else {
+    naft <- which(names(rslt)=="nstep")
 }
-
-# Pick out the index of the stopping criterion:
-icrit <- match(crit,c('PCLL','L2','Linf'))
-if(is.na(icrit)) stop('Stopping criterion not recognized.')
-
-# Perform initial setting-up.
-tpm    <- par0$tpm
-if(stationary) {
-    ispd   <- revise.ispd(tpm)
-} else { # Make the chains equally likely to start in any state.
-    ispd <- matrix(1/K,K,length(y))
+rslt   <- append(rslt,list(ylengths=ylnths),after=naft)
+naft <- naft + 1
+nafrac <- nafracCalc(y)
+rslt   <- append(rslt,list(nafrac=nafrac),after=naft)
+naft <- naft + 1
+if(keep.y) {
+    rslt   <- append(rslt,list(y=y),after=naft)
+    naft <- naft + 1
 }
-Rho    <- par0$Rho
-m      <- nrow(Rho)
-digits <- 2+ceiling(abs(log10(tolerance)))
-
-old.theta <- c(c(tpm[,-K]),c(Rho[1:(m-1),]))
-fy        <- ffun(y,Rho)
-rp        <- recurse(fy,tpm,ispd,lns)
-old.ll    <- sum(log(rp$llc))
-
-if(verbose) cat('\n      Initial set-up completed ...\n\n')
-
-# Revise:
-em.step <- 1
-if(verbose) cat('Repeating ...\n\n')
-chnge <- numeric(3)
-repeat{
-	if(verbose) cat(paste('EM step ',em.step,':\n',sep=''))
-
-# Calculate the parameters.
-	tpm  <- revise.tpm(rp$xi,mixture)
-	ispd <- if(stationary) {
-			revise.ispd(tpm)
-		} else {
-			revise.ispd(gamma=rp$gamma,lns=lns,cis=cis)
-		}
-	Rho  <- revise.rho(y,rp$gamma,rnms)
-
-# Update the log likelihood on the basis of the
-# new parameter estimates.  This entails calculating
-# the new recursive probabilities (which will be used
-# to update the parameter estimates on the *next* EM
-# step, if necessary).
-	fy <- ffun(y,Rho)
-	rp <- recurse(fy,tpm,ispd,lns)
-	ll <-  sum(log(rp$llc))
-
-# Test for convergence:
-	new.theta <- c(c(tpm[,-K]),c(Rho[1:(m-1),]))
-	chnge[1] <- 100*(ll - old.ll)/abs(old.ll)
-	chnge[2] <- sqrt(sum((old.theta-new.theta)**2))
-	chnge[3] <- max(abs(old.theta-new.theta))
-	if(verbose){
-		cat('     Log-likelihood: ',
-            	format(round(ll,digits)),'\n',sep='')
-		cat('     Percent decrease in log-likelihood: ',
-		    format(round(chnge[1],digits)),'\n',sep='')
-		cat('     Root-SS of change in coef.: ',
-		    format(round(chnge[2],digits)),'\n',sep='')
-		cat('     Max. abs. change in coef.: ',
-		    format(round(chnge[3],digits)),'\n',sep='')
-	}
-
-	if(chnge[icrit] < tolerance) {
-			converged <- TRUE
-			nstep <- em.step
-			break
-		}
-
-	if(em.step >= itmax) {
-		cat('Failed to converge in ',itmax,' EM steps.\n',sep='')
-		converged <- FALSE
-		nstep <- em.step
-		break
-	}
-
-# Replace the ``old'' parameter and log likelihood values
-# by the new ones.
-	old.theta <- new.theta
-	old.ll    <- ll
-# Increment the step number.
-	em.step   <- em.step + 1
+keep.X <- keep.X & !bivar & newstyle & !is.null(X)
+if(keep.X) {
+    rslt   <- append(rslt,list(X=X),after=naft)
+    naft <- naft + 1
 }
-
-# Tidy up a bit:
-if(length(y)==1) {
-   if(keep.y) y <- y[[1]]
-   ispd <- as.vector(ispd)
-}
-stnms <- rownames(par0$tpm)
-if(!is.null(stnms)) {
-    rownames(tpm) <- stnms
-    colnames(tpm) <- stnms
-    names(ispd)   <- stnms
-    colnames(Rho) <- stnms
-}
-rslt <- list(Rho=Rho,tpm=tpm,ispd=ispd,log.like=ll,converged=converged,
-             nstep=nstep,y=if(keep.y) y else NULL, data.name=data.name,
-             stationary=stationary)
+rslt   <- append(rslt,list(parity=attr(y,"parity")),after=naft)
+naft <- naft + 1
+rslt   <- append(rslt,list(numeric=attr(y,"numeric")),after=naft)
+args <- list(newstyle=newstyle,method=method,optimiser=optimiser,
+             optimMethod=optimMethod,stationary=stationary,
+             mixture=mixture,cis=cis,tolerance=tolerance,
+             itmax=itmax,crit=crit,addIntercept=addIntercept)
+rslt$args   <- args
 class(rslt) <- "hmm.discnp"
 rslt
 }

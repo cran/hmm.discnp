@@ -1,42 +1,55 @@
-viterbi <- function(y,object=NULL,tpm,Rho,ispd=NULL,log=FALSE) {
+viterbi <- function(y,model=NULL,tpm,Rho,ispd=NULL,log=FALSE,warn=TRUE) {
 #
 # Function viterbi to apply the Viterbi algorithm to a collection
 # of data sequences, given the parameters of the model.
 #
 
-# If ``object'' is present, get the parameters from that, and
+# If ``model'' is present, get the parameters from that, and
 # ignore those (if any) specified as separate arguments.
-if(!is.null(object)) {
-	tpm  <- object$tpm
-	Rho  <- object$Rho
-	ispd <- object$ispd
+if(!is.null(model)) {
+	tpm  <- model$tpm
+	Rho  <- model$Rho
+	ispd <- model$ispd
 }
+
+# Set the type:
+type <- switch(class(Rho),matrix=1,list=2,array=3,NULL)
+if(is.null(type)) stop("Argument \"Rho\" is not of an appropriate form.\n")
+
 K <- nrow(tpm)
 if(missing(y)) {
-	y <- if(!is.null(object)) object$y else NULL
+	y <- if(!is.null(model)) model$y else NULL
 	if(is.null(y)) stop("No observation sequence supplied.\n")
 }
-y <- charList(y)
+
+# Make sure y is a list, and get the number of sequences and
+# lengths of these sequences.
+y    <- tidyList(y)
+nseq <- length(y)
+lns  <- sapply(y,length)
 
 # Build ispd if it was given as NULL
 if(is.null(ispd)) ispd <- revise.ispd(tpm)
 
 # Make sure that the y-values are compatible with Rho.
-Rho <- check.yval(y,Rho)
+Rho <- check.yval(y,Rho,type,warn=warn)
 
-# Make sure y is a list, and get the number of sequences and
-# lengths of these sequences.
-if(is.atomic(y)) y <- list(y)
-nseq <- length(y)
-lns  <- sapply(y,length)
+fys <- function(y,s,Rho,type) {
+    switch(type,Rho[y,s],Rho[[1]][y[1],s]*Rho[[2]][y[2],s],
+                Rho[cbind(y[1],y[2],s)])
+}
 
+sK <- switch(type, colnames(Rho),colnames(Rho[[1]]),dimnames(Rho)[[3]])
+if(is.null(sK)) sK <- 1:K
 rslt <- list()
 for(j in 1:nseq) {
-	psi <- list()
+	psi <- vector("list",nseq)
+        yt  <- y[[j]][1,]
+        rrr <- fys(yt,sK,Rho,type)
         if(log) {
-            delta <- log(ispd) + log(Rho[y[[j]][1],])
+            delta <- log(ispd) + log(rrr)
         } else {
-	    delta <- ispd*Rho[y[[j]][1],]
+	    delta <- ispd*rrr
 	    delta <- delta/sum(delta)
         }
 	nj <- lns[j]
@@ -53,11 +66,12 @@ for(j in 1:nseq) {
 	        psi[[tt]] <- tmp # Note that tmp will be a list of
 		                 # vectors, each of length between
                                  # 1 and K = the number of states.
+                yt  <- y[[j]][tt,]
+                rrr <- fys(yt,sK,Rho,type)
 		if(log) {
-                    delta <- log(Rho[y[[j]][tt],]) +
-                                 apply(delta + log(tpm),2,max)
+                    delta <- log(rrr) + apply(delta + log(tpm),2,max)
                 } else {
-		    delta <- Rho[y[[j]][tt],]*apply(delta*tpm,2,max)
+		    delta <- rrr*apply(delta*tpm,2,max)
                     delta <- delta/sum(delta)
                 }
 	}

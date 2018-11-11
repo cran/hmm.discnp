@@ -1,4 +1,4 @@
-C Output from Public domain Ratfor, version 1.0
+C Output from Public domain Ratfor, version 1.03
       subroutine afun(fy,xispd,tpm,epsilon,n,nstate,wrk,xlc,alpha)
       implicit double precision(a-h,o-z)
       dimension wrk(nstate), xispd(nstate), xlc(n)

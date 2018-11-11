@@ -1,4 +1,4 @@
-C Output from Public domain Ratfor, version 1.0
+C Output from Public domain Ratfor, version 1.03
       subroutine xfun(alpha,beta,fy,tpm,epsilon,n,nstate,nm1,wrk,xi)
       implicit double precision(a-h,o-z)
       dimension alpha(nstate,n), beta(nstate,n), fy(nstate,n)

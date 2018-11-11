@@ -2,7 +2,7 @@ subroutine recurse(fy,xispd,tpm,nreps,epsilon,lns,nstate,nis,cis,
                    wrk,xlc,ntot,nxi,alpha,beta,gamma,xi,xisum)
 
 implicit double precision(a-h,o-z)
-logical cis
+integer cis
 dimension xispd(nstate,nis), xlc(ntot), lns(nreps)
 dimension tpm(nstate,nstate), wrk(nstate,nstate)
 dimension fy(nstate,ntot), alpha(nstate,ntot), beta(nstate,ntot)
@@ -18,7 +18,7 @@ do k = 1,nreps {
 	n = lns(k)
         nm1 = n - 1
 	kstart = 1 + kstop
-        if(cis) {
+        if(cis > 0) {
             kis = 1
         } else {
             kis = k

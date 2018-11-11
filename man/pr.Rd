@@ -1,5 +1,4 @@
 \name{pr}
-\Rdversion{1.1}
 \alias{pr}
 \title{
   Probability of state sequences.
@@ -10,7 +9,7 @@
   parameters.
 }
 \usage{
-pr(s,y,object=NULL,tpm,Rho,ispd=NULL)
+pr(s, y, model=NULL, tpm, Rho, ispd=NULL, warn=TRUE)
 }
 \arguments{
   \item{s}{
@@ -18,40 +17,49 @@ pr(s,y,object=NULL,tpm,Rho,ispd=NULL)
   a list of such sequences.
 }
   \item{y}{
-  A sequence of observations from a hidden Markov model, corresponding
-  to the state sequence \code{s}, or a list of such sequences
-  corresponding to the state sequences in the list \code{s}.  If
-  \code{y} is or consists of a single sequence, it is assumed to
-  correspond to each of the state sequences in \code{s} in turn.
-  Otherwise the length of the list \code{y} must be the same as the
-  length of the list \code{s} (otherwise an error is given).  If
-  \code{y} is missing, it is extracted from \code{object} provided
-  that \code{object} and its \code{y} component are not \code{NULL}.
-  Otherwise an error is given.
+  A one or two column matrix of observations from a hidden Markov
+  model, corresponding to the state sequence \code{s}, or a list
+  of such matrices corresponding to the state sequences in the
+  list \code{s}.  If \code{y} consists of a single matrix,
+  it is assumed to correspond to each of the state sequences in
+  \code{s} in turn.  Otherwise the length of the list \code{y}
+  must be the same as the length of the list \code{s}. (If not,
+  then an error is given).  If \code{y} is missing, it is extracted
+  from \code{model} provided that \code{model} and its \code{y}
+  component are not \code{NULL}.  Otherwise an error is given.
 }
-  \item{object}{
+  \item{model}{
   An object of class \code{hmm.discnp} as returned by
   \code{\link{hmm}()}.
 }
   \item{tpm}{
   The transition probability matrix of the chain.  Ignored (and
-  extracted from \code{object} instead) if \code{object} is not
+  extracted from \code{model} instead) if \code{model} is not
   \code{NULL}.
 }
   \item{Rho}{
-  The matrix of probabilities specifying the distribution of the
-  observations, given the underlying state.  The rows of this matrix
-  correspond to the possible values of the observations, the columns
-  to the states.  Ignored (and extracted from \code{object} instead)
-  if \code{object} is not \code{NULL}.
+  An object specifying the \dQuote{emission} probabilities of
+  observations, given the underlying state.  See \code{\link{hmm}()}.
+  Ignored (and extracted from \code{model} instead) if \code{model}
+  is not \code{NULL}.
 }
   \item{ispd}{
   The vector specifying the initial state probability distribution
-  of the Markov chain.  Ignored (and extracted from \code{object}
-  instead) if \code{object} is not \code{NULL}.  If both \code{ispd}
-  and \code{object} are NULL then \code{ispd} is taken to be the
+  of the Markov chain.  Ignored (and extracted from \code{model}
+  instead) if \code{model} is not \code{NULL}.  If both \code{ispd}
+  and \code{model} are NULL then \code{ispd} is taken to be the
   stationary distribution of the chain, calculated from \code{tpm}.
 }
+  \item{warn}{Logical scalar; should a warning be issued if \code{Rho}
+  hasn't got relevant dimension names?  (Note that if this is so,
+  then the corresponding dimension names are formed from the sorted
+  unique values of \code{y} or of the appropriate column(s) of \code{y}.
+  And if \emph{this} is so, then the user should be sure that the
+  ordering of the entries of \code{Rho} corresponds properly to the
+  the sorted unique values of \code{y}.)  This argument is passed
+  to the utility function \code{check.yval()} which actually issues
+  the warning if \code{warn=TRUE}.
+  }
 }
 \value{
   The probability of \code{s} given \code{y}, or a vector
@@ -73,14 +81,15 @@ pr(s,y,object=NULL,tpm,Rho,ispd=NULL)
          \code{\link{fitted.hmm.discnp}()}}
 
 \examples{
-# See the help for sim.hmm() for how to generate y.num.
+# See the help for rhmm() for how to generate y.num.
 \dontrun{
 fit.num <- hmm(y.num,K=2,verb=TRUE)
 # Using fitted parmeters.
 s.vit.1   <- viterbi(y.num,fit.num)
-pr.vit.1  <- pr(s.vit.1,object=fit.num)
+pr.vit.1  <- pr(s.vit.1,model=fit.num)
 # Using true parameters from which y.num was generated.
 s.vit.2   <- viterbi(y.num,tpm=P,Rho=R)
 pr.vit.2  <- pr(s.vit.2,y.num,tpm=P,Rho=R)
-}}
+}
+}
 \keyword{models}
