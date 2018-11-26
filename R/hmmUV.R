@@ -15,6 +15,27 @@ hmmUV <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,
 if(!(is.null(X) | newstyle))
     stop("If \"X\" is non-NULL then \"newstyle\" must be TRUE.\n")
 
+# If Rho has been specified in par0, and if it is given in
+# the "newstyle" format or if its components have row names,
+# replace yval by the row names or by the levels of Rho$y
+if(!is.null(Rho0 <- par0$Rho)) {
+    if(is.matrix(Rho0)) {
+        rnms <- rownames(Rho0)
+    } else if(is.data.frame(Rho0)) {
+        rnms <- levels(Rho0$y)
+    }
+    rval <- !is.null(rnms)
+    if(rval) {
+        if(!is.null(yval)) {
+            whinge <- paste0("The specified initial value of Rho has row names.\n", 
+                             "These take precedence and yval has been replaced\n",
+                             "by these row names.\n")
+            warning(whinge)
+        }
+        yval <- rnms
+    }
+}
+
 # Check that the observation values are compatible
 # with yval if it is specified.
 lvls <- attr(y,"lvls")
@@ -217,7 +238,6 @@ if(is.null(digits)) digits <- 2+ceiling(abs(log10(tolerance)))
                                   hessian=hessian,...)
                 method <- "bf"
             } else {
-                Dat  <- lapply(Dat,function(x){x$y})
                 rslt <- hmmLM(Dat,par0=par,itmax=itmax,crit=crit,lmc=lmc,
                               tolerance=tolerance,bicm=bicm,rhovals=rhovals,
                               hglmethod=hglmethod,digits=digits,verbose=verbose)

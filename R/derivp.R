@@ -5,7 +5,9 @@ d1p  <- array(0,c(K,K,npar))
 d2p  <- array(0,c(K,K,npar,npar))
 
 zeta <- theta[1:(K*(K-1))]
-E    <- exp(cbind(matrix(zeta,nrow=K),0))
+M    <- cbind(matrix(zeta,nrow=K),0)
+M    <- M-apply(M,1,max)
+E    <- exp(M)
 Id   <- diag(K)
 den  <- apply(E,1,sum)
 for(i in 1:K) {
@@ -19,6 +21,7 @@ for(i in 1:K) {
                 b <- E[i,l]*Id[j,k]+E[i,k]*(Id[j,l]+Id[k,l])
                 c <- 2*E[i,k]*E[i,l]/den[i]
                 d2p[i,j,m,n] <- E[i,j]*(a-b+c)/den[i]^2
+if(any(is.na(d2p))) browser()
             }
         }
     }

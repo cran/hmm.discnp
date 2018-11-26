@@ -7,7 +7,18 @@ if(type==1) {
     K   <- nrow(gamma)
     xxx <- vector("list",K)
     for(k in 1:K) {
-        mnfit    <- multinom(y ~ 0 + ., data=DF,weights=gamma[k,],trace=FALSE)
+        mnfit <- suppressWarnings(
+                     multinom(y ~ 0 + ., data=DF,weights=gamma[k,],trace=FALSE)
+                 )
+# Make provision for there being zero actual appearances in the
+# data of some levels of Dat$y:
+        mc <- coef(mnfit)
+        btm <- min(mc)
+        z   <- -300 - (abs(btm) - btm)/2
+        M <- matrix(z,nrow=length(lvls),ncol=ncol(mc))
+        rownames(M) <- lvls
+        M[rownames(mc),] <- mc
+        M[1,] <- 0
 #
 # The nnet::multinom() function uses the convention that the *first*
 # exponent is 0, rather than the last, whereas the convention that is
@@ -23,7 +34,6 @@ if(type==1) {
 # It is only slightly more complicated in the general case.
 # Note that coef(mnfit) is always a matrix, even if there is
 # only a single column.
-        M <- rbind(0,coef(mnfit))
         xxx[[k]] <- t(t(M) - M[nrow(M),])
     }
     CCC <- do.call(rbind,xxx)

@@ -6,7 +6,9 @@ d1f  <- array(0,c(m,K,npar))
 d2f  <- array(0,c(m,K,npar,npar))
 Id   <- diag(max(K,m))
 phi  <- theta[(npr+1):npar]
-E    <- exp(rbind(matrix(phi,ncol=K),0))
+M    <- rbind(matrix(phi,ncol=K),0)
+M    <- t(t(M) - apply(M,2,max))
+E    <- exp(M)
 den  <- apply(E,2,sum)
 mm1  <- m - 1
 for(i in 1:m) {
