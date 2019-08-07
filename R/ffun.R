@@ -12,14 +12,19 @@ f1 <- function(Y,Rho) {
     Pred   <- Y[,-1,drop=FALSE]
     state  <- levels(Rho$state)
     rslt   <- vector("list",length(state))
+    names(rslt) <- state
     indmat <- cbind(y,seq(along=y))
-    for(k in state) {
-        B   <- as.matrix(Rho[Rho$state==k,-(1:2)])
-        Tmp <- exp(B%*%t(Pred))
-        den <- apply(Tmp,2,sum)
 # Note that we are cbinding a *factor* to a numeric vector, which
 # coerces the factor to numeric mode so that the resulting entries
 # are integers, with i corresponding to the i-th level of the factor.
+# That makes the indexing of "Tmp" by "indmat" in the following
+# work correctly.
+    for(k in state) {
+        B   <- as.matrix(Rho[Rho$state==k,-(1:2)])
+        Tmp <- B%*%t(Pred)
+        Tmp <- t(t(Tmp) - apply(Tmp,2,max))
+        Tmp <- exp(Tmp)
+        den <- apply(Tmp,2,sum)
         num <- Tmp[indmat]
         prb <- num/den
         prb[is.na(prb)] <- 1

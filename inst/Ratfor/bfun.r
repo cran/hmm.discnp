@@ -1,6 +1,6 @@
-subroutine bfun(fy,xispd,tpm,epsilon,n,nstate,wrk,beta)
+subroutine bfun(fy,tpm,epsilon,n,nstate,wrk,beta)
 implicit double precision(a-h,o-z)
-dimension wrk(nstate), xispd(nstate)
+dimension wrk(nstate)
 dimension fy(nstate,n), tpm(nstate,nstate), beta(nstate,n)
 
 # Set some constants.

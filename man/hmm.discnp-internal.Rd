@@ -1,6 +1,7 @@
 \name{hmm.discnp-internal}
-\alias{checkConstColumns}
+\alias{[.multipleHmmDataSets}
 \alias{check.yval}
+\alias{checkConstColumns}
 \alias{checkyXoK}
 \alias{derivf}
 \alias{derivp}
@@ -33,6 +34,7 @@
 \alias{paramExtract}
 \alias{p2expForm}
 \alias{phi2rho}
+\alias{predictEngineHmmDiscnp}
 \alias{recurse}
 \alias{reparam}
 \alias{revise.ispd}
@@ -48,7 +50,9 @@
   Internal hmm.discnp functions.
 }
 \usage{
-check.yval(y, Rho, type, warn=TRUE)
+\method{[}{multipleHmmDataSets}(x,i)
+check.yval(yval, Rho, type, warn=TRUE)
+checkConstColumns(y,prednames)
 checkyXoK(y, X)
 derivf(theta, K)
 derivp(theta, K)
@@ -95,6 +99,7 @@ makeDat(y, X, addIntercept)
 paramExtract(Rho, newstyle)
 p2expForm(x)
 phi2rho(phi, ijk)
+predictEngineHmmDiscnp(stateProbs,Rho,numb,drop)
 recurse(fy, tpm, ispd, lns)
 reparam(pars, stationary)
 revise.ispd(tpm=NULL, gamma=NULL, lns=NULL, cis=TRUE)

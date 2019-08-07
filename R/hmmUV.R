@@ -8,16 +8,19 @@ hmmUV <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,
 # Function hmmUV.  To conduct the fitting of a Hidden Markov model
 # when the observations are univariate.  Note that in the univariate
 # case we are allowed to have a matrix X of auxiliary predictors
-# if the method is "EM".  Or "bf"???
+# if the method is "EM" or "bf".
 #
 
 # Check that the newstyle value is legitimate.
 if(!(is.null(X) | newstyle))
     stop("If \"X\" is non-NULL then \"newstyle\" must be TRUE.\n")
 
+# Make sure that yval, if specified, is character.
+if(!is.null(yval)) yval <- as.character(yval)
+
 # If Rho has been specified in par0, and if it is given in
-# the "newstyle" format or if its components have row names,
-# replace yval by the row names or by the levels of Rho$y
+# the "newstyle" format or if its component Rho has row names,
+# replace yval by these row names or by the levels of Rho$y
 if(!is.null(Rho0 <- par0$Rho)) {
     if(is.matrix(Rho0)) {
         rnms <- rownames(Rho0)
@@ -26,10 +29,10 @@ if(!is.null(Rho0 <- par0$Rho)) {
     }
     rval <- !is.null(rnms)
     if(rval) {
-        if(!is.null(yval)) {
-            whinge <- paste0("The specified initial value of Rho has row names.\n", 
-                             "These take precedence and yval has been replaced\n",
-                             "by these row names.\n")
+        if(!is.null(yval) && !identical(yval,rnms)) {
+            whinge <- paste0("The specified initial value of Rho has row names\n", 
+                             "which differ from \"yval\".  These row names take\n",
+                             "precedence and yval has been replaced by them.\n")
             warning(whinge)
         }
         yval <- rnms
@@ -49,10 +52,8 @@ nval <- length(yval)
 # attribute really does provide the appropriate levels.
 attr(y,"lvls") <- yval
 
-# Make sure that X, if supplied, has the appropriate form.
+# If X was supplied, get the predictor names.
 if(!is.null(X)) {
-    X <- tidyList(X,rp="predictor",addIntercept=addIntercept)
-    checkyXoK(y,X)
     prednames <- attr(X,"prednames")
 } else prednames <- "Intercept"
 
@@ -179,7 +180,15 @@ if(method=="EM") {
     t1        <- as.vector(tpm[,-K])
     t2        <- paramExtract(Rho,newstyle)
     old.theta <- c(t1,t2)
-    fy        <- ffun(Dat,Rho,type=if(newstyle) 1 else 2)
+    if(newstyle) {
+        if(is.null(X)) {
+            fy <- ffun(Dat,cnvrtRho(Rho),type=2)
+        } else {
+            fy <- ffun(Dat,Rho,type=1)
+        }
+    } else {
+        fy <- ffun(Dat,Rho,type=2)
+    }
     rp        <- recurse(fy,tpm,ispd,lns)
     old.ll    <- sum(log(rp$llc))
 
@@ -208,14 +217,28 @@ if(is.null(digits)) digits <- 2+ceiling(abs(log10(tolerance)))
     		} else {
     			revise.ispd(gamma=rp$gamma,lns=lns,cis=cis)
     		}
-    	Rho  <- revise.rho(Dat,rp$gamma,type=if(newstyle) 1 else 2)
+        if(newstyle) {
+            if(is.null(X)) {
+    	        Rho <- cnvrtRho(revise.rho(Dat,rp$gamma,type=2))
+            } else Rho <- revise.rho(Dat,rp$gamma,type=1)
+        } else {
+            Rho <- revise.rho(Dat,rp$gamma,type=2)
+        }
     
 # Update the log likelihood on the basis of the
 # new parameter estimates.  This entails calculating
 # the new recursive probabilities (which will be used
 # to update the parameter estimates on the *next* EM
 # step, if necessary).
-    	fy <- ffun(Dat,Rho,type=if(newstyle) 1 else 2)
+        if(newstyle) {
+            if(is.null(X)) {
+                fy <- ffun(Dat,cnvrtRho(Rho),type=2)
+            } else {
+                fy <- ffun(Dat,Rho,type=1)
+            }
+        } else {
+            fy <- ffun(Dat,Rho,type=2)
+        }
     	rp <- recurse(fy,tpm,ispd,lns)
     	ll <-  sum(log(rp$llc))
 

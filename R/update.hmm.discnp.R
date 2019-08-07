@@ -1,8 +1,8 @@
 update.hmm.discnp <- function(object,...,data,Kplus1=FALSE,tpm2=NULL,
                               verbose=FALSE,method=NULL,optimiser=NULL,
                               stationary=NULL,mixture=NULL,cis=NULL,
-                              tolerance=NULL,itmax=NULL,crit=NULL,X=NULL,
-                              addIntercept=NULL) {
+                              tolerance=NULL,itmax=NULL,crit=NULL,
+                              newstyle=NULL,X=NULL,addIntercept=NULL) {
 
 # Check that the "data" argument is compatible with the "object"
 # argument.
@@ -18,6 +18,7 @@ if(is.null(cis))          cis          <- object$args$cis
 if(is.null(tolerance))    tolerance    <- object$args$tolerance
 if(is.null(itmax))        itmax        <- object$args$itmax
 if(is.null(crit))         crit         <- object$args$crit
+if(is.null(newstyle))     newstyle     <- object$args$newstyle
 if(is.null(addIntercept)) addIntercept <- object$args$addIntercept
 
 # Increment the number of states by one if required.
@@ -97,8 +98,9 @@ if(identical(par0$tpm,NA)) {
 
 fit <- hmm(y=data,K=K,par0=par0,method=method,optimiser=optimiser,
            stationary=stationary,mixture=mixture,cis=cis,
-           tolerance=tolerance,itmax=itmax,crit=crit,X=X,
-           addIntercept=addIntercept,verbose=verbose,...)
+           tolerance=tolerance,itmax=itmax,crit=crit,
+           newstyle=newstyle,X=X,addIntercept=addIntercept,
+           verbose=verbose,...)
 nafter <- which(names(fit)=="log.like") - 1
 fit <- append(fit,list(init.log.like=ill),after=nafter)
 class(fit) <- "hmm.discnp"

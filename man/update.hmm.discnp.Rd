@@ -10,7 +10,7 @@
 \method{update}{hmm.discnp}(object,..., data, Kplus1=FALSE,
         tpm2=NULL, verbose=FALSE, method=NULL, optimiser=NULL,
         stationary=NULL, mixture=NULL, cis=NULL, tolerance=NULL,
-        itmax=NULL, crit=NULL, X=NULL, addIntercept=NULL)
+        itmax=NULL, crit=NULL, newstyle=NULL, X=NULL, addIntercept=NULL)
 }
 
 \arguments{
@@ -92,6 +92,9 @@
   \item{crit}{
   See the help for \code{hmm()}.
 }
+  \item{newstyle}{
+ See the help for \code{hmm()}.
+} 
   \item{X}{
   See the help for \code{hmm()}.
 }
@@ -108,7 +111,7 @@ An object of class \code{hmm.discnp} with an additional component
 \code{init.log.like} which is the initial log likelihood
 calculated at the starting values of the parameters (which may
 be modified from the parameters returned in the object being
-updated, if \code{Kplus1} is \code{TRUE}.  The calculation is
+updated, if \code{Kplus1} is \code{TRUE}).  The calculation is
 done by the function \code{logLikHmm()}.  Barring the strange and
 unforeseen, \code{init.log.like} should be (reassuringly) equal
 to \code{object$log.like}.  See \code{\link{hmm}()} for details of

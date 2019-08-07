@@ -29,7 +29,7 @@ do k = 1,nreps {
                   xlc(kstart),alpha(1,kstart))
 
 # Update the beta's.
-	call bfun(fy(1,kstart),xispd(1,kis),tpm,epsilon,n,nstate,wrk,
+	call bfun(fy(1,kstart),tpm,epsilon,n,nstate,wrk,
                   beta(1,kstart))
 
 # Update the gamma's.

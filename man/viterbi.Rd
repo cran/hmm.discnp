@@ -101,18 +101,22 @@ Owen Marshall.
          \code{\link{mps}()}, \code{\link{pr}()},
          \code{\link[HMM]{viterbi}()}}
 \examples{
-# See the help for rhmm() for how to generate y.num and y.let.
+# See the help for logLikHmm() for how to generate y.num and y.let.
 \dontrun{
-fit.num <- hmm(y.num,K=2,verb=TRUE)
-v.1 <- viterbi(model=fit.num)
-v.2 <- viterbi(y.num,tpm=P,Rho=R) # P and R as in the
-                                  # help for rhmm().
-# The order of the states has gotten swapped; 3-v.1[[1]] is much
-# more similar to v.2[[1]] than is v.1[[1]].
+fit.num     <- hmm(y.num,K=2,verb=TRUE,keep.y=TRUE)
+v.1         <- viterbi(model=fit.num)
+rownames(R) <- 1:5 # Avoids a (harmless) warning.
+v.2         <- viterbi(y.num,tpm=P,Rho=R)
+# P and R as in the help for logLikHmm() and for sp().
 
-fit.let <- hmm(y.let,K=2,verb=TRUE)
-v.3 <- viterbi(model=fit.let)    # Works.
-v.4 <- viterbi(y.let,tpm=P,Rho=R) # Throws an error (R has no row names.)
+# Note that the order of the states has gotten swapped; 3-v.1[[1]]
+# is identical to v.2[[1]]; for other k = 2, ..., 20, 3-v.1[[k]]
+# is much more similar to v.2[[k]] than is v.1[[k]].
+
+fit.let <- hmm(y.let,K=2,verb=TRUE,keep.y=TRUE))
+v.3 <- viterbi(model=fit.let)
+rownames(R) <- letters[1:5]
+v.4 <- viterbi(y.let,tpm=P,Rho=R)
 }
 }
 \keyword{models}

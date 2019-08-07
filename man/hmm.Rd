@@ -444,14 +444,18 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    if the corresponding components of the observations.
 }
 \item{y}{
-   A (slighty tidied up) version of the observations (argument
-   \code{y}).  Present only if \code{keep.y} is \code{TRUE}.
+   An object of class \code{"tidyList"}.  It is a tidied up version
+   of the observations; i.e. the observations \code{y} after the
+   application of the undocumented function \code{tidyList()}.
+   Present only if \code{keep.y} is \code{TRUE}.
 }
 \item{X}{
-   A (slighty tidied up) version of the predictor matrix or
-   list of predictor matrices (argument
-   \code{X}).  Present only if \code{X} is supplied, is an
-   appropriate argument, and if \code{keep.X} is \code{TRUE}.
+   An object of class \code{"tidyList"}.  It is tidied up version
+   of the predictor matrix or list of predictor matrices; i.e. the
+   argument \code{X} after the application of \code{tidyList()}
+   (with argument \code{rp} set to \code{"predictor"}.  Present only
+   if \code{X} is supplied, is an appropriate argument, and if
+   \code{keep.X} is \code{TRUE}.
 }
 \item{parity}{
    Character string; \code{"univar"} if the data were univariate,

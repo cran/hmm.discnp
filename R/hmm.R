@@ -148,6 +148,10 @@ if(bivar) {
                       crit=crit,bicm=bicm)
     }
 } else {
+    if(!is.null(X) & method %in% c("EM","bf")) {
+        X <- tidyList(X,rp="predictor",addIntercept=addIntercept)
+        checkyXoK(y,X)
+    }
     optimiser <- match.arg(optimiser)
     rslt <- hmmUV(y,yval=yval,par0=par0,K=K,rand.start=rand.start,
                   method=method,hglmethod=hglmethod,optimiser=optimiser,
@@ -174,12 +178,12 @@ if(keep.y) {
 }
 keep.X <- keep.X & !bivar & newstyle & !is.null(X)
 if(keep.X) {
-    rslt   <- append(rslt,list(X=X),after=naft)
+    rslt <- append(rslt,list(X=X),after=naft)
     naft <- naft + 1
 }
-rslt   <- append(rslt,list(parity=attr(y,"parity")),after=naft)
+rslt <- append(rslt,list(parity=attr(y,"parity")),after=naft)
 naft <- naft + 1
-rslt   <- append(rslt,list(numeric=attr(y,"numeric")),after=naft)
+rslt <- append(rslt,list(numeric=attr(y,"numeric")),after=naft)
 args <- list(newstyle=newstyle,method=method,optimiser=optimiser,
              optimMethod=optimMethod,stationary=stationary,
              mixture=mixture,cis=cis,tolerance=tolerance,

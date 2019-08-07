@@ -61,7 +61,7 @@ if(inherits(y,"madeDat")) {
 
 # Make sure that the entries of the vectors in y correspond
 # to the appropriate dimension names of Rho.
-    Rho <- check.yval(y,Rho,type,warn=warn)
+    Rho <- check.yval(attr(y,"lvls"),Rho,type,warn=warn)
 
 # If we are using predictors, tidy them up.
 if(type==1 & !is.null(X)) {

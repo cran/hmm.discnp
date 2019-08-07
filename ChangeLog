@@ -647,7 +647,7 @@ Version 1.0-1 |--> 2.0-0
 Started on adding cappacity for using Levinberg-Marquardt
 algorithm, 08/02/2018.
 
-Finished (???) add LM capacity to the package 27/03/2018.
+Finished (???) adding LM capacity to the package 27/03/2018.
 (*SUBSTANTIAL* modifications effected.)
 
 Tidied up and checked, 28/06/2018.
@@ -1089,3 +1089,79 @@ Fixed a bug in hmmUV() w.r.t. the switch to method="LM" if there is
 a *decrease* in the log likelihood.  The data "Dat" were being
 (now completely unnecessarily) being restructured, which was
 mucking up the call to get.l().  Eliminated the restructuring.
+
+Incremented the version number (to 2.1-5)
+and submitted to CRAN 26/11/2018.
+
+Found an egregious error in derivp.R.  Fixed it.  (Strangely
+the corresponding error was *not* made in derivf.R.)
+
+Incremented the version number (to 2.1-6).
+29/11/2018
+
+Re-visited derivf.R --- turns out there were errors therein
+even more egregious than in derivp.R.  Corrected these errors.
+
+Incremented the version number (to 2.1-7).
+26/01/2019
+
+Fixed bug in viterbi().  Thanks to Jeroen Donkers for pointing
+out (and isolating) the bug.
+
+Fixed corresponding bugs in pr() and mps(); made some related
+changes in sp().
+
+Fixed a bug in fitted.hmm.discnp().
+
+Changed check.yval() --- realised that there is no need to pass
+all of the data set y, only to extract the "lvls" attribute!!
+So made the first argument yval, rather than y.  Now the calls to
+this function are made in the form check.yval(attr(y,"lvls"),...).
+
+Incremented the version number (to 2.1-8).
+02/02/2019
+
+Adjusted the treatment of a specified "yval" slightly; if it is
+identical with the rowname of a supplied par0$Rho, then no warning
+is issued.
+
+Changed code so that if there is no predictor matrix "X" then
+revise.rho() and fun() get called with type=2 (with appropriate
+adjustments being made to "Rho"), which speeds things up by a
+factor of 5+.
+
+Incremented the version number (to 2.1-9).
+25/02/2019
+
+Change/adjusted sp(), fitted.hmm.discnp() and predict.hmm.discnp()
+so that "fitted/predicted" values (in a certain sense) are returned
+when the data are categorical.  Reorganised and streamlined (???)
+code.
+
+Incremented the version number (to 2.1-10).
+09/03/2019
+
+Added the S3 class "multipleHmmDataSets"; arranged for the objects
+returned by rhmm() to have this class.  Added an extractor method
+for this class.  Added the function predictEngineHmmDiscnp() to
+be called by fitted.hmm.discnp() and predict.hmm.disnp(), thereby
+tidying up the code
+14/03/2019
+
+Fixed a major glitch in ffun.R.  I had neglected to allow for
+the "numerical gotcha" resulting from doing exp(v)/sum(exp(v))
+when there are large (positive) values in v.  In such cases one
+gets "Inf/Inf" whence "Nan".  The fix is of course to subtract
+the maximum of v from each entry of v.  Done
+
+Incremented the version number (to 2.1-11).
+01/06/2019
+
+Fixed up some glitches in the documentation.
+
+Added as suppressWarnings() to a call to as.numeric() in check.yval()
+to avoid a disconcerting (misleading and bascically spurious)
+warning that can occur.
+
+Adjusted a comment (in f1()) in ffun.R.
+07/08/2019

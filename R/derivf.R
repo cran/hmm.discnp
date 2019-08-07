@@ -4,7 +4,18 @@ m    <- 2 - K + npar/K
 npr  <- K*(K-1)
 d1f  <- array(0,c(m,K,npar))
 d2f  <- array(0,c(m,K,npar,npar))
-Id   <- diag(max(K,m))
+
+# d1f[i,j,k] = the derivative of rho_ij w.r.t. theta_k
+# where theta_k = phi_{i1,j1}, where k = (j1-1)*(m-1) + i1 + npr
+# These derivatives are identically zero unless j1 = j since
+# rho_ij does not involve phi_{i1,j1} unless j1 = j.
+
+# d2f[i,j,k,l] = the second derivative of rho_ij w.r.t. theta_k
+# and theta_l, where theta_k = phi_{i1,j1} and theta_l = phi_{i2,j2},
+# k = (j1-1)*(m-1) + i1 + npr and l = (j2-1)*(m-1) + i2 + npr
+# These derivatives are identically zero unless j1 = j and j2 = j.
+
+Id   <- diag(m)
 phi  <- theta[(npr+1):npar]
 M    <- rbind(matrix(phi,ncol=K),0)
 M    <- t(t(M) - apply(M,2,max))
@@ -13,20 +24,16 @@ den  <- apply(E,2,sum)
 mm1  <- m - 1
 for(i in 1:m) {
     for(j in 1:K) {
-        for(k in 1:mm1) {
-            h <- (j-1)*mm1 + k
-# d1f[i,j,npr+h] = the derivative of rho_ij w.r.t. theta_{npr+h} (the (npr+h)-th
-# parameter) which is equal to phi_{k,j} where h = (j-1)*(m-1) + k.
-            d1f[i,j,npr+h] <- E[i,j]*(Id[i,k]*den[j] - E[k,j])/den[j]^2
-# d2f[i,j,npr+h,npr+n] = the second derivative of rho_ij w.r.t. theta_{npr+h}
-# and theta_{npr+n}, i.e. w.r.t. phi_{k,j} where h = (j-1)*(m-1) + k, and
-# phi_{l,j} where n = (j-1)*(m-1) + l.
-            for(l in 1:mm1) {
-                n <- (j-1)*mm1 + l
-                a <- den[j]*Id[i,k]*Id[i,l]
-                b <- E[l,j]*(Id[i,k]+Id[k,l])+E[k,j]*Id[i,l]
-                c <- 2*E[k,j]*E[l,j]/den[j]
-                d2f[i,j,npr+h,npr+n] <- E[i,j]*(a-b+c)/den[j]^2
+        for(i1 in 1:mm1) {
+            k <- (j-1)*mm1 + i1 + npr
+            d1f[i,j,k] <- E[i,j]*(Id[i,i1]*den[j] - E[i1,j])/den[j]^2
+            for(i2 in 1:mm1) {
+                l <- (j-1)*mm1 + i2 + npr
+                a <- den[j]*Id[i,i1]*Id[i,i2]
+                #b <- E[i2,j]*(Id[i,i1]+Id[i1,i2])+E[i1,j]*Id[i1,i2]
+                b <- E[i1,j]*(Id[i,i2]+Id[i1,i2])+E[i2,j]*Id[i,i1]
+                c <- 2*E[i1,j]*E[i2,j]/den[j]
+                d2f[i,j,k,l] <- E[i,j]*(a-b+c)/den[j]^2
             }
         }
     }

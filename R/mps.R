@@ -10,21 +10,27 @@ if(!is.null(model)) {
 	Rho  <- model$Rho
 	ispd <- model$ispd
 }
+
+# If Rho is presented in the "logistic style" parameterisation,
+# convert it to a matrix of probabilities.
+if(class(Rho)=="data.frame") Rho <- cnvrtRho(Rho)
+
 stnms <- rownames(tpm)
 if(is.null(ispd)) ispd <- revise.ispd(tpm)
 if(missing(y)) {
 	y <- if(!is.null(model)) model$y else NULL
 	if(is.null(y)) stop("No observation sequence supplied.\n")
 }
-y    <- tidyList(y)
-type <- if(is.matrix(Rho)) {
-            1
-        } else if(is.list(Rho)) {
-            2
-        } else if(is.array(Rho)) 3
+y <- tidyList(y)
+y <- makeDat(y,X=NULL)
 
+# Set the type:
+type <- switch(class(Rho),data.frame=1, matrix= 2, list=3, array=4, NULL)
 if(is.null(type)) stop("Argument \"Rho\" is not of an appropriate form.\n")
-Rho  <- check.yval(y,Rho,type,warn=warn)
+# Note: type = 1 can't happen here.
+if(is.null(type)) stop("Argument \"Rho\" is not of an appropriate form.\n")
+
+Rho  <- check.yval(attr(y,"lvls"),Rho,type,warn=warn)
 lns  <- sapply(y,nrow)
 nseq <- length(y)
 fy   <- ffun(y,Rho,type)

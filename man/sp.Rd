@@ -1,5 +1,4 @@
 \name{sp}
-\Rdversion{1.1}
 \alias{sp}
 \title{
   Calculate the conditional state probabilities.
@@ -8,12 +7,10 @@
   Returns the probabilities that the underlying hidden
   state is equal to each of the possible state values,
   at each time point, given the observation sequence.
-  Also can return the fitted conditional means, if requested,
-  given that the observations are numeric.
 }
 \usage{
 sp(y, model = NULL, tpm=NULL, Rho=NULL, ispd=NULL, X=NULL,
-   addIntercept=NULL, means = FALSE, warn=TRUE)
+   addIntercept=NULL, warn=TRUE, drop=TRUE)
 }
 \arguments{
   \item{y}{The observations on the basis of which the probabilities
@@ -30,9 +27,8 @@ sp(y, model = NULL, tpm=NULL, Rho=NULL, ispd=NULL, X=NULL,
 }
   \item{tpm}{
   The transition probability matrix for the underlying hidden
-  Markov chain.  Ignored if \code{model} is not \code{NULL}.
-  Ignored if \code{model} is not \code{NULL} (in which
-  case \code{tpm} is extracted from \code{model}).
+  Markov chain.  Ignored if \code{model} is not \code{NULL}
+  (in which case \code{tpm} is extracted from \code{model}).
 }
   \item{Rho}{
   An object specifying the distribution of the observations, given
@@ -43,33 +39,31 @@ sp(y, model = NULL, tpm=NULL, Rho=NULL, ispd=NULL, X=NULL,
 }
   \item{ispd}{
   Vector specifying the initial state probability distribution
-  of the underlying hidden Markov chain.
-  Ignored if \code{model} is not \code{NULL} (in which
-  case \code{ispd} is extracted from \code{model}).
-  If both \code{model} and \code{ispd} are NULL then
-  \code{ispd} is calculated to be the stationary distribution
-  of the chain as determined by \code{tpm}.
+  of the underlying hidden Markov chain.  Ignored if \code{model}
+  is not \code{NULL} (in which case \code{ispd} is extracted from
+  \code{model}).  If both \code{model[["ispd"]]} and \code{ispd}
+  are NULL then \code{ispd} is calculated to be the stationary
+  distribution of the chain as determined by \code{tpm}.
 }
-  \item{X}{An optional \emph{numeric} matrix, or a list of such
-  matrices, of \emph{predictors}.  The use of such predictors
-  is (currently, at least) applicable only in the univariate
-  emissions setting, and then only if \code{Rho} is supplied in
-  the \dQuote{newstyle} format.  If \code{X} is a list it must
-  be of the same length as \code{y} and all entries of this list
-  must have the same number of columns.  The number of rows of each
-  entry must be equal to the length of the corresponding entry of
-  \code{y}. If \code{X} is a matrix then \code{y} should be a vector
-  or one-column matrix (or a list with a single entry equal to such).
+  \item{X}{An optional \emph{numeric} matrix, or a list of
+  such matrices, of \emph{predictors}.  Ignored if \code{model}
+  is not \code{NULL} (in which case \code{X} is extracted from
+  \code{model}).
+
+  The use of such predictors is (currently, at least) applicable only
+  in the univariate emissions setting, and then only if \code{Rho}
+  is supplied in the \dQuote{newstyle} format.  If \code{X} is a list
+  it must be of the same length as \code{y} and all entries of this
+  list must have the same number of columns.  The number of rows
+  of each entry must be equal to the length of the corresponding
+  entry of \code{y}. If \code{X} is a matrix then \code{y} should
+  be a vector or one-column matrix (or a list with a single entry
+  equal to such).
 }
   \item{addIntercept}{
   Logical scalar.  See the documentation of \code{\link{hmm}()}.
-  }
-  \item{means}{
-  A logical scalar; if \code{means} is \code{TRUE} then the
-  conditional expected value of (each column of) the observations
-  (given the observation sequence) is calculated at each time point.
-  If \code{means} is \code{TRUE} and the observation values are
-  not numeric, then an error is given.
+  Ignored if \code{model} is not \code{NULL} (in which case
+  \code{addIntercept} is extracted from \code{model}).
 }
   \item{warn}{Logical scalar; should a warning be issued if \code{Rho}
   hasn't got relevant dimension names?  (Note that if this is so,
@@ -81,38 +75,27 @@ sp(y, model = NULL, tpm=NULL, Rho=NULL, ispd=NULL, X=NULL,
   to the utility function \code{check.yval()} which actually issues
   the warning if \code{warn=TRUE}.
   }
+  \item{drop}{Logical scalar.  If \code{y} is a matrix, or a
+  list of length 1, and if \code{drop} is \code{FALSE} then the
+  returned value is a list whose sole entry is the matrix that
+  would have been returned were \code{drop} equal to \code{TRUE}.
+  The argument \code{drop} is ignored if \code{y} is a list of
+  length greater than 1.
+  }
 }
 \details{
-  The conditional mean value at time \eqn{t} is calculated
-  as \deqn{\sum_k \gamma_t(k) \mu_k}{SUM_k gamma_t(k)*mu_k}
-  where \eqn{\gamma_t(k)}{gamma_t(k)} is the conditional
-  probability (given the observations) that the hidden Markov
-  chain is in state \eqn{k} at time \eqn{t}, and \eqn{\mu_k}{mu_k}
-  is the expected value of an observation given that the chain
-  is in state \eqn{k}.
+    Note that in contrast to \code{predict.hmm.discnp()}, components
+    in \code{model} take precendence over individually supplied
+    components (\code{tpm}, \code{Rho}, \code{ispd}, \code{X}
+    and \code{addIntercept}).
 }
 \value{
-    If \code{means} is \code{TRUE} then the returned value is
-    a list with components
-    \item{probs}{The conditional probabilities of the states
-    at each time point.}
-    \item{means}{The conditional expectations of the observations
-                 at each time point.}
-
-    Clearly this makes sense only if the observations are numeric.
-
-    Otherwise the returned value consists of \code{probs} as
-    described above.
-
-    If there is a single matrix of observations \code{y} then
-    \code{probs} is a matrix whose rows correspond to the states
-    of the hidden Markov chain, and whose columns correspond to
-    the observation times.  If the observations consist of a
-    list of observation vectors, then \code{probs} is a list
-    of such matrices, one for each matrix of observations.
-
-    Likewise for the \code{means} component of the list returned
-    when the argument \code{means} is \code{TRUE}.
+    If \code{y} is a single matrix of observations or a list of
+    length 1, and if \code{drop} is \code{TRUE} then the returned
+    value is a matrix whose rows correspond to the states of
+    the hidden Markov chain, and whose columns correspond to the
+    observation times.  Otherwise \code{probs} is a list of such
+    matrices, one for each matrix of observations.
 }
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr
@@ -126,11 +109,10 @@ P <- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
 R <- matrix(c(0.5,0,0.1,0.1,0.3,
               0.1,0.1,0,0.3,0.5),5,2)
 set.seed(42)
-y.num   <- rhmm(ylengths=rep(300,20),nsim=1,tpm=P,Rho=R,drop=TRUE)
-fit.num <- hmm(y.num,K=2,verb=TRUE,keep.y=TRUE,itmax=10)
-cpe1    <- sp(model=fit.num,means=TRUE) # Using the estimated parameters.
-cpe2    <- sp(y.num,tpm=P,Rho=R,means=TRUE,
-              warn=FALSE) # Using the ``true'' parameters.
+y    <- rhmm(ylengths=rep(300,20),nsim=1,tpm=P,Rho=R,drop=TRUE)
+fit  <- hmm(y,K=2,verb=TRUE,keep.y=TRUE,itmax=10)
+cpe1 <- sp(model=fit) # Using the estimated parameters.
+cpe2 <- sp(y,tpm=P,Rho=R,warn=FALSE) # Using the ``true'' parameters.
 # The foregoing would issue a warning that Rho had no row names
 # were it not for the fact that "warn" has been set to FALSE.
 }

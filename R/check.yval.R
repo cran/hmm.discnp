@@ -1,8 +1,6 @@
-check.yval <- function(y,Rho,type,warn=TRUE) {
+check.yval <- function(yval,Rho,type,warn=TRUE) {
 fname <- as.character(sys.call(-1))[1]
 if(is.na(fname)) fname <- "call from the command line"
-
-yval <- attr(y,"lvls")
 
 # Univariate, newstyle.
 if(type==1) {
@@ -12,7 +10,7 @@ if(type==1) {
     yval <- as.character(yval)
     if(all(yval %in% rn)) return(Rho)
     partmess <- "the levels of \"Rho$y\".\n"
-    whinge <- paste0("In ",fname," some y values do not match",partmess)
+    whinge <- paste0("In ",fname," some y values do not match ",partmess)
     stop(whinge,call.=FALSE)
 }
 
@@ -32,7 +30,7 @@ if(type==2) {
                             "unique values of \"y\".\n")
             warning(whinge)
         }
-        nyv  <- as.numeric(yval)
+        nyv  <- suppressWarnings(as.numeric(yval))
         yval <- if(!any(is.na(nyv))) yval[order(nyv)] else sort(yval)
         rn   <- rownames(Rho) <- yval
     }

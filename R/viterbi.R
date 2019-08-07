@@ -12,13 +12,21 @@ if(!is.null(model)) {
 	ispd <- model$ispd
 }
 
+# If Rho is presented in the "logistic style" parameterisation,
+# convert it to a matrix of probabilities.
+if(class(Rho)=="data.frame") Rho <- cnvrtRho(Rho)
+
 # Set the type:
-type <- switch(class(Rho),matrix=1,list=2,array=3,NULL)
+# 1 <--> univariate, new (logistic) style # Won't happen --- see above!
+# 2 <--> univariate, old (matrix) style
+# 3 <--> bivariate, independent
+# 4 <--> bivariate, dependent
+type <- switch(class(Rho),data.frame=1,matrix=2,list=3,array=4,NULL)
 if(is.null(type)) stop("Argument \"Rho\" is not of an appropriate form.\n")
 
 K <- nrow(tpm)
 if(missing(y)) {
-	y <- if(!is.null(model)) model$y else NULL
+	y <- if(!is.null(model)) model[["y"]] else NULL
 	if(is.null(y)) stop("No observation sequence supplied.\n")
 }
 
@@ -32,14 +40,14 @@ lns  <- sapply(y,length)
 if(is.null(ispd)) ispd <- revise.ispd(tpm)
 
 # Make sure that the y-values are compatible with Rho.
-Rho <- check.yval(y,Rho,type,warn=warn)
+Rho <- check.yval(attr(y,"lvls"),Rho,type,warn=warn)
 
 fys <- function(y,s,Rho,type) {
-    switch(type,Rho[y,s],Rho[[1]][y[1],s]*Rho[[2]][y[2],s],
+    switch(type,NA,Rho[y,s],Rho[[1]][y[1],s]*Rho[[2]][y[2],s],
                 Rho[cbind(y[1],y[2],s)])
 }
 
-sK <- switch(type, colnames(Rho),colnames(Rho[[1]]),dimnames(Rho)[[3]])
+sK <- switch(type,NA,colnames(Rho),colnames(Rho[[1]]),dimnames(Rho)[[3]])
 if(is.null(sK)) sK <- 1:K
 rslt <- list()
 for(j in 1:nseq) {

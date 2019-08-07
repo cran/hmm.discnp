@@ -16,7 +16,7 @@ function(model,...,nsim=1,verbose=FALSE,ylengths,
 # (dependent bivariate emissions).
 #
 
-# Check on compatibility of ylenths and ispd:
+# Check on compatibility of ylengths and ispd:
 if(missing(ylengths)) stop("Argument \"ylengths\" must be supplied.\n")
 nseq <- length(ylengths)
 if(is.matrix(ispd)) {
@@ -197,6 +197,8 @@ for(i in 1:nsim) {
     rslt[[i]] <- tempRes
 }
 if(verbose) cat("\n")
-return(if(nsim==1 & drop) rslt[[1]] else rslt)
+if(nsim==1 & drop) return(rslt[[1]])
+class(rslt) <- c(class(rslt),"multipleHmmDataSets")
+rslt
 }
 })

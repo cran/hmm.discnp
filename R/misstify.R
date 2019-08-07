@@ -24,15 +24,33 @@ fix2 <- function(x,nafrac,present){
     x
 }
 
-function(X,nafrac,fep=NULL) {
-    if(any(nafrac >= 1))
-        stop("Makes no sense to have a missing-fraction equal to 1.\n")
+function(y,nafrac,fep=NULL) {
+    if(inherits(y,"multipleHmmDataSets")) {
+        bivar <- ncol(y[[1]][[1]]) == 2
+        ny <- length(y)
+        if(ny==0)
+            stop("Something is wrong. Argument \"y\" has zero length.\n")
+        nafracv <- rep(nafrac,length=if(bivar) 2*ny else ny)
+        nafracl <- lapply(1:ny,function(k,nafracv,bivar){
+                                   if(bivar) nafracv[2*(k-1) + 1:2] else nafracv[k]
+                               },nafracv=nafracv,bivar=bivar)
+        xxx <- lapply(1:ny,function(k,y,nafrac,fep){
+                                        misstify(y[[k]],nafracl[[k]],fep)
+                                    },y=y,nafrac=nafrac,fep=fep)
+        class(xxx) <- class(y)
+        return(xxx)
+    }
+    nafrac <- rep(nafrac,length=ncol(y[[1]]))
+    if(!all(nafrac >= 0 & nafrac < 1)) {
+        whinge <- paste0("All entries of \"nafrac\" must be probabilities",
+                         " strictly less than 1.\n")
+        stop(whinge)
+     }
     if(is.null(fep)) {
         fep <- list(present=TRUE)
     }
-    bivar <- ncol(X[[1]]) == 2
+    bivar <- length(nafrac) == 2
     if(bivar) {
-        if(length(nafrac) == 1) nafrac <- rep(nafrac,2)
         if(length(fep) == 1) {
             fep <- c(fep,list(p2=prod(1-nafrac)/(1 - prod(nafrac))))
         } else if(fep[[2]] < 0 | fep[[2]] > 1) {
@@ -40,9 +58,9 @@ function(X,nafrac,fep=NULL) {
             stop(whinge)
         }
     }
-    X <- lapply(X,fix2,nafrac=nafrac,present=fep[[1]])
+    y <- lapply(y,fix2,nafrac=nafrac,present=fep[[1]])
     if(fep[[1]] & bivar && fep[[2]] < 1) {
-        X <- lapply(X,fix1,nafrac=nafrac,p2=fep[[2]])
+        y <- lapply(y,fix1,nafrac=nafrac,p2=fep[[2]])
     }
-    X
+    y
 }})
