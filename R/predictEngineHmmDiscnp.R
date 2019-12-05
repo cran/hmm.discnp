@@ -1,8 +1,17 @@
 predictEngineHmmDiscnp <- function(stateProbs,Rho,numb,drop) {
 
 # Set the type:
-type <- switch(class(Rho),data.frame=1, matrix=2, list=3, array=4, NULL)
-if(is.null(type)) stop("Argument \"Rho\" is not of an appropriate form.\n")
+if(inherits(Rho,"data.frame")) {
+    type <- 1
+} else if(inherits(Rho,"list")) {
+    type <- 3
+} else if(inherits(Rho,c("matrix","array"))) {
+    if(length(dim(Rho))==2) type <- 2
+    else if(length(dim(Rho))==3) type <- 4
+    else stop("Object \"Rho\" can be of dimension 2 or 3 only.\n")
+} else {
+    stop("Object \"Rho\" has an incorrect class.\n")
+}
 
 if(!is.list(stateProbs)) stateProbs <- list(stateProbs)
 fitVal <- switch(type,

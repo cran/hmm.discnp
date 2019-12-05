@@ -13,7 +13,7 @@ if(!is.null(model)) {
 
 # If Rho is presented in the "logistic style" parameterisation,
 # convert it to a matrix of probabilities.
-if(class(Rho)=="data.frame") Rho <- cnvrtRho(Rho)
+if(inherits(Rho,"data.frame")) Rho <- cnvrtRho(Rho)
 
 stnms <- rownames(tpm)
 if(is.null(ispd)) ispd <- revise.ispd(tpm)
@@ -25,10 +25,19 @@ y <- tidyList(y)
 y <- makeDat(y,X=NULL)
 
 # Set the type:
-type <- switch(class(Rho),data.frame=1, matrix= 2, list=3, array=4, NULL)
-if(is.null(type)) stop("Argument \"Rho\" is not of an appropriate form.\n")
-# Note: type = 1 can't happen here.
-if(is.null(type)) stop("Argument \"Rho\" is not of an appropriate form.\n")
+if(inherits(Rho,"data.frame")) {
+    type <- 1
+} else if(inherits(Rho,"list")) {
+    type <- 3
+} else if(inherits(Rho,c("matrix","array"))) {
+    if(length(dim(Rho))==2) type <- 2
+    else if(length(dim(Rho))==3) type <- 4
+    else stop("Object \"Rho\" can be of dimension 2 or 3 only.\n")
+} else {
+    stop("Object \"Rho\" has an incorrect class.\n")
+}
+# Note: type = 1 can't happen here; Rho would have been converted
+# from data frame to matrix.
 
 Rho  <- check.yval(attr(y,"lvls"),Rho,type,warn=warn)
 lns  <- sapply(y,nrow)
