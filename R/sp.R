@@ -17,15 +17,16 @@ sp <- function (y, model = NULL, tpm=NULL, Rho=NULL, ispd=NULL, X=NULL,
     if(is.null(tpm)) stop("Transition probability matrix not supplied.\n")
     if(is.null(ispd)) ispd <- revise.ispd(tpm)
 
+# Convert Rho if necessary.
+if(inherits(Rho,"matrix")) Rho <- cnvrtRho(Rho)
+
 # Set the type:
 if(inherits(Rho,"data.frame")) {
     type <- 1
 } else if(inherits(Rho,"list")) {
+    type <- 2
+} else if(inherits(Rho,"array")) {
     type <- 3
-} else if(inherits(Rho,c("matrix","array"))) {
-    if(length(dim(Rho))==2) type <- 2
-    else if(length(dim(Rho))==3) type <- 4
-    else stop("Object \"Rho\" can be of dimension 2 or 3 only.\n")
 } else {
     stop("Object \"Rho\" has an incorrect class.\n")
 }
@@ -35,7 +36,7 @@ if(inherits(Rho,"data.frame")) {
     Rho  <- check.yval(attr(y,"lvls"),Rho,type,warn=warn)
 
 # If we are using predictors, tidy them up.
-    if(is.data.frame(Rho)) {
+    if(inherits(Rho,"data.frame")) {
         if(ncol(Rho) > 3) {
             if(is.null(X))
                 stop("Predictors \"X\" are needed and were not supplied.\n")

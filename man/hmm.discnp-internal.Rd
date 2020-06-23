@@ -2,6 +2,7 @@
 \alias{[.multipleHmmDataSets}
 \alias{check.yval}
 \alias{checkConstColumns}
+\alias{checkStartVal}
 \alias{checkyXoK}
 \alias{derivf}
 \alias{derivp}
@@ -41,6 +42,7 @@
 \alias{revise.rho}
 \alias{revise.tpm}
 \alias{rho2phi}
+\alias{simference}
 \alias{steepest}
 \alias{tidyList}
 \alias{zeta2p}
@@ -53,6 +55,7 @@
 \method{[}{multipleHmmDataSets}(x,i)
 check.yval(yval, Rho, type, warn=TRUE)
 checkConstColumns(y,prednames)
+checkStartVal(par0,K,indep,yval,rand.start,mixture,prednames)
 checkyXoK(y, X)
 derivf(theta, K)
 derivp(theta, K)
@@ -73,41 +76,40 @@ get.l(theta, K, y)
 getIspd(pars, K)
 getRho(pars, K, rhovals, stationary, prednames)
 getTpm(pars, K, stationary)
-hmmBD(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
-      mixture=FALSE, cis=TRUE, tolerance, digits=NULL, verbose=FALSE,
-      itmax=200, crit, bicm)
-hmmBI(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL, stationary=cis,
-      mixture=FALSE, cis=TRUE, tolerance, digits=NULL, verbose=FALSE,
-      itmax=200, crit, bicm)
+hmmBD(y, par0, K, stationary,
+      mixture, cis, tolerance, digits, verbose,
+      itmax, crit, bicm)
+hmmBI(y, par0, K, stationary,
+      mixture, cis, tolerance, digits, verbose,
+      itmax, crit, bicm)
 hmmNumOpt(Dat, par0, stationary, verbose, itmax, bicm, rhovals, npar, optimiser,
           optimMethod, hessian=FALSE, ...)
 hmmLM(y, par0, itmax=200, crit, lmc=10, tolerance,
       bicm, rhovals, hglmethod, digits=NULL, verbose=FALSE) 
 hmmSD(y, par0, itmax=200, crit, tolerance,
       bicm, rhovals, hglmethod, digits=NULL, verbose=FALSE) 
-hmmUV(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
-      method=c("EM","bf","LM","SD"), hglmethod=c("fortran","oraw","raw"),
-      optimiser=c("nlm","optim"), optimMethod=NULL, stationary=cis,
-      mixture=FALSE, cis=TRUE, tolerance, digits=NULL, verbose=FALSE,
-      itmax=200, crit, bicm, newstyle=TRUE, X=NULL, addIntercept=TRUE,
-      lmc=10, hessian=FALSE, ...)
-init.all(nval, K, rand.start, mixture, indep, newstyle, yval, prednames)
+hmmUV(y, par0, K, method,
+      hglmethod, optimiser, optimMethod, stationary,
+      mixture, cis, tolerance, digits, verbose,
+      itmax, crit, bicm, X, addIntercept, lmc, hessian, ...)
+init.all(K, rand.start, mixture, indep, yval, prednames)
 lmstep(theta, K, y, lmc, hglmethod)
 lse(z)
 msRho(Rho0, G)
 makeDat(y, X, addIntercept)
-paramExtract(Rho, newstyle)
+paramExtract(Rho)
 p2expForm(x)
 phi2rho(phi, ijk)
 predictEngineHmmDiscnp(stateProbs,Rho,numb,drop)
 recurse(fy, tpm, ispd, lns)
-reparam(pars, stationary)
+reparam(object, expForm=TRUE, stationary=NULL)
 revise.ispd(tpm=NULL, gamma=NULL, lns=NULL, cis=TRUE)
-revise.rho(Dat, gamma, stnms, type)
+revise.rho(Dat, gamma, type)
 revise.tpm(xi, mixture)
 rho2phi(Rho)
+simference(object, expForm=TRUE, seed=NULL,nsim=100,verbose=TRUE)
 steepest(K, y, theta)
-tidyList(y, rp=c("response","predictor"),addIntercept)
+tidyList(y, rp=c("response","predictor"),addIntercept=NULL, yval=NULL)
 }
 \details{
   These functions are auxiliary and are not intended to be called

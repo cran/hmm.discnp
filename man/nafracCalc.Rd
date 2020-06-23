@@ -13,10 +13,10 @@ nafracCalc(y,drop=TRUE)
 }
 \arguments{
   \item{y}{
-   A vector or a one or two column matrix of discrete data or a list of such
-   vectors or matrices, or a \emph{list} of such objects (an object
-   of class \code{"multipleHmmDataSets"} such as might be produced by
-   \code{\link{rhmm}()}).
+   A vector or a one or two column matrix of discrete data or a
+   list of such vectors or matrices, or a \emph{list} of such lists
+   (an object of class \code{"multipleHmmDataSets"} such as might
+   be produced by \code{\link{rhmm}()}).
 }
    \item{drop}{
    Logical scalar. If \code{y} is of class

@@ -30,59 +30,84 @@ expForm2p <- function(x){
     xr/sum(xr)
 }
 
-reparam <- function(pars,stationary) {
-# Convert a list with entries "ispd", "tpm" and "Rho" to
-# a vector of parameters (with no redundancy and the
-# same information content).
-lpars <- vector("list",3)
-# Do ispd if the model is not stationary.
-if(!stationary) {
-   ispd  <- pars$ispd
-   K     <- length(ispd)
-   xxx   <- p2expForm(ispd)[-K]
-   names(xxx) <- paste0("omega.",1:K)[-K]
-   lpars[[1]] <- xxx
-} else lpars[[1]] <- NULL
+reparam <- function(object,expForm=TRUE,stationary=NULL) {
+# Convert a list with entries "ispd", "tpm" and "Rho", and possibly
+# "stationary" to a vector of parameters (with no redundancy and
+# the same information content).  Note that "object" may be an
+# object of class "hmm.discnp" as returned by the function of
+# that name.
 
-newstyle <- is.data.frame(pars$Rho)
+if(is.null(stationary)) stationary <- object$stationary
+if(is.null(stationary))
+    stop("No value of \"stationary\" provided.\n")
+
+newpars <- vector("list",3)
+# Do ispd if "stationary" is not TRUE.
+if(stationary) {
+   newpars[[1]] <- NULL
+} else {
+   ispd  <- object$ispd
+   K     <- length(ispd)
+   if(expForm) {
+       xxx   <- p2expForm(ispd)[-K]
+       names(xxx) <- paste0("omega.",1:K)[-K]
+   } else {
+       xxx <- ispd[-K]
+       names(xxx) <- paste0("pi.",1:K)[-K]
+   }
+   newpars[[1]] <- xxx
+}
+
 # Do tpm:
-    tpm <- pars$tpm
+    tpm <- object$tpm
     K   <- ncol(tpm)
-    nms <- paste(if(newstyle) "zeta" else "p",row(tpm)[,-K],col(tpm)[,-K],sep=".")
-    A   <- if(newstyle) t(apply(tpm,1,p2expForm))[,-K] else tpm[,-K]
-# The matrix of "zeta" or "p" values is strung out, *column by column*.
+if(expForm) {
+    nms <- paste("zeta",row(tpm)[,-K],col(tpm)[,-K],sep=".")
+    A   <- t(apply(tpm,1,p2expForm))[,-K]
+} else {
+    nms <- paste("p",row(tpm)[,-K],col(tpm)[,-K],sep=".")
+    A   <- tpm[,-K]
+}
+# The matrix A, of "zeta"  values or of "p" values, is strung out,
+# *column by column*.
     xxx <- as.vector(A)
     names(xxx) <- nms
-    lpars[[2]] <- xxx
+    newpars[[2]] <- xxx
 
 # Do Rho:
-    Rho  <- pars$Rho
-    if(newstyle) {
-        lvls <- levels(Rho$y)
-        m    <- length(lvls)
-        sts  <- unique(Rho$state)
+    Rho  <- object$Rho
+    if(!inherits(Rho,"data.frame"))
+        stop("Component \"Rho\" of \"object\" is not of the correct form.\n")
+    lvls <- levels(Rho$y)
+    m    <- length(lvls)
+    sts  <- unique(Rho$state)
+
 # Changed 17/03/2018 to treat the *last* row of coefficients,
 # for all states (last phi value, phi_{m,j}, all j) as 0.
 # Rather than the first row.
-        Rho  <- Rho[Rho$y!=lvls[m],-(1:2),drop=FALSE]
-        cns  <- colnames(Rho)
-        if(length(cns)==1) cns <- "phi" # Not "Intercept"!
-        eee  <- expand.grid(lvls[-m],sts,cns)
-        nms  <- do.call(paste,c(eee[,c(3,1,2)],list(sep=".")))
+if(expForm) {
+    Rho  <- Rho[Rho$y!=lvls[m],-(1:2),drop=FALSE]
+    cns  <- colnames(Rho)
+    if(length(cns)==1) cns <- "phi" # Not "Intercept"!
+    eee  <- expand.grid(lvls[-m],sts,cns)
+    nms  <- do.call(paste,c(eee[,c(3,1,2)],list(sep=".")))
+    Rho  <- as.matrix(Rho)
+} else {
+    if(ncol(Rho) > 3)
+        stop("When there are predictors, only expForm=TRUE is allowed.\n")
+    Rho <- cnvrtRho(Rho)
+    Rho <- Rho[-m,]
+    eee <- as.matrix(expand.grid(rownames(Rho)[-K],colnames(Rho)))
+    nms <- apply(eee,1,function(x){paste0("rho.",paste(x,collapse="."))})
+}
+
 # The matrix of coefficient values is strung out *column by column*.
-        xxx  <- as.vector(as.matrix(Rho))
-    } else if(is.matrix(Rho)) {
-        xxx <- as.vector(Rho[-nrow(Rho),])
-        m   <- nrow(Rho)
-        nms <- paste("rho",row(Rho)[-m,],col(Rho)[-m,],sep=".")
-    } else {
-        stop("Component \"Rho\" of \"pars\" is not of the correct form.\n")
-    }
-    names(xxx) <- nms
-    lpars[[3]] <- xxx
+xxx  <- as.vector(Rho)
+names(xxx) <- nms
+newpars[[3]] <- xxx
 
 # Return the result.
-    return(unlist(lpars))
+unlist(newpars)
 }
 
 getIspd <- function(pars,K) {

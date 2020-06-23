@@ -11,22 +11,32 @@ mps(y, model = NULL, tpm, Rho, ispd=NULL, warn=TRUE)
 \arguments{
   \item{y}{The observations for which the underlying most
   probable hidden states are required.  May be a sequence
-  of observations, or a list each component of which constitutes
-  a (replicate) sequence of observations.  If \code{y} is
-  missing it is set equal to the \code{y} component of
-  \code{model}, given that that object and that component
-  exist.  Otherwise an error is given.}
+  of observations in the form of a vector or a one or two
+  column matrix, or a list each component of which constitutes
+  a (replicate) sequence of observations.  It may also be
+  an object of class \code{"multipleHmmDataSets"} as returned
+  by \code{\link{rhmm}()} with \code{nsim>1}.
+
+  If \code{y} is missing, it is extracted from
+  \code{model} (whence it will \emph{not} be of class
+  \code{"multipleHmmDataSets"}!) provided that \code{model} and
+  its \code{y} component are not \code{NULL}.  Otherwise an error
+  is given.
+}
   \item{model}{ An object describing a fitted hidden Markov
-   model, as returned by \code{\link{hmm}()}.  In order to
-   make any kind of sense, \code{model} should bear some
-   reasonable relationship to \code{y}.}
+  model, as returned by \code{\link{hmm}()}.  In order to
+  make any kind of sense, \code{model} should bear some
+  reasonable relationship to \code{y}.
+}
   \item{tpm}{ The transition probability matrix for a hidden
   Markov model; ignored if \code{model} is non-null. Should
-  bear some reasonable relationship to \code{y}.}
+  bear some reasonable relationship to \code{y}.
+}
   \item{Rho}{An object specifying the probability distributions of
   the observations (\dQuote{emission} probabilities) for a hidden
   Markov model.  See \code{\link{hmm}()}.  Ignored if \code{model}
-  is non-null. Should bear some reasonable relationship to \code{y}.}
+  is non-null. Should bear some reasonable relationship to \code{y}.
+}
   \item{ispd}{A vector specifying the initial state probability
   distribution for a hidden Markov model, or a matrix each of whose
   columns are trivial (\dQuote{delta function}) vectors specifying
@@ -38,17 +48,19 @@ mps(y, model = NULL, tpm, Rho, ispd=NULL, warn=TRUE)
   and \code{model} are \code{NULL} then \code{ispd} is taken to
   be the stationary distribution of the chain, calculated from
   \code{tpm}.
-  }
-  \item{warn}{Logical scalar; should a warning be issued if \code{Rho}
-  hasn't got relevant dimension names?  (Note that if this is so,
-  then the corresponding dimension names are formed from the sorted
-  unique values of \code{y} or of the appropriate column(s) of \code{y}.
-  And if \emph{this} is so, then the user should be sure that the
-  ordering of the entries of \code{Rho} corresponds properly to the
-  the sorted unique values of \code{y}.)  This argument is passed
-  to the utility function \code{check.yval()} which actually issues
-  the warning if \code{warn=TRUE}.
-  }
+}
+  \item{warn}{Logical scalar; in the bivariate setting, should a
+  warning be issued if the two matrices constituting \code{Rho}
+  (bivariate independent case) or the array constituting \code{Rho}
+  (bivariate dependent case) have not got relevant dimension names?
+  (Note that if this is so, then the corresponding dimension names
+  are formed from the sorted unique values of the appropriate
+  columns of \code{y}.  And if \emph{this} is so, then the user
+  should be sure that the ordering of the entries of \code{Rho}
+  corresponds properly to the the sorted unique values of \code{y}.)
+  This argument is passed to the utility function \code{check.yval()}
+  which actually issues the warning if \code{warn=TRUE}.
+}
 }
 \details{
   For each \eqn{t} the maximum value of \eqn{\gamma_t(i)}{gamma_t(i)},
@@ -63,6 +75,9 @@ mps(y, model = NULL, tpm, Rho, ispd=NULL, warn=TRUE)
   If \code{y} is a list of replicate sequences, then the value is
   a list, the \eqn{j}-th entry of which constitutes the vector of
   most probable states underlying the \eqn{j}-th replicate sequence.
+
+  If \code{y} is of class \code{"multipleHmmDataSets"} then the
+  value returned is a list of lists of the sort described above.
 }
 
 \references{
@@ -91,14 +106,21 @@ To obtain the most probable sequence of states use
          \code{\link{viterbi}()}}
 
 \examples{
-# See the help for rhmm() for how to generate y.num.
 \dontrun{
+P <- matrix(c(0.7,0.3,0.1,0.9),2,2,byrow=TRUE)
+rownames(P) <- 1:2
+R <- matrix(c(0.5,0,0.1,0.1,0.3,
+              0.1,0.1,0,0.3,0.5),5,2)
+set.seed(42)
+lll   <- sample(250:350,20,TRUE)
+set.seed(909)
+y.num <- rhmm(ylengths=lll,nsim=1,tpm=P,Rho=R,drop=TRUE)
 fit.num <- hmm(y.num,K=2,verb=TRUE)
 s.1 <- mps(y.num,fit.num)
-s.2 <- mps(y.num,tpm=P,ispd=c(0.25,0.75),Rho=R) # P and R as in the help
-                                                # for rhmm().
-# The order of the states has gotten swapped; (3 - s.1[,1]) is much
-# more similar to s.2[,1] than is s.1[,1].
+s.2 <- mps(y.num,tpm=P,ispd=c(0.25,0.75),Rho=R)
+# The order of the states has got swapped; 
+# note that ifelse(s.1[[1]]=="1","2","1") is much
+# more similar to s.2[[1]] than is s.1[[1]].
 }
 }
 \keyword{models}

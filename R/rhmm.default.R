@@ -6,7 +6,7 @@ canBeNumeric <- function(x) {
 
 function(model,...,nsim=1,verbose=FALSE,ylengths,
                          nafrac=NULL,fep=NULL,tpm,Rho,
-                         ispd=NULL,yval=NULL,drop=TRUE) {
+                         ispd=NULL,yval=NULL,drop=TRUE,forceNumeric=TRUE) {
 #
 # Function rhmm.default to simulate data from a hidden Markov
 # model with transition probability matrix tpm, and discrete
@@ -19,7 +19,7 @@ function(model,...,nsim=1,verbose=FALSE,ylengths,
 # Check on compatibility of ylengths and ispd:
 if(missing(ylengths)) stop("Argument \"ylengths\" must be supplied.\n")
 nseq <- length(ylengths)
-if(is.matrix(ispd)) {
+if(inherits(ispd,"matrix")) {
    if(nseq != ncol(ispd)) {
        whinge <- paste("Number of columns of \"ispd\" is not equal to",
                        "the length of \"ylengths\".\n")
@@ -27,56 +27,43 @@ if(is.matrix(ispd)) {
    }
 }
 
-# Set the type:
-# 1 = univariate newstyle, 2 = univariate *not* newstyle, 3 =
-# bivariate independent, 4 = bivariate dependent.
-if(is.data.frame(Rho)) {
-   type <- 1
-} else if(is.matrix(Rho)) {
-   type <- 2
-} else if(is.list(Rho) & !is.data.frame(Rho)) {
-   type <- 3
-} else if(is.array(Rho)) {
-   type <- 4
-}
-if(is.null(type)) stop("Argument \"Rho\" is not of an appropriate form.\n")
-parity <- if(type %in% 1:2) "univar" else "bivar"
+# Convert Rho if necessary.
+if(inherits(Rho,"matrix")) Rho <- cnvrtRho(Rho)
 
-nyv <- is.null(yval)
-if(nyv & type > 2) yval <- vector("list",2)
+# Set the type:
+# 1 = univariate, 2 = bivariate independent, 3 = bivariate dependent.
+if(inherits(Rho,"data.frame")) {
+   type <- 1
+} else if(inherits(Rho,"list")) {
+   type <- 2
+} else if(inherits(Rho,"array")) {
+   type <- 3
+} else {
+    stop("Argument \"Rho\" is not of an appropriate form.\n")
+}
+parity <- if(type==1) "univar" else "bivar"
+nyv    <- is.null(yval)
+if(nyv & type > 1) yval <- vector("list",2)
 
 # Check for validity of the Rho argument and reconcile dimension
 # names with "yval".
 switch(type,
     {
-        Rho <- cnvrtRho(Rho)
         if(is.null(yval)) {
-            yval <- rownames(Rho)
+            yval <- levels(Rho$y)
         } else {
-            if(length(yval)!=nrow(Rho))
+            if(length(yval)!=length(levels(Rho$y)))
                 stop(paste("Mismatch between length of \"yval\"",
-                           "and number of rows of \"Rho\".\n"))
+                           "and number of y values specified by \"Rho\".\n"))
         }
+        Rho <- cnvrtRho(Rho)
         rownames(Rho) <- yval
-    },
-    {
-      if(any(Rho<0)) stop("Negative entries in Rho.\n")
-      xxx <- unname(apply(Rho,2,sum))
-      if(!isTRUE(all.equal(xxx,rep(1,ncol(Rho)))))
-	stop("Columns of Rho do not all sum to 1.\n")
-      if(is.null(yval)) {
-	yval <- if(is.null(rownames(Rho))) 1:nrow(Rho) else rownames(Rho)
-      } else {
-	if(length(yval)!=nrow(Rho))
-		stop(paste("Mismatch between length of \"yval\"",
-                           "and number of rows of \"Rho\".\n"))
-      }
-      rownames(Rho) <- yval
     },
     {
       if(ncol(Rho[[1]]) != ncol(Rho[[2]]))
           stop("Mismatch in number of states between Rho[[1]] and Rho[[2]].\n")
-      if(length(yval) != 2)
+      if(length(yval) !=2) # If yval was NULL it would have been set to
+                           # an empty list of length 2.
           stop("Argument \"yval\", if not NULL, should be a list of length 2.\n")
       for(j in 1:2) {
         if(any(Rho[[j]] < 0))
@@ -113,9 +100,9 @@ switch(type,
     })
 
 
-K <- switch(type,ncol(Rho),ncol(Rho),ncol(Rho[[1]]),dim(Rho)[3])
+K <- switch(type,ncol(Rho),ncol(Rho[[1]]),dim(Rho)[3])
 
-if(is.list(yval)) {
+if(inherits(yval,"list")) {
     ok <- sapply(yval,canBeNumeric)
 } else ok <- canBeNumeric(yval)
 
@@ -126,15 +113,22 @@ if(length(ok) == 1) {
     if(nok == 2) {
         obsRnum <- TRUE
     } else if(nok == 0) {
-        obdRum <- FALSE
+        obsRnum <- FALSE
     } else stop("Inconsistent modes for y-values.\n")
+}
+yval.save <- yval
+if(obsRnum & forceNumeric) {
+    if(inherits(yval,"list")) {
+        yval <- lapply(yval,as.numeric)
+    } else {
+        yval <- as.numeric(yval)
+    }
 }
 
 xample <- function(n,yval,Rho,state,type) {
 # We could calculate "type" here but it's faster (???)
 # to use the pre-calculated value.
 switch(type,
-    return(matrix(sample(yval,size=n,prob=Rho[,state],replace=TRUE))),
     return(matrix(sample(yval,size=n,prob=Rho[,state],replace=TRUE))),
     {
         y1 <- sample(yval[[1]],size=n,prob=Rho[[1]][,state],replace=TRUE)
@@ -176,8 +170,8 @@ for(i in 1:nsim) {
     for(j in 1:nseq) {
         jr    <- jr+1
         M     <- matrix(if(obsRnum) 0 else "",nrow=ylengths[j],
-                        ncol=if(type %in% 1:2) 1 else 2)
-        prb   <- if(is.matrix(ispd)) ispd[,j] else ispd
+                        ncol=if(type==1) 1 else 2)
+        prb   <- if(inherits(ispd,"matrix")) ispd[,j] else ispd
 	s1    <- sample(1:K,1,prob=prb)
         M[1,] <- xample(1,yval,Rho,state=s1,type)
 	for(k in 2:ylengths[j]) {
@@ -192,7 +186,9 @@ for(i in 1:nsim) {
         tempRes[[j]] <- M
     }
     if(!is.null(nafrac)) tempRes <- misstify(tempRes,nafrac=nafrac,fep=fep)
-    attr(tempRes,"uval") <- yval
+    if(type==1) tempRes <- lapply(tempRes,as.vector)
+    if(nseq==1 & drop) tempRes <- tempRes[[1]]
+    attr(tempRes,"uval") <- yval.save
     attr(tempRes,"parity") <- parity
     rslt[[i]] <- tempRes
 }

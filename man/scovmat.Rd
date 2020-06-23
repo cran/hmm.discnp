@@ -9,11 +9,19 @@
    based on simulation (or \dQuote{parametric bootstrapping}).
 }
 \usage{
-scovmat(object, seed = NULL, nsim=100, verbose = TRUE)
+scovmat(object, expForm=TRUE, seed = NULL, nsim=100, verbose = TRUE)
 }
 \arguments{
   \item{object}{
   An object of class \code{hmm.discnp} as returned by \code{\link{hmm}()}.
+}
+  \item{expForm}{
+  Logical scalar.  Should the covariance matrix produced
+  be that of the estimates of the parameters expressed in
+  \dQuote{exponential} (or \dQuote{smooth} or \dQuote{logistic})
+  form?  If \code{expForm=FALSE} then the parameter estimates
+  considered are \dQuote{raw} probabilities, with redundancies
+  (last column of \code{tpm}; last row of \code{Rho}) removed.
 }
   \item{seed}{
   Integer scalar serving as a seed for the random number generator.
@@ -32,11 +40,9 @@ scovmat(object, seed = NULL, nsim=100, verbose = TRUE)
 }
 \details{
   This function is currently applicable only to models fitted to
-  univariate data.  The covariance matrix produced is for the
-  \dQuote{raw} parameters (entries of \code{tpm} with the
-  last column dropped --- since the rows sum to 1, and the
-  entries of \code{Rho} with the last row dropped --- since
-  the columns sum to 1.
+  univariate data.  If there are \emph{predictors} in the model,
+  then only the exponential form of the parameters may be used,
+  i.e. \code{expForm} \emph{must} be \code{TRUE}.
 }
 \value{
    A (positive definite) matrix which is an estimate of the

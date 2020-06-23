@@ -2,7 +2,7 @@ check.yval <- function(yval,Rho,type,warn=TRUE) {
 fname <- as.character(sys.call(-1))[1]
 if(is.na(fname)) fname <- "call from the command line"
 
-# Univariate, newstyle.
+# Univariate.
 if(type==1) {
     rn <- levels(Rho$y)
     if(is.null(rn))
@@ -14,34 +14,8 @@ if(type==1) {
     stop(whinge,call.=FALSE)
 }
 
-# Univariate, "oldstyle".
-if(type==2) {
-    yval <- as.character(yval)
-    rn   <- rownames(Rho)
-    if(is.null(rn)) {
-        ny <- nrow(Rho)
-        if(length(yval) != ny)
-            stop(paste("In ",fname," wrong number of rows in \"Rho\".\n",
-                        sep=""),call.=FALSE)
-        if(warn) {
-            whinge <- paste("Matrix \"Rho\" has no row names.",
-                            "I am assuming that the\n",
-                            "rows of Rho correspond to the sorted",
-                            "unique values of \"y\".\n")
-            warning(whinge)
-        }
-        nyv  <- suppressWarnings(as.numeric(yval))
-        yval <- if(!any(is.na(nyv))) yval[order(nyv)] else sort(yval)
-        rn   <- rownames(Rho) <- yval
-    }
-    if(all(yval %in% rn)) return(Rho)
-    partmess <- "the row names of \"Rho\".\n"
-    whinge <- paste0("In ",fname," some y values do not match",partmess)
-    stop(whinge,call.=FALSE)
-}
-
 # Bivariate independent.
-if(type==3) {
+if(type==2) {
     yval <- lapply(yval,as.character)
     for(j in 1:2) {
         rn <- rownames(Rho[[j]])
@@ -70,7 +44,7 @@ if(type==3) {
     return(Rho)
 }
 # Bivariate dependent.
-if(type==4) {
+if(type==3) {
     for(j in 1:2) {
         nmbr <- if(j==1) "first" else "second"
         rn <- dimnames(Rho)[[j]]
@@ -98,4 +72,5 @@ if(type==4) {
     }
     return(Rho)
 }
+stop(paste("The value",type,"of \"type\" is not recognised.\n"))
 }

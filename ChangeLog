@@ -1172,3 +1172,93 @@ of a matrix as c("matrix","array").
 Incremented the version number (to 2.1-12).
 Uploaded to CRAN.
 05/12/2019
+
+01/01/2020
+Commenced a major (???) revision.  In particular got rid of the
+"newstyle" argument.  The "Rho" parameter matrix will now be accepted
+in either old (matrix) or new (dataframe) style, but if presented
+in the old style it will be immediately and automatically converted
+to the new style.
+
+11/01/2020
+Got things to work and check.  Some problems remain in respect of
+rhmm() and mps().
+
+Set the version number to 3.0-1.
+
+04/02/2020
+Added in the "ipopt" method of fitting models; this depends
+on the (rather arcane) Ipopt package.
+
+13/02/2020
+Fixed up rhmm() to return *numeric* data where appropriate.
+Fixed up mps() to always return "categorical" states.  Also
+fixed it to handle objects of class "multipleHmmDataSets".
+Checked on Viterbi; apparently it never handled missing values
+in the observations.  Adjusted it so that now it does;
+arranged things so that it calls upon ffun() to do the
+calculations of probabilities.  Checked that the new version
+gave the same answer as the old one in an example where there
+were no missing values.
+
+Fixed a couple of serious glitches in pr().  Adjusted pr() to work
+if "y" is of class "multipleHmmDataSets" (as returned by rhmm() if
+"nsim" is greater than 1.
+
+Incremented the version number (to 3.9-2).
+
+14/02/2020
+Adjusted hmm() to return the value of the "stationary" argument
+(so that reparam() can make use of it when it is applied to an
+object of class "hmm.discnp".
+
+Adjusted reparam() so that it can do the "raw" (probability) parameters
+as well as the "exponential" form of the parameters.  (Choice controlled
+by the logical argument "expForm".)
+Adjusted scovmat() and squantCI() accordingly.
+Adjusted the help files for:
+
+    * logLikHmm()
+    * misstify()
+    * nafracCalc()
+    * predict.hmm.discnp()
+    * pr()
+    * scovmat()
+    * sp()
+    * squantCI()
+    * mps()
+    * viterbi()
+    * hmm()
+
+(In particular got the help consistent with the capacity of functions
+to handle objects of class "multipleHmmDataSets".)
+
+Fixed a glitch in init.all() (did not give dimnames to Rho matrices
+or array in the bivariate setting).
+
+Fixed a glitch in hmmBD() --- the value of "lns" was set in the wrong
+place (after its initial use!!!).
+
+Made a wee adjustment to checkStartVal() --- made sure "stnms" was
+of mode character.
+
+Incremented the version number (to 3.9-3).
+
+12/04/2020
+Fixed bug in tidyList() --- made sure that the "lvls" attribute
+of the returned value (or each of the components thereof in the
+bivariate case) is of mode "character".
+
+13/04/2020
+Fixed buglet w.r.t. "method"; need to apply match.arg() to
+"method" before comparing method with "ipoptr".
+
+14/04/2020
+Fixed bug in cnvrtRho():  needed to use expForm2p() when
+converting from "data frame form" to "matrix" form.
+
+23/06/2020
+Backed out the introduction of the "ipopt" method; doesn't seem
+to work worth a damn and is not actually available on CRAN anyhow.
+
+Incremented the version number (to 3.9-4).

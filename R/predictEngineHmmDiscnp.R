@@ -1,21 +1,23 @@
 predictEngineHmmDiscnp <- function(stateProbs,Rho,numb,drop) {
 
+# Convert Rho if necessary (just for consistency with the
+# overall pattern; we'll actually convert it *back* again later).
+if(inherits(Rho,"matrix")) Rho <- cnvrtRho(Rho)
+
 # Set the type:
 if(inherits(Rho,"data.frame")) {
     type <- 1
 } else if(inherits(Rho,"list")) {
+    type <- 2
+} else if(inherits(Rho,"array")) {
     type <- 3
-} else if(inherits(Rho,c("matrix","array"))) {
-    if(length(dim(Rho))==2) type <- 2
-    else if(length(dim(Rho))==3) type <- 4
-    else stop("Object \"Rho\" can be of dimension 2 or 3 only.\n")
 } else {
     stop("Object \"Rho\" has an incorrect class.\n")
 }
 
-if(!is.list(stateProbs)) stateProbs <- list(stateProbs)
+if(!inherits(stateProbs,"list")) stateProbs <- list(stateProbs)
 fitVal <- switch(type,
-# Univariate, Rho a data frame.
+# Univariate
     {
         Roe <- cnvrtRho(Rho)
         if(numb) {
@@ -26,29 +28,11 @@ fitVal <- switch(type,
                                  "but the levels of Rho$y are not numeric.\n")
                 stop(whinge)
             } 
-            cmns   <- apply(yval * Roe, 2, sum)
+            cmns <- apply(yval * Roe, 2, sum)
             lapply(stateProbs,function(x,cmns){apply(cmns*x,2,sum)},
                              cmns=cmns)
         } else {
             lapply(stateProbs,function(x,Rho){t(Rho%*%x)},Rho=Roe)
-        }
-    },
-
-# Univariate, Rho a matrix.
-    {
-        if(numb) {
-            yval <- as.numeric(row.names(Rho))
-            if (any(is.na(yval))) {
-                whinge <- paste0("Argument \"object\" indicates that",
-                                 " the y-values are numeric,\n",
-                                 "but the row names of Rho are not numeric.\n")
-                stop(whinge)
-            } 
-            cmns   <- apply(yval * Rho, 2, sum)
-            lapply(stateProbs,function(x,cmns){apply(cmns*x,2,sum)},
-                             cmns=cmns)
-        } else {
-            fv <- lapply(stateProbs,function(x,Rho){t(Rho%*%x)},Rho=Rho)
         }
     },
 
@@ -82,6 +66,7 @@ fitVal <- switch(type,
                 aaa},Rho=Rho)
         }
     },
+
 # Bivariate dependent:
     {
         if(numb) {

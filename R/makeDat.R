@@ -25,7 +25,7 @@ makeDat <- function(y,X,addIntercept) {
     }
 
 # Get the levels of the "y" factor (the putatively possible values
-# of the emissions.
+# of the emissions).
     lvls <- attr(y,"lvls")
 
 # Do the right thing, according to parity.

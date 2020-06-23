@@ -10,7 +10,7 @@
 \method{update}{hmm.discnp}(object,..., data, Kplus1=FALSE,
         tpm2=NULL, verbose=FALSE, method=NULL, optimiser=NULL,
         stationary=NULL, mixture=NULL, cis=NULL, tolerance=NULL,
-        itmax=NULL, crit=NULL, newstyle=NULL, X=NULL, addIntercept=NULL)
+        itmax=NULL, crit=NULL, X=NULL, addIntercept=NULL)
 }
 
 \arguments{
@@ -92,9 +92,6 @@
   \item{crit}{
   See the help for \code{hmm()}.
 }
-  \item{newstyle}{
- See the help for \code{hmm()}.
-} 
   \item{X}{
   See the help for \code{hmm()}.
 }

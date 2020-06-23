@@ -1,6 +1,6 @@
 revise.ispd <- function(tpm=NULL,gamma=NULL,lns=NULL,cis=TRUE) {
 # Function revise.ispd.  To revise the initial state probability
-# distribution
+# distribution.
 # Note: "cis" <--> constant initial state probability distribution,
 # meaning constant over replicate sequences, each of which is assumed
 # to conform to the same hidden Markov model.

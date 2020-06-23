@@ -26,6 +26,13 @@ fix2 <- function(x,nafrac,present){
 
 function(y,nafrac,fep=NULL) {
     if(inherits(y,"multipleHmmDataSets")) {
+        classy   <- class(y)
+        y        <- lapply(y,tidyList)
+        class(y) <- classy
+    } else {
+        y <- tidyList(y)
+    }
+    if(inherits(y,"multipleHmmDataSets")) {
         bivar <- ncol(y[[1]][[1]]) == 2
         ny <- length(y)
         if(ny==0)

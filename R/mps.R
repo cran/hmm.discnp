@@ -1,21 +1,31 @@
-mps <- function(y,model=NULL,tpm,Rho,ispd=NULL,warn=TRUE){
+mps <- function(y,model=NULL,tpm=NULL,Rho=NULL,ispd=NULL,warn=TRUE){
 #
 # Function mps: most probable states.
 #
-# To do:  Something about supplying newstyle and X. (06/04/2017)
+# To do:  Something about supplying X. (10/01/2020)
 #
+
+if(inherits(y,"multipleHmmDataSets")) {
+    rslt <- lapply(y,function(x,model,tpm,Rho,ispd,warn){
+                              mps(x,model,tpm,Rho,ispd,warn)
+                     },model=model,tpm=tpm,Rho=Rho,
+                       ispd=ispd,warn=warn)
+    return(rslt)
+}
 
 if(!is.null(model)) {
 	tpm  <- model$tpm
 	Rho  <- model$Rho
 	ispd <- model$ispd
 }
+if(is.null(tpm) | is.null(Rho))
+    stop("At least one of \"tpm\" and \"Rho\" was not supplied.\n")
 
-# If Rho is presented in the "logistic style" parameterisation,
-# convert it to a matrix of probabilities.
-if(inherits(Rho,"data.frame")) Rho <- cnvrtRho(Rho)
 
-stnms <- rownames(tpm)
+# Convert Rho if necessary.
+if(inherits(Rho,"matrix")) Rho <- cnvrtRho(Rho)
+
+stnms <- if(is.null(rownames(tpm))) as.character(1:nrow(tpm)) else rownames(tpm)
 if(is.null(ispd)) ispd <- revise.ispd(tpm)
 if(missing(y)) {
 	y <- if(!is.null(model)) model$y else NULL
@@ -28,16 +38,12 @@ y <- makeDat(y,X=NULL)
 if(inherits(Rho,"data.frame")) {
     type <- 1
 } else if(inherits(Rho,"list")) {
+    type <- 2
+} else if(inherits(Rho,c("array"))) {
     type <- 3
-} else if(inherits(Rho,c("matrix","array"))) {
-    if(length(dim(Rho))==2) type <- 2
-    else if(length(dim(Rho))==3) type <- 4
-    else stop("Object \"Rho\" can be of dimension 2 or 3 only.\n")
 } else {
     stop("Object \"Rho\" has an incorrect class.\n")
 }
-# Note: type = 1 can't happen here; Rho would have been converted
-# from data frame to matrix.
 
 Rho  <- check.yval(attr(y,"lvls"),Rho,type,warn=warn)
 lns  <- sapply(y,nrow)

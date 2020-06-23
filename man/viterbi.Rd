@@ -9,13 +9,20 @@
 viterbi(y, model = NULL, tpm, Rho, ispd=NULL,log=FALSE, warn=TRUE)
 }
 \arguments{
-  \item{y}{The observations for which the underlying most probable
-  hidden states are required.  May be a sequence of observations,
-  or a list each entry of which constitutes an independent sequence
-  of observations.  If \code{y} is missing (and if \code{model}
-  is not \code{NULL}) then \code{y} is extracted from \code{model},
-  provided that the \code{y} component of \code{model} is present.
-  Otherwise an error is given.}
+  \item{y}{The observations for which the most probable sequence(s)
+  of underlying hidden states are required.  May be a sequence of
+  observations in the form of a vector or a one or two column matrix,
+  or a list each component of which constitutes a (replicate)
+  sequence of observations.  It may also be an object of class
+  \code{"multipleHmmDataSets"} as returned by \code{\link{rhmm}()}
+  with \code{nsim>1}.
+
+  If \code{y} is missing, it is extracted from
+  \code{model} (whence it will \emph{not} be of class
+  \code{"multipleHmmDataSets"}!) provided that \code{model} and
+  its \code{y} component are not \code{NULL}.  Otherwise an error
+  is given.
+}
   \item{model}{ An object describing a hidden Markov model, as
   fitted to the data set \code{y} by \code{\link{hmm}()}.}
   \item{tpm}{ The transition probability matrix for a hidden
@@ -74,6 +81,9 @@ viterbi(y, model = NULL, tpm, Rho, ispd=NULL,log=FALSE, warn=TRUE)
   If \code{y} consists of a list of observation sequences, the
   value is a list each entry of which is of the form described
   above.
+
+  If \code{y} is of class \code{"multipleHmmDataSets"} then the
+  value returned is a list of lists of the sort described above.
 }
 
 \references{

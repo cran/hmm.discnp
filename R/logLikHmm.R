@@ -9,7 +9,8 @@ logLikHmm <- function(y,model=NULL,tpm=NULL,ispd=NULL,Rho=NULL,
 # Univariate case.
 #
 #   * a matrix Rho where
-#     P(Y = y_i | S = k) = Rho[i,k], OR
+#     P(Y = y_i | S = k) = Rho[i,k]
+#     (this will get coverted to a data frame), OR
 #
 #   * a data frame with columns "y", "state", and further
 #     columns of coefficients corresponding to the numerical
@@ -44,15 +45,21 @@ if(!is.null(model)) {
     ispd <- model$ispd
     addIntercept <- model$args$addIntercept
 }
-
 if(is.null(Rho)) stop("\"Rho\" not supplied.\n")
 
+# Convert Rho if necessary.
+if(inherits(Rho,"matrix")) Rho <- cnvrtRho(Rho)
+
 # Set the type:
-type <- if(is.data.frame(Rho)) 1
-        else if(is.matrix(Rho)) 2
-        else if(is.list(Rho) & !is.data.frame(Rho)) 3
-        else if(is.array(Rho)) 4
-if(is.null(type)) stop("\"Rho\" is not of an appropriate form.\n")
+if(inherits(Rho,"data.frame")) {
+    type <- 1
+} else if(inherits(Rho,"list")) {
+    type <- 2
+} else if(inherits(Rho,"array")) {
+    type <- 3
+} else {
+    stop("\"Rho\" is not of an appropriate form.\n")
+}
 
 if(inherits(y,"madeDat")) {
     Dat <- y
@@ -74,7 +81,7 @@ Dat <- makeDat(y,X)
 }
 
 # If K=1 do the triv thing:
-K <- switch(EXPR=type,length(levels(Rho$state)),ncol(Rho),
+K <- switch(EXPR=type,length(levels(Rho$state)),
             ncol(Rho[[1]]),dim(Rho)[3])
 if(K==1) return(sum(log(ffun(Dat,Rho,type))))
 

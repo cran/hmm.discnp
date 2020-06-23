@@ -3,7 +3,7 @@ hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,
                 optimiser=c("nlm","optim"),optimMethod=NULL,stationary=cis,
                 mixture=FALSE,cis=TRUE,indep=NULL,tolerance=1e-4,digits=NULL,
                 verbose=FALSE,itmax=200,crit=c("PCLL","L2","Linf","ABSGRD"),
-                keep.y=FALSE,keep.X=keep.y,newstyle=TRUE,X=NULL,
+                keep.y=FALSE,keep.X=keep.y,X=NULL,
                 addIntercept=TRUE,lmc=10,hessian=FALSE,...) {
 
 #
@@ -22,6 +22,15 @@ hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,
 #
 
 method <- match.arg(method)
+
+# If y is of class "multipleHmmDataSets" bail out.
+if(inherits(y,"multipleHmmDataSets")) {
+    whinge <- paste0("Argument \"y\" is a list of \"appropriate\" data sets.\n",
+                     "  This function should be applied to the individual\n",
+                     "  components, perhaps by means of lapply().\n")
+    stop(whinge)
+}
+
 # EM <--> Expectation/maximisation algorithm.
 # bf <--> brute force (maximise using either nlm() or optim()).
 # LM <--> Levenberg-Marquardt algorithm.
@@ -31,14 +40,6 @@ method <- match.arg(method)
 crit <- match.arg(crit)
 if(method=="EM" & crit=="ABSGRD")
     stop("Stopping criterion \"ABSGRD\" is not useable with the EM algorithm.\n")
-
-if(!newstyle) {
-    if(method %in% c("bf","LM","SD")) {
-        whinge <- paste0("When the \"",method,"\" method is used ",
-                         "\"newstyle\" must be TRUE.\n")
-        stop(whinge)
-    }
-}
 
 if(method %in% c("LM","SD")) {
     if(!is.null(X)){
@@ -53,8 +54,7 @@ if(method %in% c("LM","SD")) {
     }
 }
 
-# Check on consistency of ``mixture'' and ``stationary''.
-# Also check on "mixture" and "method".
+# Check on consistency of "mixture" with "stationary" and "method".
 if(mixture) {
     if(!stationary)
 	stop("Makes no sense for a mixture model to be non-stationary.\n")
@@ -64,7 +64,7 @@ if(mixture) {
         stop("Currently the \"LM\" method does not do mixtures.\n")
 }
 
-# Check on consistancy of ``stationary'' and ``cis''.
+# Check on consistancy of "stationary" and "cis".
 if(stationary & !cis)
 	stop(paste("If the model is stationary the initial state\n",
                    "probability distribution must be constant\n",
@@ -80,7 +80,10 @@ if(stationary & !cis)
 # "y" will have been coerced to character mode.  Consequently the
 # "numeric" attribute of the result could be wrong if tidyList()
 # were re-applied.
-y <- tidyList(y)
+y     <- tidyList(y,yval=yval)
+lvls  <- attr(y,"lvls")
+
+# Check on method and predictors w.r.t. 
 bivar <- attr(y,"parity")=="bivar"
 if(bivar) {
     if(method %in% c("bf","LM")) {
@@ -88,44 +91,25 @@ if(bivar) {
                          "be used for univariate data.\n")
         stop(whinge)
     }
-}
-
-# Check that at least one of par0 and K is specified and, if
-# both are specified, there is no inconsistency.
-if(is.null(K)) {
-    if(is.null(par0))
-	stop('One of par0 and K must be specified.')
-    K <- nrow(par0$tpm)
-    if(K != ncol(par0$tpm))
-            stop("The specified tpm is not square.\n")
-} else if(K==1 & !is.null(par0)) {
-    warning("When K equals 1, par0 is ignored.\n")
-} else if(!is.null(par0) && K != nrow(par0$tpm)) {
-    stop("The values of \"K\" and \"par0\" are inconsistent.\n")
-}
-
-# Check on (conditional) independence requirement.
-if(bivar) {
-    if(is.null(par0$Rho)) {
-        if(is.null(indep)) {
-            stop("Neither \"indep\" nor \"par0$Rho\" have been supplied.\n")
-        }
-    } else if(is.list(par0$Rho)) {
-        if(is.null(indep)) {
-            indep <- TRUE
-        } else if(!indep) {
-             stop(paste("The value of \"indep\" and that of \"par0$Rho\"\n",
-                        "are inconsistent.\n",sep=""))
-        }
+} else {
+    if(!is.null(X) & method %in% c("EM","bf")) {
+        X <- tidyList(X,rp="predictor",addIntercept=addIntercept)
+        checkyXoK(y,X)
+    }
+    if(!is.null(X)) {
+        prednames <- attr(X,"prednames")
     } else {
-        if(is.null(indep)) {
-            indep <- FALSE
-        } else if(indep) {
-             stop(paste("The value of \"indep\" and that of \"par0$Rho\"\n",
-                        "are inconsistent.\n",sep=""))
-        }
+        prednames <- "Intercept"
     }
 }
+
+# Organise the starting values.
+starts <- checkStartVal(par0,K,indep,lvls,rand.start,
+                      mixture,prednames)
+par0   <- starts$par0
+K      <- starts$K
+indep  <- starts$indep
+stnms  <- starts$stnms
 
 # Set up the multiplier for BIC.
 nobs <- sum(!is.na(unlist(y)))
@@ -137,30 +121,57 @@ bicm <- log(nobs)
 # UV <--> "univariate".
 if(bivar) {
     if(indep) {
-        rslt <- hmmBI(y,yval=yval,par0=par0,K=K,rand.start=rand.start,
+        rslt <- hmmBI(y,par0=par0,K=K,
                       stationary=stationary,mixture=mixture,cis=cis,
-                      tolerance=tolerance,verbose=verbose,itmax=itmax,
+                      tolerance=tolerance,digits=digits,verbose=verbose,itmax=itmax,
                       crit=crit,bicm=bicm)
     } else {
-        rslt <- hmmBD(y,yval=yval,par0=par0,K=K,rand.start=rand.start,
+        rslt <- hmmBD(y,par0=par0,K=K,
                       stationary=stationary,mixture=mixture,cis=cis,
-                      tolerance=tolerance,verbose=verbose,itmax=itmax,
+                      tolerance=tolerance,digits=digits,verbose=verbose,itmax=itmax,
                       crit=crit,bicm=bicm)
     }
 } else {
-    if(!is.null(X) & method %in% c("EM","bf")) {
-        X <- tidyList(X,rp="predictor",addIntercept=addIntercept)
-        checkyXoK(y,X)
-    }
     optimiser <- match.arg(optimiser)
-    rslt <- hmmUV(y,yval=yval,par0=par0,K=K,rand.start=rand.start,
+    rslt <- hmmUV(y,par0=par0,K=K,
                   method=method,hglmethod=hglmethod,optimiser=optimiser,
                   optimMethod=optimMethod,stationary=stationary,
                   mixture=mixture,cis=cis,tolerance=tolerance,
                   digits=digits,verbose=verbose,itmax=itmax,crit=crit,
-                  bicm=bicm,newstyle=newstyle,X=X,
-                  addIntercept=addIntercept,lmc=lmc,hessian=hessian,...)
+                  bicm=bicm,X=X,addIntercept=addIntercept,
+                  lmc=lmc,hessian=hessian,...)
 }
+# Tidy up the dimension names of tpm and Rho (or the
+# levels of Rho$state, as is appropriate).
+if(K > 1) {
+    rownames(rslt$tpm) <- colnames(rslt$tpm) <- stnms
+    if(cis) {
+        names(rslt$ispd) <- stnms
+    } else {
+        if(length(y)==1) {
+            rslt$ispd <- as.vector(rslt$ispd)
+            names(rslt$ispd) <- stnms
+        } else {
+            colnames(rslt$ispd) <- stnms
+        }
+    }
+    if(bivar) {
+        if(indep) {
+           colnames(rslt$Rho[[1]]) <- colnames(rslt$Rho[[2]]) <- stnms
+        } else {
+           dimnames(rslt$Rho)[[3]] <- stnms
+        }
+    } else {
+        levels(rslt$Rho$state) <- stnms
+        rslt <- append(rslt,after=1,list(Rho.matrix=cnvrtRho(rslt$Rho)))
+    }
+}
+
+# Add the value of "stationary" to the result.
+naft <- which(names(rslt)=="tpm")
+rslt  <- append(rslt,list(stationary=stationary),after=naft)
+
+# Add the lengths of the observation sequences to the returned value.
 ylnths <- sapply(y,nrow)
 if("prior.emsteps" %in% names(rslt)) {
     naft <- which(names(rslt)=="prior.emsteps")
@@ -168,23 +179,29 @@ if("prior.emsteps" %in% names(rslt)) {
     naft <- which(names(rslt)=="nstep")
 }
 rslt   <- append(rslt,list(ylengths=ylnths),after=naft)
-naft <- naft + 1
+
+# Add the missing value fraction(s) to the returned value.
+naft   <- naft + 1
 nafrac <- nafracCalc(y)
 rslt   <- append(rslt,list(nafrac=nafrac),after=naft)
-naft <- naft + 1
+naft   <- naft + 1
+
+# Possibly add y and X to the returned value.
 if(keep.y) {
-    rslt   <- append(rslt,list(y=y),after=naft)
+    rslt <- append(rslt,list(y=y),after=naft)
     naft <- naft + 1
 }
-keep.X <- keep.X & !bivar & newstyle & !is.null(X)
+keep.X <- keep.X & !bivar & !is.null(X)
 if(keep.X) {
     rslt <- append(rslt,list(X=X),after=naft)
     naft <- naft + 1
 }
+
+# Add some auxiliary information to the returned value.
 rslt <- append(rslt,list(parity=attr(y,"parity")),after=naft)
 naft <- naft + 1
 rslt <- append(rslt,list(numeric=attr(y,"numeric")),after=naft)
-args <- list(newstyle=newstyle,method=method,optimiser=optimiser,
+args <- list(method=method,optimiser=optimiser,
              optimMethod=optimMethod,stationary=stationary,
              mixture=mixture,cis=cis,tolerance=tolerance,
              itmax=itmax,crit=crit,addIntercept=addIntercept)

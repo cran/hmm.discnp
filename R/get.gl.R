@@ -6,8 +6,8 @@ npar <- length(theta)
 tpm  <- getTpm(theta,K,stationary=TRUE)
 ispd <- revise.ispd(tpm)
 rrr  <- attr(y,"lvls")
-Rho  <- cnvrtRho(getRho(theta,K,rhovals=rrr,stationary=TRUE,
-                 prednames="Intercept"))
+Rho  <- getRho(theta,K,rhovals=rrr,stationary=TRUE,
+               prednames="Intercept")
 m    <- nrow(Rho)
 dp   <- derivp(theta,K)
 d1p  <- dp$d1p
@@ -21,7 +21,7 @@ ndat  <- length(y)
 alist <- vector("list",ndat)
 xll   <- numeric(ndat)
 ky    <- 0     
-fy    <- ffun(y,Rho,type=2)
+fy    <- ffun(y,Rho,type=1)
 j2    <- 0
 for(yl in y) {
     ylv   <- yl[,1]

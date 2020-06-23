@@ -10,11 +10,20 @@
    bootstrapping}).
 }
 \usage{
-squantCI(object, seed = NULL, alpha = 0.05, nsim=100, verbose = TRUE)
+squantCI(object, expForm = TRUE, seed = NULL, alpha = 0.05,
+         nsim=100, verbose = TRUE)
 }
 \arguments{
   \item{object}{
   An object of class \code{hmm.discnp} as returned by \code{\link{hmm}()}.
+}
+  \item{expForm}{
+  Logical scalar.  Should the confidence intervals produced
+  be for the parameters expressed in \dQuote{exponential}
+  (or \dQuote{smooth} or \dQuote{logistic}) form?
+  If \code{expForm=FALSE} then the parameters considered are
+  \dQuote{raw} probabilities, with redundancies (last column of
+  \code{tpm}; last row of \code{Rho}) removed.
 }
   \item{seed}{
   Integer scalar serving as a seed for the random number generator.
@@ -37,19 +46,19 @@ squantCI(object, seed = NULL, alpha = 0.05, nsim=100, verbose = TRUE)
 }
 \details{
   This function is currently applicable only to models fitted to
-  univariate data.  The confidence intervals calculated are for the
-  \dQuote{raw} parameters (entries of \code{tpm} with the
-  last column dropped --- since the rows sum to 1, and the
-  entries of \code{Rho} with the last row dropped --- since
-  the columns sum to 1.
+  univariate data.  If there are \emph{predictors} in the model,
+  then only the exponential form of the parameters may be used,
+  i.e. \code{expForm} \emph{must} be \code{TRUE}.
 }
 \value{
-   A 2-by-\code{npar} matrix (where \code{npar} is the number of
-   \dQuote{independent} parameters in the model) whose columns
-   form the estimated confidence intervals.  The column labels
-   indicate the parameters to which each column pertains, in a
-   reasonably perspicuous manner.  The row labels indicate the
-   relevant quantiles in percentages.
+   A \code{npar}-by-2 matrix (where \code{npar} is the number
+   of \dQuote{independent} parameters in the model) whose rows
+   form the estimated confidence intervals.  (The first entry of
+   each row is the lower bound of a confidence interval for the
+   corresponding parameter, and the second entry is the upper bound.
+   The row labels indicate the parameters to which each row pertains,
+   in a reasonably perspicuous manner.  The column labels indicate
+   the relevant quantiles in percentages.
 
    This matrix has an attribute \code{seed} (the random number
    generation seed that was used) so that the calculations can

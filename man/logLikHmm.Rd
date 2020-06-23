@@ -13,9 +13,9 @@ logLikHmm(y, model=NULL, tpm=NULL, ispd=NULL, Rho=NULL, X=NULL,
 }
 \arguments{
   \item{y}{
-  A vector, or list of vectors, or a two column matrix or a a list
-  of such matrics, whose entries consist of observations from a
-  hidden Markov model with discrete non-parametric observation
+  A vector, or list of vectors, or a one or two column matrix or a
+  list of such matrics, whose entries consist of observations from
+  a hidden Markov model with discrete non-parametric observation
   distributions.
 }
   \item{model}{An object specifying a hidden Markov model, usually
@@ -39,15 +39,14 @@ logLikHmm(y, model=NULL, tpm=NULL, ispd=NULL, Rho=NULL, X=NULL,
   if \code{model} is non-\code{NULL}.
   }
   \item{X}{An optional \emph{numeric} matrix, or a list of such
-  matrices, of \emph{predictors}.  The use of such predictors
-  is (currently, at least) applicable only in the univariate
-  emissions setting, and then only if \code{Rho} is supplied in
-  the \dQuote{newstyle} format.  If \code{X} is a list it must
-  be of the same length as \code{y} and all entries of this list
-  must have the same number of columns.  The number of rows of each
-  entry must be equal to the length of the corresponding entry of
-  \code{y}. If \code{X} is a matrix then \code{y} should be a vector
-  or one-column matrix (or a list with a single entry equal to such).
+  matrices, of \emph{predictors}.  The use of such predictors is
+  (currently, at least) applicable only in the univariate emissions
+  setting.  If \code{X} is a list it must be of the same length as
+  \code{y} and all entries of this list must have the same number
+  of columns.  The number of rows of each entry must be equal to
+  the length of the corresponding entry of \code{y}. If \code{X}
+  is a matrix then \code{y} should be a vector or one-column matrix
+  (or a list with a single entry equal to such).
   }
   \item{addIntercept}{
   Logical scalar.  See the documentation of \code{\link{hmm}()}.

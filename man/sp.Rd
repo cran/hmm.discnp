@@ -15,11 +15,11 @@ sp(y, model = NULL, tpm=NULL, Rho=NULL, ispd=NULL, X=NULL,
 \arguments{
   \item{y}{The observations on the basis of which the probabilities
   of the underlying hidden states are to be calculated.  May be
-  a (one or two column) matrix of observations, or a list each
-  component of which is such a matrix.  If \code{y} is missing it is
-  set equal to the \code{y} component of \code{model}, given that
-  that argument is non-\code{NULL} and that that component exist.
-  Otherwise an error is given.
+  a vector of a one or two column matrix of observations, or
+  a list each component of which is such a vector or matrix.
+  If \code{y} is missing it is set equal to the \code{y} component
+  of \code{model}, given that that argument is non-\code{NULL}
+  and that that component exists.  Otherwise an error is given.
 }
   \item{model}{
   An object of class \code{hmm.discnp} as returned by
@@ -50,15 +50,13 @@ sp(y, model = NULL, tpm=NULL, Rho=NULL, ispd=NULL, X=NULL,
   is not \code{NULL} (in which case \code{X} is extracted from
   \code{model}).
 
-  The use of such predictors is (currently, at least) applicable only
-  in the univariate emissions setting, and then only if \code{Rho}
-  is supplied in the \dQuote{newstyle} format.  If \code{X} is a list
-  it must be of the same length as \code{y} and all entries of this
-  list must have the same number of columns.  The number of rows
-  of each entry must be equal to the length of the corresponding
-  entry of \code{y}. If \code{X} is a matrix then \code{y} should
-  be a vector or one-column matrix (or a list with a single entry
-  equal to such).
+  The use of such predictors is (currently, at least) applicable
+  only in the univariate emissions setting.  If \code{X} is a list it
+  must be of the same length as \code{y} and all entries of this list
+  must have the same number of columns.  The number of rows of each
+  entry must be equal to the length of the corresponding entry of
+  \code{y}. If \code{X} is a matrix then \code{y} should be a vector
+  or one-column matrix (or a list with a single entry equal to such).
 }
   \item{addIntercept}{
   Logical scalar.  See the documentation of \code{\link{hmm}()}.
@@ -94,7 +92,7 @@ sp(y, model = NULL, tpm=NULL, Rho=NULL, ispd=NULL, X=NULL,
     length 1, and if \code{drop} is \code{TRUE} then the returned
     value is a matrix whose rows correspond to the states of
     the hidden Markov chain, and whose columns correspond to the
-    observation times.  Otherwise \code{probs} is a list of such
+    observation times.  Otherwise  the returned value is a list of such
     matrices, one for each matrix of observations.
 }
 \author{Rolf Turner

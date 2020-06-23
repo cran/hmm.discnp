@@ -14,7 +14,7 @@ nreps <- length(lns)
 nxi   <- L - nreps
 N <- K*K*nxi
 epsilon <- sqrt(.Machine$double.eps)
-if(is.matrix(ispd)) {
+if(inherits(ispd,"matrix")) {
     if(ncol(ispd) != nreps)
         stop("Number of columns of \"ispd\" must equal \"nreps\".\n")
     cis <- 0
@@ -23,7 +23,6 @@ if(is.matrix(ispd)) {
     cis <- 1
     nis <- 1
 }
-
 # Recursive probabilities:
         rp <- .Fortran(
                 'recurse',

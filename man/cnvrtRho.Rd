@@ -4,9 +4,10 @@
     Convert Rho between forms.
 }
 \description{
-    Converts the \dQuote{old style} (matrix) specification
-    of the emission probabilities to the \dQuote{new style}
-    (data frame) specification, or vice versa.
+    Converts a matrix specification of the emission probabilities
+    (in which the probabilities are simply the entries of the matrix)
+    to a data frame specification (in which the probabilities are
+    a logistic-style function of the parameters) or vice versa.
 }
 \usage{
 cnvrtRho(Rho)
@@ -22,17 +23,17 @@ cnvrtRho(Rho)
 }
 }
 \details{
-  The \dQuote{new style} specification of \code{Rho} allows
-  for predictor variables \code{x}.  It \code{Rho} is of the
-  \dQuote{new style} and is designed to allow for predictor
+  The data frame specification of \code{Rho} allows
+  for predictor variables \code{x}.  If \code{Rho} is of the
+  data frame form, and is designed to allow for predictor
   variables, then it will have more than three columns and
-  cannot be converted to the \dQuote{old style}.  In such
+  cannot be converted to the matrix form.  In such
   cases \code{cnvrtRho} will throw an error.
 }
 \value{
-   A data frame if the argument \code{Rho} is a matrix (\dQuote{old style}
-   specification), or a matrix if the argument \code{Rho} is a data
-   frame (\dQuote{new style} specification.
+   A data frame if the argument \code{Rho} is a matrix,
+    or a matrix if the argument \code{Rho} is a data
+   frame.
 }
 \author{Rolf Turner
   \email{r.turner@auckland.ac.nz}\cr

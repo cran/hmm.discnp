@@ -21,15 +21,17 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
     optimiser=c("nlm","optim"), optimMethod=NULL, stationary=cis,
     mixture=FALSE, cis=TRUE, indep=NULL, tolerance=1e-4, digits=NULL,
     verbose=FALSE, itmax=200, crit=c("PCLL","L2","Linf","ABSGRD"),
-    keep.y=FALSE, keep.X=keep.y, newstyle=TRUE, X=NULL,
+    keep.y=FALSE, keep.X=keep.y,X=NULL,
     addIntercept=TRUE, lmc=10, hessian=FALSE,...)
 }
 \arguments{
 \item{y}{
-   A one or two column matrix of discrete data or a list of such
-   matrices; missing values are allowed.  If \code{y} is a vector,
-   or list of vectors (of discrete data) these vectors are coerced
-   to one column matrices.
+   A vector or a list of vectors, or one or two column matrix
+   (bivariate setting) or a list of such matrices; missing values
+   are allowed.  If \code{y} is a vector, or list of vectors (of
+   discrete data) these vectors are coerced to one column matrices.
+   The entries of these vectors or matrices may be numeric or
+   character and are assumed to constitute  discrete data.
 } \item{yval}{
    A vector (of length \code{m}, say) of possible values for the
    data or a list of two such vectors (of lengths \code{m1} and
@@ -38,6 +40,11 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    the respective variates as provided in \code{y}.  If \code{yval}
    is supplied and any value of \code{y} does not match some value
    of \code{yval}, then an error is thrown.
+
+   The argument \code{yval} is provided so as to allow for fitting
+   of models to data in which some of the data values \dQuote{of interest}
+   were never observed.  The estimated emission probabilities of such
+   \dQuote{never observed} values will of course be zero.
 } \item{par0}{
    An optional (\emph{named}) list of starting values for the
    parameters of the model, with components \code{tpm} (transition
@@ -60,7 +67,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    you leave it unspecified.
 
    If \code{par0} is not specified, starting values are created by
-   the function \code{init.all()}.
+   the (undocumented) function \code{init.all()}.
 }
 \item{K}{
    The number of states in the hidden Markov chain; if \code{par0}
@@ -75,7 +82,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
 \item{rand.start}{
    A list consisting of two logical scalars which must be named
    \code{tpm} and \code{Rho}, if \code{tpm} is TRUE then the function
-   init.all() chooses entries for then starting value of \code{tpm}
+   init.all() chooses entries for the starting value of \code{tpm}
    at random; likewise for \code{Rho}.  This argument defaults to
    \code{list(tpm=FALSE,Rho=FALSE)}.
 }
@@ -100,13 +107,13 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    transcription of the fortran code, do-loops being replaced by
    for-loops.  With method \code{"raw"} the for-loops are eliminated
    and matrix-vector calculations are applied.  The \code{"oraw"}
-   method is about 25 times slower than the \code{"fortran"}
-   method and the \code{"raw"} method is more than 30 times slower.
-   The \dQuote{raw} methods are present mainly for debugging purposes
-   and would not usually be used in practice.  This argument is
-   used only if the \code{method} is \code{"LM"} or \code{"SD"}
-   (and is involved only peripherally in the latter instance).
-   It is ignored otherwise.
+   method is about 25 times slower than the \code{"fortran"} method
+   and the \code{"raw"} method is (surprisingly?) even worse;
+   it is more than 30 times slower.  The \dQuote{raw} methods are
+   present mainly for debugging purposes and would not usually be
+   used in practice.  This argument is used only if the \code{method}
+   is \code{"LM"} or \code{"SD"} (and is involved only peripherally
+   in the latter instance).  It is ignored otherwise.
 }
 \item{optimiser}{
    Character string specifying the optimiser to use when the
@@ -239,23 +246,14 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    a component of the value of this function?  Note that the
    value of \code{keep.X} will be silently set equal to \code{FALSE}
    unless it actually \dQuote{makes sense} to keep \code{X}.  I.e.
-   unless the observations are \emph{univariate}, \code{newstyle}
-   is \code{TRUE}, and \code{X} is actually supplied, i.e. is
+   unless the observations are \emph{univariate}
+   and \code{X} is actually supplied, i.e. is
    not \code{NULL}.
-}
-\item{newstyle}{
-   Logical scalar; if \code{TRUE} then the \dQuote{new style} of of
-   parameterising \code{Rho} (see \bold{Details}) is used, in the
-   univariate setting.  Note that if \code{X} is not \code{NULL}
-   or it the method is not \code{"EM"} then \code{newstyle}
-   \emph{cannot} be set to \code{FALSE}; if it is, then an error
-   is thrown.
 }
 \item{X}{An optional \emph{numeric} matrix, or a list of such
    matrices, of \emph{predictors}.  The use of such predictors
    is (currently, at least) applicable only in the univariate
-   emissions setting, and then only if \code{Rho} is supplied in
-   the \dQuote{newstyle} format.  If \code{X} is a list it must be
+   emissions setting.  If \code{X} is a list it must be
    of the same length as \code{y} and all entries of this list must
    have the same number of columns.  If the columns of any entry
    of the list are named, then they must be named for \emph{all}
@@ -290,7 +288,8 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    otherwise ignored.
 }
 
-\item{hessian}{Logical scalar.  Should the hessian matrix be
+\item{hessian}{
+   Logical scalar.  Should the hessian matrix be
    returned?  This argument is relevant only if \code{method="bf"}
    (in which case it is passed along to \code{hmmNumOpt()}) and is
    ignored otherwise.  This argument should be set to \code{TRUE}
@@ -300,7 +299,8 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    a value.
 }
 
-\item{\dots}{Additional arguments passed to \code{hmmNumOpt()}.
+\item{\dots}{
+   Additional arguments passed to \code{hmmNumOpt()}.
    There is one noteworthy argument \code{useAnalGrad} which is used
    \dQuote{directly} by \code{hmmNumOpt()}.  This argument is a
    logical scalar and if it is \code{TRUE} then calls to \code{nlm()}
@@ -329,18 +329,30 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    A list with components:
 
 \item{Rho}{
-   The fitted value of the matrix, data frame, list of two
-   matrices, or array \code{Rho} specifying the distributions of
-   the observations (the \dQuote{emission} probabilities).
+   The fitted value of the data frame, list of two matrices,
+   or array \code{Rho} (in the case of a univariate model, a
+   bivariate independent model or a bivariate dependent model
+   respectively) specifying the distributions of the observations
+   (the \dQuote{emission} probabilities).
+}
+\item{Rho.matrix}{
+   Present \emph{only} in the univariate setting.  A matrix
+   whose entries are the (fitted) emission probabilities,
+   row corresponding to values of the emissions and columns
+   to states.  The columns sum to 1.  This component provides
+   the same information as \code{Rho}, but in a more readily
+   interpretable form.
 }
 \item{tpm}{
    The fitted value of the transition probabilty matrix \code{tpm}.
 }
+\item{stationary}{
+   Logical scalar; the value of the \code{stationary} argument.
+}
 \item{ispd}{
-   The fitted initial state probability distribution, or a matrix of
-   (trivial or \dQuote{deterministic}) initial state probability
-   distributions, one (column) of \code{ispd} for each observation
-   sequence.
+   The fitted initial state probability distribution, or a matrix
+   of initial state probability distributions, one (column) of
+   \code{ispd} for each observation sequence.
 
    If \code{stationary} is \code{TRUE} then \code{ispd} is assumed
    to be the (unique) stationary distribution for the chain,
@@ -351,8 +363,10 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    observation sequences, at time \code{t=1}.
 
    If \code{cis} is \code{FALSE} then \code{ispd} is a matrix
-   whose columns are trivial probability vectors, as described
-   above.
+   whose columns are the vectors of conditional probabilities of
+   the states, given the observation sequences, at time \code{t=1},
+   as described above.  (If there is only one observation sequence,
+   then this --- one-column --- matrix is converted into a vector.)
 }
 \item{log.like}{
    The final (maximal, we hope!) value of the log likelihood, as
@@ -385,10 +399,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    otherwise; (2) \code{ntpmpar} is \code{K*(K-1)} (3) \code{nrhopar}
    is
    \itemize{
-   \item \code{K*(nrow(Rho)-1)} for univariate models with
-   \code{newstyle} equal to \code{FALSE}
    \item \code{(nrow(Rho) - K)*(ncol(Rho)-2)} for univariate models
-   with \code{newstyle} equal to \code{TRUE}
    \item \code{K*(sum(sapply(Rho,nrow))-K)} for bivariate independent models
    \item \code{prod(dim(Rho))-K} for bivariate dependent models.
    }
@@ -485,7 +496,6 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
 
    It has components:
    \itemize{
-       \item \code{newstyle}
        \item \code{method}
        \item \code{optimiser}
        \item \code{optimMethod}
@@ -511,11 +521,29 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    discrete non-parametric distributions.  For example a value of
    1854.955 was returned after 200 LM steps in one (non-convergent,
    of course!)  attempt at fitting a model.  The stopping criterion
-   \code{"PCLL"} in this example was took the \dQuote{reasonable}
+   \code{"PCLL"} in this example took the \dQuote{reasonable}
    value of 0.03193748 when iterations ceased.
 }
 
 \section{Notes}{
+   This function \emph{used} to have an argument \code{newstyle},
+   a logical scalar (defaulting to \code{TRUE}) indicating whether
+   (in the univariate setting) the emission probabilities
+   should be represented in \dQuote{logistic} form.   (See
+   \bold{Details}, \bold{Univariate case:}, above.)  Now the
+   emission probabilities are \emph{always} represented in the
+   \dQuote{logistic} form.   The component \code{Rho} of the
+   starting parameter values \code{par0} may still be supplied
+   as a matrix of probabilities (with columns summing to 1), but
+   this component is converted (internally, silently) to the
+   logistic form.
+
+   The object returned by this function also has (in the univariate
+   setting), in addition to the component \code{Rho}, a component
+   \code{Rho.matrix} giving the emission probabilities in the
+   more readily interpretable matrix-of-probabilities form. (See
+   \bold{Value} above.)
+
    The package \emph{used} to require the argument \code{y} to
    be a \emph{matrix} in the case of multiple observed sequences.
    If the series were of unequal length the user was expected to
@@ -541,14 +569,11 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
 
    The returned values of \code{tpm} and \code{Rho} (or the entries
    of \code{Rho} when \code{Rho} is a list) have dimension names.
-   These are the same as the dimension names of the starting values
-   of these objects (as provided in \code{par0}) if these exist.
-   Otherwise they are formed from the sorted unique values of
-   the observations in \code{y} or are taken to be the appropriate
-   sequences of integers.  Likewise the returned value of \code{ispd}
-   is a named vector, the names being the same as the row (and
-   column) names of \code{tpm} and the corresponding dimension
-   names of \code{Rho} or of its entries.
+   These are formed from the argument \code{yval} if this is
+   supplied, otherwise from the sorted unique values of the
+   observations in \code{y}.  Likewise the returned value of
+   \code{ispd} is a named vector, the names being the same as the
+   row (and column) names of \code{tpm}.
 
    If \code{method} is equal to \code{"EM"} it \emph{may} get
    switched to \code{"bf"} at some EM step if there is a decrease
@@ -574,12 +599,12 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    when \code{stationary} is \code{FALSE}.  I have yet to figure
    out/track down what is going on here.
 }
-
 \details{
-   In the univariate case the emission probabilities are, in the case
-   in which \code{newstyle} is \code{TRUE} (the default), specified
-   by means of a data frame \code{Rho}.  The first column of \code{Rho},
-   named \code{y}, is a factor consisting of the possible values
+   \itemize{
+   \item \bold{Univariate case:}
+   In the univariate case the emission probabilities are specified by
+   means of a data frame \code{Rho}.  The first column of \code{Rho},
+   named \code{"y"}, is a factor consisting of the possible values
    of the emissions, repeated \code{K} times (where \code{K} is
    the number of states).  The second column, named \code{states},
    is a factor consisting of integer values \code{1, 2, \dots, K}.
@@ -602,44 +627,44 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    The probabilities of the emissions taking on their
    various possible values are given by \deqn{\Pr(Y = y_i |
    \boldsymbol{x}, \textrm{state}=S) = \ell_i/\sum_{j=1}^m
-   \ell_j}{Pr(Y = y_i | x, state=S) = \ell_i/sum \ell_j}
-   where \eqn{\ell_j}{l_j} is the \eqn{j\textrm{th}}{j-th} entry of
-   \eqn{\boldsymbol{\beta}^{\top}\boldsymbol{x}}{t(beta)\%*\%x}
-   and  where in turn \eqn{\boldsymbol{x}}{x} is the vector of
-   predictors and \eqn{\boldsymbol{\beta}}{beta} is the coefficient
-   vector in the linear predicator that corresponds to \eqn{y_i}
-   and the hidden state \eqn{S}.  For identifiability the vectors
-   \eqn{\boldsymbol{\beta}}{beta} corresponding to the first value
-   of \eqn{Y} (the first level of \code{Rho$y}) are set equal to
-   the zero vector for all values of the state \eqn{S}.
+   \ell_j}{\code{Pr(Y = y_i | x, state=S) = l[i]/sum(l)}} where
+   \eqn{\ell_j}{l_j} is the \eqn{j\textrm{th}}{\code{j}th} entry of
+   \eqn{\boldsymbol{\beta}^{\top}\boldsymbol{x}}{\code{t(beta)\%*\%x}}
+   and  where in turn \eqn{\boldsymbol{x}}{\code{x}} is the vector
+   of predictors and \eqn{\boldsymbol{\beta}}{\code{beta}} is the
+   coefficient vector in the linear predicator that corresponds to
+   \eqn{y_i} and the hidden state \eqn{S}.  For identifiability the
+   vectors \eqn{\boldsymbol{\beta}}{\code{beta}} corresponding to
+   the first value of \eqn{Y} (the first level of \code{Rho$y}) are
+   set equal to the zero vector for all values of the state \eqn{S}.
 
-   If \code{newstyle} is \code{FALSE} \code{Rho} is specified by
-   a matrix \eqn{\textrm{Rho} = [\rho_{ij}]}{Rho = [rho_ij]} where
-   \eqn{\rho_{ij} = \Pr(Y = y_i | S = j)}{rho_ij = Pr(Y = y_i |
-   S = j)}.  If \code{newstyle} is \code{FALSE} and if \code{X}
-   is not \code{NULL} then an error is thrown.
+   Note that the \code{Rho} component of the starting values
+   \code{par0} may be specified as a \emph{matrix} of probabilities,
+   with rows corresponding to possible values of the observations and
+   columns corresponding to states.  That is the \code{Rho} component
+   of \code{par0} may be provided in the form \eqn{\textrm{Rho} =
+   [\rho_{ij}]}{\code{Rho = Rho[ij]}} where \eqn{\rho_{ij} = \Pr(Y = y_i
+   | S = j)}{\code{Rho[i,j]= Pr(Y = y[i] | S = j)}}.  This is permissable
+   as long as \code{X} is \code{NULL} and may be found to be more
+   convenient and intuitive.  If the starting value for \code{Rho}
+   is provided in matrix form it is (silently) converted internally
+   into the data frame form, by the (undocumented) function
+   \code{cnvrtRho()}.
 
-   In the independent bivariate case the emission probabilities
-   are specified by a list of two such matrices.  In this
-   setting \eqn{P(Y_1,Y_2) = (y_{i1},y_{i2}) | S = j) =
-   \rho^{(1)}_{i_1,j} \rho^{(2)}_{i_2,j}}{ P((Y_1,Y_2) = (y_i1,y_i2)
-   | S = j) = rho.1_[i1,j] * rho.2[i2,j]} where \eqn{R^{(k)} =
-   [\rho^{(k)}_{ij}]}{R.k = [rho.k[ij]]} (\eqn{k = 1,2})
-   are the two emission probability matrices.
+   \item \bold{Independent bivariate case:} the emission
+   probabilities are specified by a list of two matrices.
+   In this setting \eqn{\Pr(Y_1,Y_2) = (y_{i1},y_{i2}) | S = j) =
+   \rho^{(1)}_{i_1,j} \rho^{(2)}_{i_2,j}}{\code{Pr((Y[1],Y[2]) = (y[i1],y[i2])
+   | S = j) = Rho.1[i1,j] * Rho.2[i2,j]}} where \eqn{R^{(k)} =
+   [\rho^{(k)}_{ij}]}{\code{Rho.k}} (\eqn{k = 1,2}) are the
+   two emission probability matrices.
 
-   In the independent bivariate case the emission probabilities
-   are specified by a list of two such matrices.  In this
-   setting \eqn{P(Y_1,Y_2) = (y_{i1},y_{i2}) | S = j) =
-   \rho^{(1)}_{i_1,j} \rho^{(2)}_{i_2,j}}{ P((Y_1,Y_2) = (y_i1,y_i2)
-   | S = j) = rho.1_[i1,j] * rho.2[i2,j]} where \eqn{R^{(k)} =
-   [\rho^{(k)}_{ij}]}{R.k = [rho.k[ij]]} (\eqn{k = 1,2})
-   are the two emission probability matrices.
-   In the dependent bivariate case the emission probabilities
+   \item \bold{Dependent bivariate case:} the emission probabilities
    are specified by a three dimensional array.  In this setting
-   \eqn{P((Y_1,Y_2) = (y_{i1},y_{i2}) | S = j) = \rho_{i_1,i_2,j}}{
-   P((Y_1,Y_2) = (y_i1,y_i2) | S = j) = rho[i1,i2,j]} where \eqn{R_k =
-   [\rho^{(k)}_{ij}]}{R_k = [rho[ijk]]} is the emission probability
-   array.
+   \eqn{\Pr((Y_1,Y_2) = (y_{i1},y_{i2}) | S = j) = \rho_{i_1,i_2,j}}{
+   \code{Pr((Y_1,Y_2) = (y[i1],y[i2]) | S = j) = Rho[i1,i2,j]}} where
+   \eqn{R = [\rho_{ijk}]}{\code{Rho}} is the emission probability array.
+   }
 
    The hard work of calculating the recursive probabilities used
    to fit the model is done by a Fortran subroutine "recurse"
@@ -689,17 +714,13 @@ Rho  <- cbind(c(rep(1,5),rep(0,5)),c(rep(0,5),rep(1,5)))/5
 rownames(Rho) <- Yval
 set.seed(42)
 xxx  <- rhmm(ylengths=rep(1000,5),nsim=1,tpm=Tpm,Rho=Rho,yval=Yval,drop=TRUE)
-fit1  <- hmm(xxx,par0=list(tpm=Tpm,Rho=Rho),newstyle=FALSE,itmax=10)
-print(fit1$Rho)
-newRho  <- cnvrtRho(Rho)
-fit2  <- hmm(xxx,par0=list(tpm=Tpm,Rho=newRho),itmax=10)
-print(round(cnvrtRho(fit2$Rho),6))
-# Agrees with fit1$Rho to 5 decimal places; the difference
-# is due to the fitting procedure used with the "new style"
-# Rho, which calls upon multinom() from the nnet package.
+fit  <- hmm(xxx,par0=list(tpm=Tpm,Rho=Rho),itmax=10)
+print(fit$Rho) # A data frame
+print(cnvrtRho(fit$Rho)) # A matrix of probabilities
+                         # whose columns sum to 1.
 
 # 2.
-# See the help for rhmm() for how to generate y.num.
+# See the help for logLikHmm() for how to generate y.num.
 \dontrun{
    fit.num     <- hmm(y.num,K=2,verb=TRUE,itmax=10)
    fit.num.mix <- hmm(y.num,K=2,verb=TRUE,mixture=TRUE,itmax=10)

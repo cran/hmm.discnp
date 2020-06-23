@@ -34,7 +34,7 @@ to ethics constraints.
     commensurate with the corresponding fractions in the real data.
 
     The values in the first column of each matrix (the
-    \code{cellCount} column consist of integers from 1 to 5 and
+    \code{cellCount} column) consist of integers from 1 to 5 and
     are to be interpreted as indicators of cell counts in units of
     \eqn{10^9}{1e9} cells per litre, discretised according to the
     following scale:
@@ -71,11 +71,8 @@ to ethics constraints.
   supplied by Dr. Jonathan Williams, Northern District Health Board.
 }
 \examples{
-\dontrun{
-# Takes a long time:
-    fit <- hmm(ccprSim,K=2,indep=FALSE,itmax=500,verbose=TRUE)
-# Throws an error; inadequate data:
-    subsetFit <- hmm(ccprsim[1021:1025],K=2,indep=FALSE,itmax=5)
+\dontrun{ # Takes too long.
+    fit <- hmm(ccprSim,K=2,indep=FALSE,itmax=5,verbose=TRUE)
 }
 }
 \keyword{datasets}

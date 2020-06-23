@@ -22,7 +22,7 @@ if(useAnalGrad & Xused) {
     useAnalGrad <- FALSE
 }
 
-pars0 <- reparam(par0,stationary)
+pars0 <- reparam(par0,stationary=stationary)
 K     <- ncol(par0$tpm)
 
 # Check on the length of pars0.  In particular note that the value

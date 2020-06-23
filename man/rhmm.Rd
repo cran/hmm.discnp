@@ -13,18 +13,18 @@ from a model such as is fitted by the function \code{hmm()}.
 rhmm(model,...,nsim,verbose=FALSE)
 \method{rhmm}{default}(model, ..., nsim=1, verbose=FALSE, ylengths,
                        nafrac=NULL, fep=NULL, tpm, Rho, ispd=NULL, yval=NULL,
-                       drop=TRUE)
+                       drop=TRUE, forceNumeric=TRUE)
 \method{rhmm}{hmm.discnp}(model, ..., nsim=1, verbose=FALSE, inMiss=TRUE,
-                          fep=NULL, drop=TRUE)
+                          fep=NULL, drop=TRUE, forceNumeric=TRUE)
 }
 \arguments{
 \item{model}{
-   An object of class \code{hmm.discnp}.  This will have the form
-   of a list specifying a hidden Markov model with discrete emissions
+   An object of class \code{hmm.discnp}.  This will have the form of
+   a list specifying a hidden Markov model with discrete emissions
    and emission probabilities specified non-parametrically, i.e.
-   by means of a table or tables.  Usually this will be an object
-   returned by \code{\link{hmm}()}.  This argument is ignored
-   by the default method.
+   by means of some form of table or tables.  Usually this will
+   be an object returned by \code{\link{hmm}()}.  This argument is
+   ignored by the default method.
 }
 
 \item{...}{
@@ -80,22 +80,35 @@ to be the stationary distribution of the chain, calculated from
 \code{tpm}.  Ignored by the \code{hmm.discnp} method and extracted
 from \code{model}.
 }
-
 \item{yval}{Vector of possible values of the observations, or (in
 the bivariate setting) a list of two such vectors.  If not supplied
-it is formed from the appropriates dimension names of \code{Rho}
-or of the entries of \code{Rho} if \code{Rho} is a list.  Ignored by
-the \code{hmm.discnp} method.
+it is formed from the levels of the factor constituting the \code{y}
+column of \code{Rho} (univariate case) or from appropriate dimension
+names associated with \code{Rho} (bivariate case).  Ignored by the
+\code{hmm.discnp} method.
 }
 \item{drop}{
-    Logical scalar; if \code{nsim} is 1 and if \code{drop} is
-    \code{TRUE} then the list to be returned by this function
-    is replaced by its first and only entry. (See below.)
+    Logical scalar; if \code{TRUE} then lists of length 1 are
+    replaced by their first entry.  In particular if \code{nsim}
+    is 1 and if \code{drop} is \code{TRUE} then the list to be
+    returned by this function (see below) is replaced by its first and only
+    entry.  Also if \code{ylengths} is of length 1 (so that each
+    entry of the returned value contains only a single sequence of
+    of simulated observations) then each list of such sequences
+    is replaced by its first and only entry.
 }
 \item{inMiss}{
     Logical scalar; if \code{TRUE} then missing values will
     be randomly inserted into the data in the fraction
     \code{nafrac} determined from \code{object}.
+}
+\item{forceNumeric}{
+    Logical scalar; if \code{TRUE} then if all of the possible
+    values of the observations can be interpreted as numeric
+    (by \code{as.numeric()}) then they are so interpreted.
+    That is, the value returned will consist of a collection
+    of numeric sequences, rather than a collection of sequences
+    of values of categorical variables.
 }
 }
 
@@ -111,6 +124,10 @@ entries when \code{yval} is a list.
 
 If \code{nsim=1} and \code{drop} is \code{TRUE} then the (\dQuote{outer})
 list described above is replaced by its first and only entry
+
+If the length of \code{ylengths} is \code{1} and \code{drop} is
+\code{TRUE} then each \dQuote{inner} list described above is
+replaced by its first and only entry.
 }
 
 \section{Note}{

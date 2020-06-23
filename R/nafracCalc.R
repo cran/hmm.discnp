@@ -4,7 +4,7 @@ nafracCalc <- function(y,drop=TRUE){
         if(drop & length(y)==1) rslt <- rslt[[1]]
         return(rslt)
     }
-    if(!is.list(y)) y <- list(y)
+    if(!inherits(y,"list")) y <- list(y)
 
 # Check that the entries of y all have the same class and that this
 # class is appropriate.
@@ -26,7 +26,7 @@ nafracCalc <- function(y,drop=TRUE){
 # Now count the missing values.
     aaa <- sapply(y,function(x){apply(as.matrix(x),2,function(z){sum(is.na(z))})})
     bbb <- sapply(y,function(x){apply(as.matrix(x),2,length)},simplify="array")
-    num <- if(is.matrix(aaa)) apply(aaa,1,sum) else (sum(aaa))
-    den <- if(is.matrix(bbb)) apply(bbb,1,sum) else (sum(bbb))
+    num <- if(inherits(aaa,"matrix")) apply(aaa,1,sum) else (sum(aaa))
+    den <- if(inherits(bbb,"matrix")) apply(bbb,1,sum) else (sum(bbb))
     num/den
 }

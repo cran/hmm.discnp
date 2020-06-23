@@ -30,7 +30,7 @@
   If not \code{NULL}, an object of class \code{hmm.discnp} as returned by
   \code{\link{hmm}()}.
 }
-  \item{y}{A data structure from which the fitted model \code{object}
+  \item{y}{A data structure to which the fitted model \code{object}
   \emph{could} have been fitted.  If \code{y} is NULL, an attempt
   is made to extract \code{y} from \code{model}.
 }
