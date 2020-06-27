@@ -3,7 +3,7 @@ hmm <- function(y,yval=NULL,par0=NULL,K=NULL,rand.start=NULL,
                 optimiser=c("nlm","optim"),optimMethod=NULL,stationary=cis,
                 mixture=FALSE,cis=TRUE,indep=NULL,tolerance=1e-4,digits=NULL,
                 verbose=FALSE,itmax=200,crit=c("PCLL","L2","Linf","ABSGRD"),
-                keep.y=FALSE,keep.X=keep.y,X=NULL,
+                X=NULL,keep.y=FALSE,keep.X=keep.y,
                 addIntercept=TRUE,lmc=10,hessian=FALSE,...) {
 
 #
@@ -133,6 +133,7 @@ if(bivar) {
     }
 } else {
     optimiser <- match.arg(optimiser)
+    hglmethod <- match.arg(hglmethod)
     rslt <- hmmUV(y,par0=par0,K=K,
                   method=method,hglmethod=hglmethod,optimiser=optimiser,
                   optimMethod=optimMethod,stationary=stationary,

@@ -1261,4 +1261,49 @@ converting from "data frame form" to "matrix" form.
 Backed out the introduction of the "ipopt" method; doesn't seem
 to work worth a damn and is not actually available on CRAN anyhow.
 
-Incremented the version number (to 3.9-4).
+Incremented the version number (to 3.0-4).  Uploaded to CRAN
+
+26/06/2020
+Started searching for the bug revealed by an experiment with the
+toy data that came from Noric Couderc.  (That I *should* have
+caught before uploading to CRAN,  Grrrrrr!!!)
+
+Fixed a mess-up w.r.t where "rhovals" gets defined in hmmUV().
+
+Fixed the bug that was fucking everything up for the LM method;
+turned out to be "m <- nrow(Rho)" which assumed that Rho was
+a *matrix* of emission probabilities, whereas it is (now) a
+data frame providing the "new style" representation.  This resulted
+in the Fortran code writing to unallocated memory, and all hell
+broke loose.
+
+Adjusted init.all() so that rand.start is allowed to be a single
+logical scalar (and not necessarily a list of two such).  If it is
+a logical scalar, it is converted into a list, both components of
+which are equal to that scalar.
+
+Changed the name of "method" in get.hgl() to "hglmethod"; took out
+the match.arg() construction, which does not belong there.
+
+Put the match.arg() construction into hmm() where it does belong.
+
+Got rid of the procedure of automatically switching methods (to
+"bf" or "LM") if the EM algorithm produces a decrease in the
+log likelihood.  An error is now thrown and the user is instructed
+to change the method explicitly, starting from scratch.
+
+Changed the name of the file "type4stuff.R" to "bivDepStuff.R".
+(There is no longer a "type = 4" case!!!)
+
+Incremented the version number (to 3.0-5).  Uploaded to CRAN.
+
+27/06/2020
+Realized there was *STILL* a fucking bug in the package!!!
+The same error appears in get.gl() as in get.hgl().  I had
+fixed the latter but not the former.  It is mysterious why
+the bug was not triggered by Noric Couderc's toy data.  Get
+a slightly different answer when using the correct code than
+when using the buggy code, but only slightly different.  And
+no crashes.  Go figure.  Have now fixed get.gl().
+
+Incremented the version number (to 3.0-6).  Uploaded to CRAN.

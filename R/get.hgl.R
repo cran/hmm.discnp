@@ -1,15 +1,14 @@
-get.hgl <- function(theta,K,y,method=c("fortran","oraw","raw")) {
+get.hgl <- function(theta,K,y,hglmethod) {
 #
 # Function get.hgl --- get Hessian, gradient, and log likelihood.
 #
-meth <- match.arg(method)
 npar <- length(theta)
 tpm  <- getTpm(theta,K,stationary=TRUE)
 ispd <- revise.ispd(tpm)
 rrr  <- attr(y,"lvls")
 Rho  <- getRho(theta,K,rhovals=rrr,stationary=TRUE,
                prednames="Intercept")
-m    <- nrow(Rho)
+m    <- length(rrr)
 dp   <- derivp(theta,K)
 d1p  <- dp$d1p
 d2p  <- dp$d2p
@@ -35,7 +34,7 @@ for(yl in y) {
     j1           <- j2 + 1
     j2           <- j2 + ny
     fyl          <- fy[,j1:j2]
-    workfun      <- switch(meth,fortran=forgethgl,oraw=orgethgl,raw=rgethgl)
+    workfun      <- switch(hglmethod,fortran=forgethgl,oraw=orgethgl,raw=rgethgl)
     xxx          <- workfun(fyl,ylv,ymiss,tpm,ispd,d1pi,d2pi,npar,d1p,d2p,m,d1f,d2f)
     ky           <- ky + 1
     lll[ky]      <- xxx$ll

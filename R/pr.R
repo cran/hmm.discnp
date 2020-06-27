@@ -87,8 +87,6 @@ for(i in 1:nseq) {
             stop(paste("Mismatch between length of state sequence\n",
                        "and length of observation sequence.\n",sep=""))
         if(type > 1) y2 <- y[[ii]][,2]
-        #poot <- try(tpm[cbind(si[-n],si[-1])])
-        #if(inherits(poot,"try-error")) browser()
         bit1 <- log(ispd[si[1]]) + sum(log(tpm[cbind(si[-n],si[-1])]))
         bit2 <- switch(type,
                        sum(log(Rho[cbind(y1,si)])),

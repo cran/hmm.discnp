@@ -21,7 +21,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
     optimiser=c("nlm","optim"), optimMethod=NULL, stationary=cis,
     mixture=FALSE, cis=TRUE, indep=NULL, tolerance=1e-4, digits=NULL,
     verbose=FALSE, itmax=200, crit=c("PCLL","L2","Linf","ABSGRD"),
-    keep.y=FALSE, keep.X=keep.y,X=NULL,
+    X=NULL,keep.y=FALSE, keep.X=keep.y,
     addIntercept=TRUE, lmc=10, hessian=FALSE,...)
 }
 \arguments{
@@ -80,11 +80,14 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    is calculated in the dQuote{obvious} way.
 }
 \item{rand.start}{
-   A list consisting of two logical scalars which must be named
-   \code{tpm} and \code{Rho}, if \code{tpm} is TRUE then the function
+   Either a logical scalar or a list consisting of two logical
+   scalars which must be named \code{tpm} and \code{Rho}.  If the
+   former, it is converted internally into a list with entries
+   named \code{tpm} and \code{Rho}, both having the same value as
+   the original argument.  If \code{tpm} is TRUE then the function
    init.all() chooses entries for the starting value of \code{tpm}
-   at random; likewise for \code{Rho}.  This argument defaults to
-   \code{list(tpm=FALSE,Rho=FALSE)}.
+   at random; likewise for \code{Rho}.  If left \code{NULL}, this
+   argument defaults to \code{list(tpm=FALSE,Rho=FALSE)}.
 }
 \item{method}{
    Character string, either \code{"bf"}, \code{"EM"},
@@ -237,19 +240,6 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    (The \code{nlm()} and \code{optim()} functions have their own
    obscure stopping criteria.)
 }
-\item{keep.y}{
-   Logical scalar; should the observations \code{y} be returned as
-   a component of the value of this function?
-}
-\item{keep.X}{
-   Logical scalar; should the predictors \code{X} be returned as
-   a component of the value of this function?  Note that the
-   value of \code{keep.X} will be silently set equal to \code{FALSE}
-   unless it actually \dQuote{makes sense} to keep \code{X}.  I.e.
-   unless the observations are \emph{univariate}
-   and \code{X} is actually supplied, i.e. is
-   not \code{NULL}.
-}
 \item{X}{An optional \emph{numeric} matrix, or a list of such
    matrices, of \emph{predictors}.  The use of such predictors
    is (currently, at least) applicable only in the univariate
@@ -275,6 +265,19 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    predictors are not permitted.  It may be possible to use factor
    predictors by supplying \code{X} or its entries as the output of
    \code{\link{model.matrix}()}; this will depend on circumstances.
+}
+\item{keep.y}{
+   Logical scalar; should the observations \code{y} be returned as
+   a component of the value of this function?
+}
+\item{keep.X}{
+   Logical scalar; should the predictors \code{X} be returned as
+   a component of the value of this function?  Note that the
+   value of \code{keep.X} will be silently set equal to \code{FALSE}
+   unless it actually \dQuote{makes sense} to keep \code{X}.  I.e.
+   unless the observations are \emph{univariate}
+   and \code{X} is actually supplied, i.e. is
+   not \code{NULL}.
 }
 \item{addIntercept}{
    Logical scalar.  Should a column of ones, corresponding to an
@@ -525,7 +528,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    value of 0.03193748 when iterations ceased.
 }
 
-\section{Notes}{
+\section{Notes --- Various}{
    This function \emph{used} to have an argument \code{newstyle},
    a logical scalar (defaulting to \code{TRUE}) indicating whether
    (in the univariate setting) the emission probabilities
@@ -599,6 +602,34 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    when \code{stationary} is \code{FALSE}.  I have yet to figure
    out/track down what is going on here.
 }
+\section{Note on \code{method}}{
+   If the \code{method} is \code{"EM"} it is actually possible
+   for the log likelihood to \emph{decrease} at some EM step.
+   This is \dQuote{impossible in an ideal world} but can happen
+   to the fact the EM algorithm, as implemented in this package
+   at least, cannot maximise the expected log likelihood if the
+   component corresponding to the initial state probability
+   distribution is taken into consideration.  This component
+   should ideally be maximised subject to the constraint that
+   \code{t(P)\%*\%ispd = ispd}, but this constraint seems to
+   effectively impossible to impose.  Lagrangian multipliers
+   don't cut it.  Hence the summand in question is ignored at
+   the M-step.  This usually works alright since the summand
+   is asymptotically negligible, but things can sometimes go
+   wrong.  If such a decrease occurs, an error is thrown.
+
+   In previous versions of this package, instead of throwing
+   an error the \code{hmm()} function would automatically switch
+   to either the \code{"bf"} or the \code{"LM"} method, depending
+   whether a matrix \code{X} of auxiliary predictors is supplied,
+   starting from the penultimate parameter estimates produced
+   by the EM algorithm.   However this appears not to be a good
+   idea; those \dQuote{penultimate estimates} appear not to be
+   good starting values for the other methods.  Hence an error
+   is now thrown and the user is explicitly instructed to invoke
+   a different method, \dQuote{starting from scratch}.
+}
+
 \details{
    \itemize{
    \item \bold{Univariate case:}

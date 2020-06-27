@@ -66,6 +66,8 @@ if(stationary) {
 nrhopar <- (nrow(par0$Rho) - K)*(ncol(par0$Rho)-2)
 ntpmpar <- K*(K-1)
 npar    <- nispar + ntpmpar + nrhopar
+Rho     <- par0$Rho
+rhovals <- levels(Rho$y)
 
 # Put together a list of data frames consisting of y and the
 # predictors.
@@ -80,14 +82,12 @@ if(method=="EM") {
 # Perform initial setting-up.
     tpm       <- par0$tpm
     ispd      <- par0$ispd
-    Rho       <- par0$Rho
     t1        <- as.vector(tpm[,-K])
     t2        <- paramExtract(Rho)
     old.theta <- c(t1,t2)
     fy        <- ffun(Dat,Rho,type=1)
     rp        <- recurse(fy,tpm,ispd,lns)
     old.ll    <- sum(log(rp$llc))
-    rhovals   <- levels(Rho$y)
 
 # Set the number of digits with which to print out
 # "progress reports".
@@ -124,32 +124,16 @@ if(is.null(digits)) digits <- 2+ceiling(abs(log10(tolerance)))
         fy <- ffun(Dat,Rho,type=1)
     	rp <- recurse(fy,tpm,ispd,lns)
     	ll <-  sum(log(rp$llc))
-#if(em.step >= 106) browser()
 
     	chnge[1]  <- 100*(ll - old.ll)/(abs(old.ll + tolerance))
         if(ll < old.ll) {
-            Xused <- !is.null(X)
-            if(verbose) {
-                cat("Decrease in log likelihood --- by ",abs(chnge[1]),
-                    " percent.\n",sep="")
-                cat("Switching to the", if(Xused) "\"bf\"" else "\"LM\"","method.\n")
-            }
-            par  <- list(ispd=ispd,tpm=tpm,Rho=Rho)
-            if(Xused) {
-                rslt <- hmmNumOpt(Dat,par0=par,stationary=stationary,verbose=verbose,
-                                  itmax=itmax,bicm=bicm,rhovals=rhovals,npar=npar,
-                                  optimiser=optimiser,optimMethod=optimMethod,
-                                  hessian=hessian,...)
-                method <- "bf"
-            } else {
-                rslt <- hmmLM(Dat,par0=par,itmax=itmax,crit=crit,lmc=lmc,
-                              tolerance=tolerance,bicm=bicm,rhovals=rhovals,
-                              hglmethod=hglmethod,digits=digits,verbose=verbose)
-                method <- "LM"
-            }
-            rslt$prior.emsteps <- em.step
-            break
-        } 
+            decll  <- round(abs(chnge[1]),digits)
+            whinge <- paste0("There was a decrease in the log likelihood in the\n",
+                             "  amount of ",decll,".  The EM algorithm\n",
+                             "  appears not to be working.  See the help for an\n",
+                             "  explanation.  Change to one of the other methods.\n")
+            stop(whinge)
+        }
 # Test for convergence:
         t1        <- as.vector(tpm[,-K])
         t2        <- paramExtract(Rho)

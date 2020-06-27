@@ -8,7 +8,7 @@ ispd <- revise.ispd(tpm)
 rrr  <- attr(y,"lvls")
 Rho  <- getRho(theta,K,rhovals=rrr,stationary=TRUE,
                prednames="Intercept")
-m    <- nrow(Rho)
+m    <- length(rrr)
 dp   <- derivp(theta,K)
 d1p  <- dp$d1p
 dpi  <- derivpi(ispd,tpm,npar,dp)

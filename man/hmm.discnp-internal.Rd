@@ -71,7 +71,7 @@ orgethgl(fy, y, ymiss, tpm, xispd, d1pi, d2pi, npar, d1p,
 rgethgl(fy, y, ymiss, tpm, xispd, d1pi, d2pi, npar, d1p,
           d2p, m, d1f, d2f)
 get.gl(theta, K, y)
-get.hgl(theta, K, y, method=c("fortran","oraw","raw"))
+get.hgl(theta, K, y, hglmethod)
 get.l(theta, K, y)
 getIspd(pars, K)
 getRho(pars, K, rhovals, stationary, prednames)

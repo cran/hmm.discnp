@@ -84,7 +84,7 @@ repeat { # Swear again; i.e. recurse.
 tpm   <- getTpm(theta,K,stationary=TRUE)
 ispd  <- revise.ispd(tpm)
 Rho   <- getRho(theta,K,rhovals=rhovals,stationary=TRUE,prednames="Intercept")
-xxx   <- get.hgl(theta,K,y,method=hglmethod)
+xxx   <- get.hgl(theta,K,y,hglmethod=hglmethod)
 hess  <- xxx$hess
 grad  <- xxx$grad
 ll    <- xxx$ll

@@ -2,7 +2,7 @@ lmstep <- function(theta,K,y,lmc,hglmethod) {
 #
 # Function lmstep to do one Levenberg-Marquardt step.
 #
-xxx     <- get.hgl(theta,K,y,method=hglmethod)
+xxx     <- get.hgl(theta,K,y,hglmethod=hglmethod)
 hess    <- xxx$hess
 ev      <- eigen(hess)$values
 osag    <- sum(abs(xxx$grad))

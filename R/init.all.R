@@ -8,7 +8,11 @@ init.all <- function(K,rand.start,mixture,indep,yval,prednames) {
 if(K==1) return(NA)
 
 # Make rand.start if necessary.
-if(is.null(rand.start)) rand.start <- list(tpm=FALSE,Rho=FALSE)
+if(is.null(rand.start)) {
+    rand.start <- list(tpm=FALSE,Rho=FALSE)
+} else if(is.logical(rand.start)) {
+    rand.start <- list(tpm=rand.start,Rho=rand.start)
+}
 
 # Do tpm --- the easy bit!!!
 if(rand.start$tpm)

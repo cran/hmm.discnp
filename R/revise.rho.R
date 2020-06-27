@@ -49,8 +49,6 @@ if(type==1) {
         Rho <- t(t(Rho)/apply(Rho,2,sum))
         rownames(Rho) <- lvls
         Rho <- cnvrtRho(Rho)
-#       RhoBack <- cnvrtRho(Rho)
-#       if(any(!is.finite(RhoBack))) browser()
     }
 }
 
