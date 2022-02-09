@@ -20,8 +20,9 @@ C Output from Public domain Ratfor, version 1.03
       else
       kis = k
       endif
+      nr = k
       call afun(fy(1,kstart),xispd(1,kis),tpm,epsilon,n,nstate,wrk, xlc(
-     *kstart),alpha(1,kstart))
+     *kstart),alpha(1,kstart),nr)
       call bfun(fy(1,kstart),tpm,epsilon,n,nstate,wrk, beta(1,kstart))
       call gfun(alpha(1,kstart),beta(1,kstart),epsilon,n, nstate,wrk,gam
      *ma(1,kstart))

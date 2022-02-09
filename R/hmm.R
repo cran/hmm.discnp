@@ -164,7 +164,9 @@ if(K > 1) {
         }
     } else {
         levels(rslt$Rho$state) <- stnms
-        rslt <- append(rslt,after=1,list(Rho.matrix=cnvrtRho(rslt$Rho)))
+        if(identical(prednames,"Intercept")) {
+            rslt <- append(rslt,after=1,list(Rho.matrix=cnvrtRho(rslt$Rho)))
+        }
     }
 }
 

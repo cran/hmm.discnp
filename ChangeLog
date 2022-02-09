@@ -1307,3 +1307,17 @@ when using the buggy code, but only slightly different.  And
 no crashes.  Go figure.  Have now fixed get.gl().
 
 Incremented the version number (to 3.0-6).  Uploaded to CRAN.
+
+09/02/2022
+
+Changed the response, to a decrease in the log likelihood when
+the EM algorithm is used, from throwing an error to returning the
+model corresponding to the last "valid" EM step, with a message
+pointing out that a decrease had occurred and suggesting the use
+of the returned value to provided starting values for the "bf" or
+"LM" algorithms.
+
+Adjusted the help file for hmm() accordingly.  Augmented the
+examples accordingly.
+
+Incremented the version number (to 3.0-7).  Uploaded to CRAN.

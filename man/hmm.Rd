@@ -578,29 +578,30 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    \code{ispd} is a named vector, the names being the same as the
    row (and column) names of \code{tpm}.
 
-   If \code{method} is equal to \code{"EM"} it \emph{may} get
-   switched to \code{"bf"} at some EM step if there is a decrease
-   in the log likelihood.  This is \dQuote{theoretically impossible}
-   but can occur in practice due to an intricacy in the way that
-   the EM algorithm treats \code{ispd} when \code{stationary}
-   is \code{TRUE}.   It turns out to be effectively impossible to
-   maximise the expected log likelihood unless the term in that
-   quantity corresponding to \code{ispd} is ignored (whence it
-   \emph{is} ignored).  Ignoring this term is \dQuote{asymptotically
-   negligible} but can have the unfortunate effect of occasionally
-   leading to a decrease in the log likelihood.
+   If \code{method} is equal to \code{"EM"} there may be a
+   \emph{decrease} (!!!) in the log likelihood at some EM step.
+   This is \dQuote{theoretically impossible} but can occur in
+   practice due to an intricacy in the way that the EM algorithm
+   treats \code{ispd} when \code{stationary} is \code{TRUE}.
+   It turns out to be effectively impossible to maximise the expected
+   log likelihood unless the term in that quantity corresponding
+   to \code{ispd} is ignored (whence it \emph{is} ignored).
+   Ignoring this term is \dQuote{asymptotically negligible} but
+   can have the unfortunate effect of occasionally leading to a
+   decrease in the log likelihood.
 
-   If such a decrease is detected, then the algorithm switches over
-   to using the \code{"bf"} method of maximisation (which is not
-   beset by this difficulty).  The current estimates of \code{ispd},
-   \code{tpm} and \code{Rho} are used as starting values
-   for the \code{"bf"} method.
+   If such a decrease is detected, then the algorithm terminates
+   and issues a message to the effect that the decrease occurred
+   and suggesting that another method be used and that perhaps the
+   results from the current curtailed application of the \code{"EM"}
+   method could be used as starting values.
 
-   It seems to me that it \emph{should} be the case that such
-   switching can occur only if \code{stationary} is \code{TRUE}.
-   However I have encountered instances in which the switch occurs
-   when \code{stationary} is \code{FALSE}.  I have yet to figure
-   out/track down what is going on here.
+   It seems to me that it \emph{should} be the case that such a
+   decrease in the log likelihood can occur only if \code{stationary}
+   is \code{TRUE}.  However I have encountered instances in which
+   a decrease occurred when \code{stationary} was \code{FALSE}.
+   I have yet to figure out/track down what is going on here.
+
 }
 \section{Note on \code{method}}{
    If the \code{method} is \code{"EM"} it is actually possible
@@ -656,11 +657,13 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    names default to \code{V1}, \code{V2} \dots.
 
    The probabilities of the emissions taking on their
-   various possible values are given by \deqn{\Pr(Y = y_i |
-   \boldsymbol{x}, \textrm{state}=S) = \ell_i/\sum_{j=1}^m
-   \ell_j}{\code{Pr(Y = y_i | x, state=S) = l[i]/sum(l)}} where
-   \eqn{\ell_j}{l_j} is the \eqn{j\textrm{th}}{\code{j}th} entry of
-   \eqn{\boldsymbol{\beta}^{\top}\boldsymbol{x}}{\code{t(beta)\%*\%x}}
+   various possible values are given by
+   \deqn{\Pr(Y = y_i | \boldsymbol{x}, \textrm{state}=S) =
+   \ell_i/\sum_{j=1}^m \ell_j}{%
+   \code{Pr(Y = y_i | x, state=S) = l[i]/sum(l)}}
+   where \eqn{\ell_j}{l_j} is the \eqn{j\textrm{th}}{\code{j}th}
+   entry of \eqn{\boldsymbol{\beta}^{\top}\boldsymbol{x}}{%
+   \code{t(beta)\%*\%x}}
    and  where in turn \eqn{\boldsymbol{x}}{\code{x}} is the vector
    of predictors and \eqn{\boldsymbol{\beta}}{\code{beta}} is the
    coefficient vector in the linear predicator that corresponds to
@@ -761,9 +764,21 @@ print(cnvrtRho(fit$Rho)) # A matrix of probabilities
 
 # 3.
 xxx <- with(SydColDisc,split(y,f=list(locn,depth)))
-fitSydCol <- hmm(xxx,K=2,itmax=10) # Two states: above and below the thermocline.
+Yval <- c("lo","mlo","m","mhi","hi")
+# Two states: above and below the thermocline.
+fitSydCol <- hmm(xxx,yval=Yval,K=2,verb=TRUE,itmax=10)
 
 # 4.
+\dontrun{ # Takes too long.
+fitlm <- hmm(xxx,yval=Yval,K=2,method="LM",verb=TRUE)
+fitem <- hmm(xxx,yval=Yval,K=2,verb=TRUE)
+# Algorithm terminates due to a decrease in the log likelhood
+# at EM step 64.
+newfitlm <- hmm(xxx,yval=Yval,par0=fitem,method="LM",verb=TRUE)
+# The log likelihood improves from -1900.988 to -1820.314
+}
+
+# 5.
 fitLesCount <- hmm(lesionCount,K=2,itmax=10) # Two states: relapse and remission.
 }
 \keyword{models}

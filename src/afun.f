@@ -1,5 +1,5 @@
 C Output from Public domain Ratfor, version 1.03
-      subroutine afun(fy,xispd,tpm,epsilon,n,nstate,wrk,xlc,alpha)
+      subroutine afun(fy,xispd,tpm,epsilon,n,nstate,wrk,xlc,alpha,nr)
       implicit double precision(a-h,o-z)
       dimension wrk(nstate), xispd(nstate), xlc(n)
       dimension fy(nstate,n), tpm(nstate,nstate), alpha(nstate,n)
@@ -25,6 +25,7 @@ C Output from Public domain Ratfor, version 1.03
 23006 continue
 23007 continue
       endif
+      kt = 1
       do23008 kt = 2,n 
       tsum = zero
       ktm = kt - 1

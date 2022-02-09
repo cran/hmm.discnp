@@ -1,6 +1,6 @@
 Package: hmm.discnp
-Version: 3.0-6
-Date: 2020-06-27
+Version: 3.0-7
+Date: 2022-02-09
 Title: Hidden Markov Models with Discrete Non-Parametric Observation
         Distributions
 Author: Rolf Turner
@@ -19,6 +19,6 @@ LazyData: true
 ByteCompile: true
 License: GPL (>= 2)
 NeedsCompilation: yes
-Packaged: 2020-06-27 03:30:13 UTC; rolf
+Packaged: 2022-02-09 00:12:01 UTC; rolf
 Repository: CRAN
-Date/Publication: 2020-06-28 00:00:07 UTC
+Date/Publication: 2022-02-09 03:10:02 UTC

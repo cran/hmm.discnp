@@ -25,8 +25,9 @@ do k = 1,nreps {
         }
 
 # Update the alpha's.
+nr = k
 	call afun(fy(1,kstart),xispd(1,kis),tpm,epsilon,n,nstate,wrk,
-                  xlc(kstart),alpha(1,kstart))
+                  xlc(kstart),alpha(1,kstart),nr)
 
 # Update the beta's.
 	call bfun(fy(1,kstart),tpm,epsilon,n,nstate,wrk,

@@ -128,11 +128,17 @@ if(is.null(digits)) digits <- 2+ceiling(abs(log10(tolerance)))
     	chnge[1]  <- 100*(ll - old.ll)/(abs(old.ll + tolerance))
         if(ll < old.ll) {
             decll  <- round(abs(chnge[1]),digits)
-            whinge <- paste0("There was a decrease in the log likelihood in the\n",
-                             "  amount of ",decll,".  The EM algorithm\n",
-                             "  appears not to be working.  See the help for an\n",
-                             "  explanation.  Change to one of the other methods.\n")
-            stop(whinge)
+            whinge <- paste0("\n  At the ",em.step,"th step, there was a DECREASE\n",
+                             "  in the log likelihood in the amount of ",decll,".\n",
+                             "  The EM algorithm appears not to be working.\n",
+                             "  See the help for an explanation.  Change to one\n",
+                             "  of the other methods, perhaps using the current\n",
+                             "  results as starting values.\n")
+
+            message(whinge)
+            converged <- FALSE
+            nstep <- em.step-1
+            break
         }
 # Test for convergence:
         t1        <- as.vector(tpm[,-K])

@@ -1,4 +1,4 @@
-subroutine afun(fy,xispd,tpm,epsilon,n,nstate,wrk,xlc,alpha)
+subroutine afun(fy,xispd,tpm,epsilon,n,nstate,wrk,xlc,alpha,nr)
 implicit double precision(a-h,o-z)
 dimension wrk(nstate), xispd(nstate), xlc(n)
 dimension fy(nstate,n), tpm(nstate,nstate), alpha(nstate,n)
@@ -17,6 +17,10 @@ tsum = zero
 do j = 1,nstate {
 	wrk(j) =  fy(j,1)*xispd(j)
 	tsum = tsum + wrk(j)
+#if(nr == 1) {
+#    call dblepr("wrk(j):",-1,wrk(j),1)
+#    call dblepr("tsum:",-1,tsum,1)
+#}
 }
 
 if(tsum < epsilon) {
@@ -31,6 +35,9 @@ else {
 		alpha(j,1) = wrk(j)/tsum
 	}
 }
+kt = 1
+#call intpr("Old code; kt =",-1,kt,1)
+#call dblepr("Old code; xlc(kt)=",-1,xlc(kt),1)
 
 # Run through the remaining n-1 of the alphas (recursing!).
 do kt = 2,n {
@@ -56,6 +63,8 @@ do kt = 2,n {
 			alpha(j,kt) = wrk(j)/tsum
 		}
 	}
+#call intpr("Old code; kt =",-1,kt,1)
+#call dblepr("Old code; xlc(kt)=",-1,xlc(kt),1)
 }
 
 return

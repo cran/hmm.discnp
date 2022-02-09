@@ -15,7 +15,8 @@ if(ncol(Y)==2) {
                                         v[is.na(v)] <- 1
                                         return(v)
                                     },yf=Y[,1],cvr=caviar)
-    return(do.call(cbind,rslt))
+    clyde <- do.call(cbind,rslt)
+    return(clyde)
 } else {
     y      <- Y$y
     Pred   <- Y[,-1,drop=FALSE]
@@ -95,11 +96,11 @@ function(Dat,Rho,type) {
 # type = 2 <--> bivariate, independent -- f2
 # type = 3 <--> bivariate, dependent   -- f3
 
-fy <- lapply(Dat,f[[type]],Rho=Rho)
-if(any(sapply(fy,is.null))) {
+fly <- lapply(Dat,f[[type]],Rho=Rho)
+if(any(sapply(fly,is.null))) {
    if(interactive) browser() else stop("Null fy component(s).\n")
 }
-fy <- do.call(rbind,fy)
+fy <- do.call(rbind,fly)
 t(fy)
 }
 })

@@ -5,6 +5,7 @@ hmmLM <- function(y,par0,itmax=200,crit,lmc=10,tolerance,
 # hidden Markov model with discrete emissions, modelled
 # non-parametrically, using the Levenberg-Marquardt algorithm.
 #
+# discnp
 
 # Do some initial housekeeping.
 K      <- nrow(par0$tpm)
