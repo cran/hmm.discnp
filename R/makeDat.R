@@ -36,7 +36,7 @@ makeDat <- function(y,X,addIntercept) {
         for(i in seq(along=rslt)) {
             yi <- data.frame(y=factor(y[[i]],levels=lvls))
             Xi <- if(is.null(X)) data.frame(Intercept=1) else X[[i]]
-            rslt[[i]] <- cbind(yi,Xi)
+            rslt[[i]] <- try(cbind(yi,Xi))
         }
         attr(rslt,"prednames") <- if(is.null(X)) "Intercept" else attr(X,"prednames")
         attr(rslt,"lvls") <- lvls

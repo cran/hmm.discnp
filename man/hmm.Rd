@@ -35,7 +35,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
 } \item{yval}{
    A vector (of length \code{m}, say) of possible values for the
    data or a list of two such vectors (of lengths \code{m1} and
-   \code{m2}, say, one for each of the two variates in the bivarate
+   \code{m2}, say, one for each of the two variates in the bivariate
    settings).  These vectors default to the sorted unique values of
    the respective variates as provided in \code{y}.  If \code{yval}
    is supplied and any value of \code{y} does not match some value
@@ -77,7 +77,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    Note that \code{K=1} is acceptable; if \code{K} is 1 then
    all observations are treated as being independent and the
    non-parametric estimate of the distribution of the observations
-   is calculated in the dQuote{obvious} way.
+   is calculated in the \dQuote{obvious} way.
 }
 \item{rand.start}{
    Either a logical scalar or a list consisting of two logical
@@ -209,8 +209,8 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    If the convergence criterion has not been met by the time
    \code{itmax} steps have been performed, a warning message
    is printed out, and the function stops.  A value is returned by
-   the function anyway, with the logical component "converged" set
-   to FALSE.  When \code{method="bf"} the \code{itmax} argument
+   the function anyway, with the logical component \code{converged} set
+   to \code{FALSE}.  When \code{method="bf"} the \code{itmax} argument
    is passed to \code{nlm()} as the value of \code{iterlim}
    or to \code{optim()} as the value of \code{maxit}.  If the
    (somewhat obscure) convergence criteria of \code{nlm()} or
@@ -241,9 +241,9 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    obscure stopping criteria.)
 }
 \item{X}{An optional \emph{numeric} matrix, or a list of such
-   matrices, of \emph{predictors}.  The use of such predictors
-   is (currently, at least) applicable only in the univariate
-   emissions setting.  If \code{X} is a list it must be
+   matrices, of \dQuote{auxiliary} \emph{predictors}.  The use of
+   such predictors is (currently, at least) applicable only in the
+   univariate emissions setting.  If \code{X} is a list it must be
    of the same length as \code{y} and all entries of this list must
    have the same number of columns.  If the columns of any entry
    of the list are named, then they must be named for \emph{all}
@@ -261,10 +261,15 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    column must be \code{"Intercept"}.
 
    Note that \code{X} (or its entries) must be a \emph{numeric}
-   matrix (or must be matrices) --- no data frames!  Factor
+   matrix (or must be numeric matrices) --- not data frames!  Factor
    predictors are not permitted.  It may be possible to use factor
    predictors by supplying \code{X} or its entries as the output of
    \code{\link{model.matrix}()}; this will depend on circumstances.
+
+   The fitted coefficients that are produced when \code{X} is supplied,
+   are (to put it mildly) a bit difficult to interpret.  See
+   \bold{Fitted Coefficients of Auxiliary Predictors} for
+   some discussion.
 }
 \item{keep.y}{
    Logical scalar; should the observations \code{y} be returned as
@@ -280,11 +285,14 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    not \code{NULL}.
 }
 \item{addIntercept}{
-   Logical scalar.  Should a column of ones, corresponding to an
-   intercept term, be prepended to each of of the matrices in the
-   list \code{X}?  (The user should remember that this argument
-   defaults to \code{TRUE}.)
+   Logical scalar.  Should a column of ones, corresponding to
+   an intercept term, be prepended to each of the matrices in
+   the list \code{X}?   If each of these matrices already has an
+   initial column of ones, then setting \code{addIntercept=TRUE}
+   results in an error being thrown.  If this is not the case,
+   then by default an initial column of ones is added.
 }
+
 \item{lmc}{
    Numeric scalar.  The (initial) \dQuote{Levenberg-Marquardt
    correction} parameter.  Used only if \code{method="LM"},
@@ -347,7 +355,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    interpretable form.
 }
 \item{tpm}{
-   The fitted value of the transition probabilty matrix \code{tpm}.
+   The fitted value of the transition probability matrix \code{tpm}.
 }
 \item{stationary}{
    Logical scalar; the value of the \code{stationary} argument.
@@ -428,7 +436,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
 
    Note that in the \code{nlm()} case a value of \code{code}
    equal to 2 indicates \dQuote{probable} convergence, and a value
-   of 3 indicates \dQuote{possible} covergence.  However in this
+   of 3 indicates \dQuote{possible} convergence.  However in this
    context \code{converged} is set equal to \code{TRUE} \emph{only}
    if \code{code} is 1.
 }
@@ -513,6 +521,14 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
 }
 }
 
+\section{Thanks}{
+A massive nest of bugs was eliminated in the transition from version
+3.0-8 to version 3.0-9.  These bugs arose in the context of using
+auxiliary predictor variables (argument \code{X}).  The handling of
+such auxiliary predictors was completely messed up.  I am grateful
+to Leah Walker for pointing out the problem to me.
+}
+
 \section{Warnings}{
    The ordering of the (hidden) states can be arbitrary.  What the
    estimation procedure decides to call \dQuote{state 1} may not be
@@ -591,10 +607,10 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    decrease in the log likelihood.
 
    If such a decrease is detected, then the algorithm terminates
-   and issues a message to the effect that the decrease occurred
-   and suggesting that another method be used and that perhaps the
-   results from the current curtailed application of the \code{"EM"}
-   method could be used as starting values.
+   and issues a message to the effect that the decrease occurred.
+   The message suggests that another method be used and that perhaps
+   the results from the penultimate EM step (which are returned by
+   this function) be used as starting values.
 
    It seems to me that it \emph{should} be the case that such a
    decrease in the log likelihood can occur only if \code{stationary}
@@ -629,6 +645,114 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    good starting values for the other methods.  Hence an error
    is now thrown and the user is explicitly instructed to invoke
    a different method, \dQuote{starting from scratch}.
+}
+
+\section{Fitted Coefficients of the Predictors}{
+It is of course of interest to understand the meaning of the
+coefficients that are fitted to the predictors in the model.
+If \code{X} is supplied then the number of predictors is (as a rule)
+one (for the intercept) plus the number of columns in each entry
+of \code{X}.  We say \dQuote{as a rule} because, e.g., the entries
+of \code{X} could each have an \dQuote{intercept} column, or the
+\code{addIntercept} argument could be \code{FALSE}.  If \code{X}
+is not supplied there is only one predictor, named \code{Intercept}.
+
+The interpretation of these predictor coefficients is a bit subtle.
+To get an idea of what it's all about, consider the output from
+example \code{4}.  (See \bold{Examples}).  The fitted coefficients
+in question are to be found in columns 3 and onward of the component
+\code{Rho} of the object returned by \code{hmm()}.  In the context
+of example \code{4}, this object is \code{fit.wap}.  (The suffix
+\code{wap} stands for \dQuote{with auxiliary predictors}.)
+\preformatted{
+  fit.wap$Rho
+       y state Intercept     ma.com      nh.com     bo.com
+  1   lo     1 1.3810463  0.4527982 -3.27161353 -1.9563915
+  2  mlo     1 0.1255631 -1.1402546 -1.37713744  0.5946980
+  3    m     1 0.7356526  0.1523734 -2.70841817 -0.1794645
+  4  mhi     1 0.8479798 -0.2438988 -1.12544989 -0.9650320
+  5   hi     1 0.0000000  0.0000000  0.00000000  0.0000000
+  6   lo     2 3.9439410 -0.8355306 -0.77702276  1.4963631
+  7  mlo     2 2.6189880 -1.9373885 -0.09190623  0.8316870
+  8    m     2 2.1457317 -1.7276183  0.19524655 -0.3249485
+  9  mhi     2 1.8834139 -1.3760011 -0.59806309  1.2828365
+  10  hi     2 0.0000000  0.0000000  0.00000000  0.0000000
+}
+
+If you multiply the matrix consisting of the predictor coefficients
+(columns 3 to 6 of \code{Rho} in this instance) times a vector of
+predictors you get, for each state, the \dQuote{exponential form}
+of the probabilities (\dQuote{pre-probabilities}) for each of the
+possible \code{y}-values, given the vector of predictors.
+
+E.g. set \code{x <- c(1,1,0,0)}. This vector picks up the intercept
+and indicates that the Malabar outfall has been commissioned,
+the North Head outfall has not been commissioned, and the Bondi
+Offshore outfall has not been commissioned.
+
+Now set:
+\preformatted{
+    pp1 <- (as.matrix(fit.wap$Rho)[,3:6]\%*\%x)[1:5]
+    pp2 <- (as.matrix(fit.wap$Rho)[,3:6]\%*\%x)[6:10]
+}
+Note that \code{pp1} consists of \dQuote{exponential
+probabilities} corresponding to state 1, and \code{pp2}
+consists of \dQuote{exponential probabilities} corresponding
+to state 2.  To convert the foregoing pre-probabilities to the
+actual probabilities of the \code{y}-values, we apply the ---
+undocumented --- function \code{expForm2p()}:
+\preformatted{
+    p1 <- expForm2p(pp1)
+    p2 <- expForm2p(pp2)
+}
+
+The value of \code{p1} is
+\preformatted{
+[1] 0.52674539 0.03051387 0.20456767 0.15400019 0.08417288
+}
+and that of \code{p2} is
+\preformatted{
+[1] 0.78428283 0.06926632 0.05322204 0.05819340 0.03503541
+}
+Note that \code{p1} and \code{p2} each sum to 1, as they should/must
+do.  This says, e.g., that when the system is in state 2, and
+Malabar has been commissioned but North Head and Bondi Offshore
+have not, the (estimated) probability that \code{y} is \code{"mhi"}
+(medium-high) is 0.05819340.
+
+It may be of some interest to test the hypothesis that the predictors
+have any actual predictive power at all:
+
+\preformatted{
+    fit.nap <- hmm(xxx,yval=Yval,K=2,verb=TRUE)
+    # "nap" <--> no aux. preds
+}
+
+There is a bit of a problem here, in that the likelihood \emph{decreases}
+at EM step 65.  (See the warning message.)
+
+We can check on this problem by refitting using method="LM".
+\preformatted{
+    fit.nap.lm <- hmm(xxx,yval=Yval,par0=fit.nap,method="LM",verb=TRUE)
+}
+Doing so produces only a small improvement in the log likelihood
+(from -1821.425 to -1820.314), so we really could have ignored the
+problem. We can now do \code{anova(fit.wap,fit.nap)} which gives
+
+\preformatted{
+    $stat
+    [1] 153.5491
+
+    $df
+    [1] 24
+
+    $pvalue
+    [1] 7.237102e-21
+}
+Thus the p-value is effectively zero, saying that in this instance
+the auxiliary predictors appear to have a \dQuote{significant} impact on
+the fit.
+
 }
 
 \details{
@@ -678,12 +802,32 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    columns corresponding to states.  That is the \code{Rho} component
    of \code{par0} may be provided in the form \eqn{\textrm{Rho} =
    [\rho_{ij}]}{\code{Rho = Rho[ij]}} where \eqn{\rho_{ij} = \Pr(Y = y_i
-   | S = j)}{\code{Rho[i,j]= Pr(Y = y[i] | S = j)}}.  This is permissable
+   | S = j)}{\code{Rho[i,j]= Pr(Y = y[i] | S = j)}}.  This is permissible
    as long as \code{X} is \code{NULL} and may be found to be more
    convenient and intuitive.  If the starting value for \code{Rho}
    is provided in matrix form it is (silently) converted internally
    into the data frame form, by the (undocumented) function
    \code{cnvrtRho()}.
+
+   When argument \code{X} is \emph{not} \code{NULL}, it is
+   difficult to specify a \dQuote{reasonable} value for the
+   \code{Rho} component of \code{par0}.  One might try to specify
+   \code{par0$Rho} in the data frame form.  The question of how
+   to specify the columns of \code{par0$Rho} corresponding to the
+   auxiliary predictors (columns of \code{X} or of the entries of
+   \code{X}) is a thorny one.
+
+   It is permissible in these circumstances to specify
+   \code{par0$Rho} as a matrix of probabilities, just as one
+   would do if \code{X} were \code{NULL}.  In this setting the
+   (undocumented) function \code{checkStartVal()} converts the
+   matrix of probabilities to data frame form and then appends
+   columns, all of whose entries are 0, corresponding to the
+   auxiliary predictors.  When \code{par0} is unspecified, the
+   (undocumented) function \code{init.all()} performs similar
+   construction to accommodate a non-\code{NULL} value of \code{X}.
+   Whether the resulting starting value for \code{Rho} makes any
+   real sense, is questionable.  However little else can be done.
 
    \item \bold{Independent bivariate case:} the emission
    probabilities are specified by a list of two matrices.
@@ -701,7 +845,7 @@ hmm(y, yval=NULL, par0=NULL, K=NULL, rand.start=NULL,
    }
 
    The hard work of calculating the recursive probabilities used
-   to fit the model is done by a Fortran subroutine "recurse"
+   to fit the model is done by a Fortran subroutine \code{recurse}
    (actually coded in Ratfor) which is dynamically loaded.  In the
    univariate case, when \code{X} is provided, the estimation of the
    \dQuote{linear predictor} vectors \eqn{\boldsymbol{\beta}}{beta}
@@ -769,16 +913,24 @@ Yval <- c("lo","mlo","m","mhi","hi")
 fitSydCol <- hmm(xxx,yval=Yval,K=2,verb=TRUE,itmax=10)
 
 # 4.
+X <- split(SydColDisc[,c("ma.com","nh.com","bo.com")],
+           f=with(SydColDisc,list(locn,depth)))
+X <- lapply(X,function(x){
+                 as.matrix(as.data.frame(lapply(x,as.numeric)))-1})
+fit.wap <- hmm(xxx,yval=Yval,K=2,X=X,verb=TRUE,itmax=10)
+# wap <--> with auxiliary predictors.
+
+# 5.
 \dontrun{ # Takes too long.
 fitlm <- hmm(xxx,yval=Yval,K=2,method="LM",verb=TRUE)
 fitem <- hmm(xxx,yval=Yval,K=2,verb=TRUE)
-# Algorithm terminates due to a decrease in the log likelhood
+# Algorithm terminates due to a decrease in the log likelihood
 # at EM step 64.
 newfitlm <- hmm(xxx,yval=Yval,par0=fitem,method="LM",verb=TRUE)
 # The log likelihood improves from -1900.988 to -1820.314
 }
 
-# 5.
+# 6.
 fitLesCount <- hmm(lesionCount,K=2,itmax=10) # Two states: relapse and remission.
 }
 \keyword{models}

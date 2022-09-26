@@ -125,16 +125,20 @@ if(is.null(digits)) digits <- 2+ceiling(abs(log10(tolerance)))
     	rp <- recurse(fy,tpm,ispd,lns)
     	ll <-  sum(log(rp$llc))
 
-    	chnge[1]  <- 100*(ll - old.ll)/(abs(old.ll + tolerance))
+    	chnge[1]  <- 100*(ll - old.ll)/(abs(old.ll) + tolerance)
         if(ll < old.ll) {
             decll  <- round(abs(chnge[1]),digits)
-            whinge <- paste0("\n  At the ",em.step,"th step, there was a DECREASE\n",
-                             "  in the log likelihood in the amount of ",decll,".\n",
-                             "  The EM algorithm appears not to be working.\n",
-                             "  See the help for an explanation.  Change to one\n",
-                             "  of the other methods, perhaps using the current\n",
-                             "  results as starting values.\n")
-
+            stpnum <- ordinal(em.step)
+            whinge <- paste0("\n  At the ",stpnum," step, there was a DECREASE in the\n",
+                             "  log likelihood in the amount of ",decll,". The EM\n",
+                             "  algorithm has apparently encountered the problem\n",
+                             "  induced by the \"ispd\" parameters which is explained\n",
+                             "  in the help. It is likely, although not certain, that\n",
+                             "  the results from the penultimate EM step are indeed a\n",
+                             "  local  maximum, or close to it.  It is advisable to\n",
+                             "  check on this by applying one of the other methods\n",
+                             "  using the results from the penultimate EM step (as\n",
+                             "  returned by this function) as starting values.\n")
             message(whinge)
             converged <- FALSE
             nstep <- em.step-1

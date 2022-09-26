@@ -1321,3 +1321,47 @@ Adjusted the help file for hmm() accordingly.  Augmented the
 examples accordingly.
 
 Incremented the version number (to 3.0-7).  Uploaded to CRAN.
+
+15/02/2022
+
+Fixed bug --- fix.tpm() gave wrong answers when K was greater
+than 2; the byrow=TRUE specification was incorrect.  But fix.tpm()
+was redundant anyway; should have been using getTpm() from
+directMaxStuff.R.  Adjust code replacing calls to fix.tpm() by
+calls to getTpm().  Removed the file fix.tpm.R.
+
+16/02/2022
+
+Amended the message produced when the EM algorithm encounters
+a decrease in the log likelihood. Add the ordinal() function
+(cribbed from spatstat; code in suffices.R) to get the suffix
+appended to "em.step" correct.  Adjusted the help file a bit.
+
+19/02/2022
+Fixed some glitches in the arguments of functions called by
+steepest() (caused by copying and pasting from hmmRT, where the
+argument lists are different).
+
+20/02/2022
+Adjusted the f1() function in ffun() to allow for the possibility
+that Y has a *single* column, which it will if f1() is called
+from f2().
+
+03/05/2022
+Incremented the version number (to 3.0-8).
+
+27/08/2022
+Fixed a massive nest of bugs relating to the handling of additional
+(i.e. in addition to "state") predictors.  I must not have tested
+out this facility.  Problem pointed out to me by Leah  Walker,
+25/08/2022.
+
+28/08/2022
+Added an example involving additional predictors to the help
+for hmm().
+
+26/09/2022
+Added material to the help file for hmm(), discussing the
+interpretation of the coefficients in the model that is fitted.
+
+Incremented the version number (to 3.0-9).

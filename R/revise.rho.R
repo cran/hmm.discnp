@@ -15,6 +15,10 @@ if(type==1) {
 # Make provision for there being zero actual appearances in the
 # data of some levels of Dat$y:
             mc <- coef(mnfit)
+            if(!inherits(mc,"matrix")) {
+                mc <- t(as.matrix(mc))
+                rownames(mc) <- lvls[-1]
+            }
             btm <- min(mc)
             z   <- -300 - (abs(btm) - btm)/2
             M <- matrix(z,nrow=length(lvls),ncol=ncol(mc))

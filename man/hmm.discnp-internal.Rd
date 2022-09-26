@@ -10,7 +10,6 @@
 \alias{ell}
 \alias{expForm2p}
 \alias{ffun}
-\alias{fix.tpm}
 \alias{forgethgl}
 \alias{orgethgl}
 \alias{rgethgl}
@@ -32,6 +31,8 @@
 \alias{lse}
 \alias{msRho}
 \alias{makeDat}
+\alias{ordinal}
+\alias{ordinalsuffix}
 \alias{paramExtract}
 \alias{p2expForm}
 \alias{phi2rho}
@@ -63,7 +64,6 @@ derivpi(ispd, tpm, npar, dp)
 ell(phi, G)
 expForm2p(x)
 ffun(Dat, Rho, type)
-fix.tpm(x, K)
 forgethgl(fy, y, ymiss, tpm, ispd, d1pi, d2pi, npar, d1p,
           d2p, m, d1f, d2f)
 orgethgl(fy, y, ymiss, tpm, xispd, d1pi, d2pi, npar, d1p,
@@ -97,6 +97,8 @@ lmstep(theta, K, y, lmc, hglmethod)
 lse(z)
 msRho(Rho0, G)
 makeDat(y, X, addIntercept)
+ordinal(k)
+ordinalsuffix(k)
 paramExtract(Rho)
 p2expForm(x)
 phi2rho(phi, ijk)

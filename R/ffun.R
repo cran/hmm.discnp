@@ -2,14 +2,18 @@ ffun <- local({
 
 f1 <- function(Y,Rho) {
 # 
-# Note that Y is a data frame whose first column is y (a factor)
-# and whose other columns are the predictors (possibly only the
-# "Intercept", or "constant" predictor).
+# Note that Y is a data frame whose first column is the response
+# (a factor) and whose other columns are the predictors (possibly
+# only the "Intercept", or "constant" predictor).
+
 #
-if(ncol(Y)==2) {
+if(ncol(Y)==1 | (ncol(Y)==2 & names(Y)[2]=="Intercept")) {
 # No predictors (other than "Intercept").
 # So we can do it the easy way.
-    caviar <- cnvrtRho(Rho)
+# Need to check whether Rho is a data frame, since f1() might
+# have been called by f2() in which case Rho is a matrix (already)
+# and doesn't need conversion.
+    caviar <- if(inherits(Rho,"data.frame")) cnvrtRho(Rho) else Rho
     rslt   <- lapply(1:ncol(caviar),function(k,yf,cvr){
                                         v <- cvr[cbind(yf,k)]
                                         v[is.na(v)] <- 1
@@ -19,11 +23,11 @@ if(ncol(Y)==2) {
     return(clyde)
 } else {
     y      <- Y$y
-    Pred   <- Y[,-1,drop=FALSE]
+    Pred   <- as.matrix(Y[,-1,drop=FALSE])
     state  <- levels(Rho$state)
     rslt   <- vector("list",length(state))
     names(rslt) <- state
-    indmat <- cbind(y,seq(along=y))
+    indmat <- cbind(seq(along=y),y)
 
 # Note that we are cbinding a *factor* to a numeric vector, which
 # coerces the factor to numeric mode so that the resulting entries
@@ -32,10 +36,10 @@ if(ncol(Y)==2) {
 # work correctly.
     for(k in state) {
         B   <- as.matrix(Rho[Rho$state==k,-(1:2)])
-        Tmp <- B%*%t(Pred)
-        Tmp <- t(t(Tmp) - apply(Tmp,2,max))
+        Tmp <- t(B%*%t(Pred))
+        Tmp <- Tmp - apply(Tmp,1,max)
         Tmp <- exp(Tmp)
-        den <- apply(Tmp,2,sum)
+        den <- apply(Tmp,1,sum)
         num <- Tmp[indmat]
         prb <- num/den
         prb[is.na(prb)] <- 1

@@ -36,8 +36,7 @@ repeat { # Swear again; i.e. recurse.
 	if(verbose) cat(paste('Lev.-Marq. step ',lm.step,':\n',sep=''))
 	xxx   <- lmstep(theta,K,y,lmc,hglmethod)
 	theta <- xxx$theta
-	zeta  <- theta[1:npro]
-	tpm   <- fix.tpm(zeta,K)
+        tpm   <- getTpm(theta,K,TRUE)
 	if(identical(all.equal(tpm,diag(K)),TRUE)) {
 		return(list(converged=FALSE,message="tpm equals identity"))
 	}

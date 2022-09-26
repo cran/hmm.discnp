@@ -33,8 +33,7 @@ sd.step <- 1
 repeat { # Swear again; i.e. recurse.
 	if(verbose) cat(paste('SD step ',sd.step,':\n',sep=''))
 	theta <- steepest(K,y,theta)
-	zeta  <- theta[1:npro]
-	tpm   <- fix.tpm(zeta,K)
+        tpm   <- getTpm(theta,K,TRUE)
 	if(identical(all.equal(tpm,diag(K)),TRUE)) {
 		return(list(converged=FALSE,message="tpm equals identity"))
 	}

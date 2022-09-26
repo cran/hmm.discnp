@@ -90,7 +90,18 @@ if(is.null(par0)) {
                 }
                 rownames(par0$Rho) <- yval
             }
-            par0$Rho <- cnvrtRho(par0$Rho)
+            newRho <- cnvrtRho(par0$Rho)
+            ncx <- length(prednames)
+            if(prednames[[1]]=="Intercept") {
+                Cx <- matrix(0,nrow(newRho),ncx-1)
+                colnames(Cx) <- prednames[-1]
+                newRho <- cbind(newRho,as.data.frame(Cx))
+            } else {
+                Cx <- matrix(0,nrow(newRho),ncx)
+                colnames(Cx) <- prednames
+                newRho <- cbind(newRho[,-3],as.data.frame(Cx))
+            }
+            par0$Rho <- newRho
         }
         lvls <- levels(par0$Rho$y)
         if(!isTRUE(all.equal(sort(yval),sort(lvls)))) {

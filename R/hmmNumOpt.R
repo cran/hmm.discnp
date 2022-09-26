@@ -38,6 +38,7 @@ if(length(pars0) == np0) {
 }
 
 .cache4nlmPars     <- new.env()
+assign("kount",0,envir=.cache4nlmPars)
 
 if(useAnalGrad) {
     objFun <- function(pars,Dat,K) {
@@ -72,10 +73,14 @@ if(useAnalGrad) {
         }
     } else {
         objFun <- function(pars,Dat,K) {
+        kount <- .cache4nlmPars$kount+1
+cat("count=",kount,"pars=",pars,"\n")
+.cache4nlmPars$kount <- kount
             prev.pars <- .cache4nlmPars$last.pars
             .cache4nlmPars$prev.pars <- prev.pars
             .cache4nlmPars$last.pars <- pars
             xxx <- try(get.l(pars,K,Dat),silent=TRUE)
+            #xxx <- try(get.gl(pars,K,Dat)$ll,silent=TRUE)
             if(inherits(xxx,"try-error")) {
                 stop("Log likelihood problem.\n")
             }
@@ -92,6 +97,8 @@ if(optimiser=="nlm") {
                  Dat=Dat,K=K,hessian=hessian)
     dotz <- list(...)
     dotz$useAnalGrad <- NULL
+    dotz$keep.x <- NULL
+    dotz$keep.y <- NULL
     argh <- c(argh,dotz)
     mrslt <- try(do.call(nlm,argh),silent=TRUE)
     if(inherits(mrslt,"try-error")) {

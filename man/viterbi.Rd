@@ -54,8 +54,8 @@ viterbi(y, model = NULL, tpm, Rho, ispd=NULL,log=FALSE, warn=TRUE)
   actually make no difference whether \code{log} is set to \code{TRUE}.
   I just included the option because I could.  Also the \code{HMM}
   package uses the logarithm approach so setting \code{log=TRUE}
-  might be of interest if comparisons are to be made between the
-  results of the two packages.
+  might be of interest if comparisons are to be made between
+  results from the two packages.
   }
   \item{warn}{Logical scalar; should a warning be issued if \code{Rho}
   hasn't got relevant dimension names?  (Note that if this is so,
@@ -108,8 +108,7 @@ Owen Marshall.
 }
 
 \seealso{\code{\link{hmm}()}, \code{\link{rhmm}()},
-         \code{\link{mps}()}, \code{\link{pr}()},
-         \code{\link[HMM]{viterbi}()}}
+         \code{\link{mps}()}, \code{\link{pr}()}}
 \examples{
 # See the help for logLikHmm() for how to generate y.num and y.let.
 \dontrun{

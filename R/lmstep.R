@@ -20,7 +20,7 @@ repeat {
         }
 	theta.new <- theta - invhm%*%xxx$grad
 	yyy       <- try(get.gl(theta.new,K,y),TRUE)
-	if(class(yyy)=="try-error") {
+	if(inherits(yyy,"try-error")) {
 		steepit <- TRUE
 		break
 	}
